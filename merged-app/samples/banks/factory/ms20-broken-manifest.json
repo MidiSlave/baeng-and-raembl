@@ -1,0 +1,33 @@
+{
+  "name": "MS-20 Broken",
+  "description": "MS-20 synthesiser broken and distorted drum samples",
+  "type": "factory",
+  "samples": {
+    "36": "samples/banks/factory/ms20-broken/kick1.wav",
+    "37": "samples/banks/factory/ms20-broken/kick2.wav",
+    "38": "samples/banks/factory/ms20-broken/snare1.wav",
+    "39": "samples/banks/factory/ms20-broken/snare2.wav",
+    "40": "samples/banks/factory/ms20-broken/rim.wav",
+    "41": "samples/banks/factory/ms20-broken/kick3.wav",
+    "42": "samples/banks/factory/ms20-broken/clhat.wav",
+    "44": "samples/banks/factory/ms20-broken/clap.wav",
+    "45": "samples/banks/factory/ms20-broken/snare3.wav",
+    "46": "samples/banks/factory/ms20-broken/ophat.wav",
+    "47": "samples/banks/factory/ms20-broken/lotom.wav",
+    "48": "samples/banks/factory/ms20-broken/midtom.wav"
+  },
+  "mapping": {
+    "36": "Broken Kick 1",
+    "37": "Broken Kick 2",
+    "38": "Broken Snare 1",
+    "39": "Broken Snare 2",
+    "40": "Grain Punch",
+    "41": "Fat Distort",
+    "42": "Grit Smack 1",
+    "44": "Grit Smack 2",
+    "45": "Grain Punch 2",
+    "46": "Overdriven",
+    "47": "Fat Distort Tom",
+    "48": "Broken Tom"
+  }
+}

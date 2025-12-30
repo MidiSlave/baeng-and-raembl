@@ -1,0 +1,37 @@
+{
+  "name": "TR-727",
+  "description": "Roland TR-727 Latin percussion machine samples",
+  "type": "factory",
+  "samples": {
+    "36": "samples/banks/factory/tr-727/kick.wav",
+    "38": "samples/banks/factory/tr-727/snare.wav",
+    "40": "samples/banks/factory/tr-727/rim.wav",
+    "42": "samples/banks/factory/tr-727/clhat.wav",
+    "46": "samples/banks/factory/tr-727/whistle.wav",
+    "47": "samples/banks/factory/tr-727/lotom.wav",
+    "48": "samples/banks/factory/tr-727/midtom.wav",
+    "50": "samples/banks/factory/tr-727/hitom.wav",
+    "51": "samples/banks/factory/tr-727/agogolo.wav",
+    "52": "samples/banks/factory/tr-727/agogohi.wav",
+    "53": "samples/banks/factory/tr-727/bongolo.wav",
+    "54": "samples/banks/factory/tr-727/bongohi.wav",
+    "55": "samples/banks/factory/tr-727/chime.wav",
+    "56": "samples/banks/factory/tr-727/shaker.wav"
+  },
+  "mapping": {
+    "36": "Low Timbale",
+    "38": "High Timbale",
+    "40": "Quijada",
+    "42": "Cabasa",
+    "46": "Whistle",
+    "47": "Low Conga",
+    "48": "Mid Conga",
+    "50": "High Conga",
+    "51": "Low Agogo",
+    "52": "High Agogo",
+    "53": "Low Bongo",
+    "54": "High Bongo",
+    "55": "Star Chime",
+    "56": "Maracas"
+  }
+}

@@ -1,0 +1,14 @@
+Dutch composer & synthesist Danny Wolfers (Legowelt) & Dim Garden have released a new album, The Art Of DX7.
+
+Wolfers describes The Art Of DX7 album as a collection of “Synthesizer folks songs, full with nostalgia and yearning.” The album was made on a vintage Yamaha DX7.
+
+In addition to the album, Wolfers has released a free library of the sounds that he used on the album. If you have a DX7 or a synthesizer that can read the DX7’s patches, you can download the sounds used on the album in .syx format.
+
+You can also use them with Dexed, which can be used to preview and play the sounds, both as a standalone application and as a VST for your DAW.
+
+You can preview The Art Of DX7 below:
+
+https://www.youtube.com/watch?v=gNpN6jZp_VE&t=3s
+
+Bobby
+08/2025

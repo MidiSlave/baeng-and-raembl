@@ -1,0 +1,35 @@
+{
+  "name": "MS-20 Metals",
+  "description": "MS-20 synthesiser metallic and harmonic cymbal samples",
+  "type": "factory",
+  "samples": {
+    "36": "samples/banks/factory/ms20-metals/kick1.wav",
+    "37": "samples/banks/factory/ms20-metals/kick2.wav",
+    "38": "samples/banks/factory/ms20-metals/snare1.wav",
+    "39": "samples/banks/factory/ms20-metals/snare2.wav",
+    "40": "samples/banks/factory/ms20-metals/snare3.wav",
+    "42": "samples/banks/factory/ms20-metals/clhat.wav",
+    "51": "samples/banks/factory/ms20-metals/crash1.wav",
+    "52": "samples/banks/factory/ms20-metals/crash2.wav",
+    "53": "samples/banks/factory/ms20-metals/ride.wav",
+    "54": "samples/banks/factory/ms20-metals/perc1.wav",
+    "55": "samples/banks/factory/ms20-metals/perc2.wav",
+    "56": "samples/banks/factory/ms20-metals/perc3.wav",
+    "57": "samples/banks/factory/ms20-metals/perc4.wav"
+  },
+  "mapping": {
+    "36": "Metallic Tom 1",
+    "37": "Metallic Tom 2",
+    "38": "Metal Cymbal 1",
+    "39": "Metal Cymbal 2",
+    "40": "Metal Cymbal 3",
+    "42": "Bell Choke",
+    "51": "Metals 1",
+    "52": "Metals 2",
+    "53": "Metal Ride",
+    "54": "Metals Perc 1",
+    "55": "Metals Perc 2",
+    "56": "Harmony",
+    "57": "Harmony 1"
+  }
+}

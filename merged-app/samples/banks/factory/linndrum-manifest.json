@@ -1,0 +1,35 @@
+{
+  "name": "LinnDrum",
+  "description": "Linn LinnDrum drum machine samples",
+  "type": "factory",
+  "samples": {
+    "36": "samples/banks/factory/linndrum/kick.wav",
+    "38": "samples/banks/factory/linndrum/snare.wav",
+    "40": "samples/banks/factory/linndrum/rim.wav",
+    "42": "samples/banks/factory/linndrum/clhat.wav",
+    "44": "samples/banks/factory/linndrum/clap.wav",
+    "46": "samples/banks/factory/linndrum/ophat.wav",
+    "47": "samples/banks/factory/linndrum/lotom.wav",
+    "48": "samples/banks/factory/linndrum/midtom.wav",
+    "50": "samples/banks/factory/linndrum/hitom.wav",
+    "51": "samples/banks/factory/linndrum/crash.wav",
+    "53": "samples/banks/factory/linndrum/ride.wav",
+    "54": "samples/banks/factory/linndrum/cowbell.wav",
+    "56": "samples/banks/factory/linndrum/shaker.wav"
+  },
+  "mapping": {
+    "36": "Bass Drum",
+    "38": "Snare Drum",
+    "40": "Rim Shot",
+    "42": "Closed Hi-Hat",
+    "44": "Clap",
+    "46": "Open Hi-Hat",
+    "47": "Low Tom",
+    "48": "Mid Tom",
+    "50": "High Tom",
+    "51": "Crash Cymbal",
+    "53": "Ride Cymbal",
+    "54": "Cowbell",
+    "56": "Shaker"
+  }
+}

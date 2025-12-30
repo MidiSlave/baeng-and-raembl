@@ -1,0 +1,4862 @@
+/* File: baeng.css
+ * Bæng-specific styles - theme variables are in shared-base.css
+ */
+
+/* ===== BÆNG LAYOUT VARIABLES ===== */
+.baeng-app {
+    /* Header spacing - reduced from default 10px */
+    --header-margin-bottom: var(--space-xs);  /* 4px (halved from 10px) */
+
+    /* ===== MODULE ZONE HEIGHTS (for pixel-perfect alignment) ===== */
+    /* All modules have: header + vis zone + 2 knob rows */
+    --baeng-header-zone: 26px;      /* module-header-container min-height */
+    --baeng-vis-zone: 100px;        /* canvas/sequencer height - reduced to match compact voices step vis */
+    --baeng-vis-margin: 8px;        /* margin around vis zone (4px top + 4px bottom) */
+    --baeng-knob-row-height: 58px;  /* label + knob + value */
+    --baeng-knob-row-gap: 6px;      /* gap between knob rows */
+
+    /* Total module height = header(26+4mb) + vis(116+8m) + knob1(58) + gap(6) + knob2(58) + padding(20) - 6px bottom */
+    /* 30 + 124 + 58 + 6 + 58 + 20 - 6 = 290px */
+    --baeng-module-height: 290px;
+
+    /* Knob dimensions */
+    --baeng-knob-size: 34px;
+    --baeng-knob-container-width: 38px;
+    --baeng-knob-label-font: var(--font-2xs);
+    --baeng-knob-value-font: var(--font-xs);
+
+    /* Fader dimensions (RVB/DLY modules) */
+    --baeng-fader-height: 198px;
+    --baeng-fader-width: 14px;
+    --baeng-fader-label-height: 22px;
+    --baeng-fader-label-font: var(--font-sm);
+    --baeng-fader-value-font: var(--font-xs);
+    --baeng-fader-container-width: 32px;
+
+    /* Row gap */
+    --baeng-row-gap: 12px;
+}
+
+/* Bæng app-specific styles */
+
+.baeng-app .main-row {
+    display: flex;
+    flex-direction: row;
+    gap: var(--dynamic-module-gap);
+    margin-bottom: 0;
+    align-items: flex-start;  /* All modules align to top */
+    flex-wrap: nowrap;
+    justify-content: center;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+
+.baeng-app .module {
+    background-color: var(--bg-module);
+    border: 1px solid var(--theme-color);
+    padding: var(--module-padding);
+    border-radius: var(--module-radius);
+    color: var(--theme-color);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    height: var(--baeng-module-height);  /* Explicit height for all modules */
+}
+
+.baeng-app .module-header-container {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--header-margin-bottom);
+    padding-bottom: var(--header-padding-bottom);
+    height: var(--baeng-header-zone);
+    flex-shrink: 0;
+}
+
+.baeng-app .voice-patch-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.baeng-app .voice-patch-button {
+    background: none;
+    border: none;
+    color: var(--theme-color);
+    padding: 0;
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.1s ease, color 0.1s ease;
+}
+.baeng-app .voice-patch-button svg {
+    width: 14px;
+    height: 14px;
+}
+.baeng-app .voice-patch-button:hover {
+    transform: scale(1.1);
+    color: var(--theme-color-hover);
+}
+
+.baeng-app .flex-spacer { flex-grow: 1; min-width: 5px; } /* Pushes title to center if icons are on one side */
+
+.baeng-app .module-header {
+    text-align: center;
+    font-weight: bold;
+    font-size: var(--header-font-size);
+    flex-grow: 1;
+    margin: 0 5px;
+    white-space: nowrap;
+    position: relative;
+}
+
+/* Clickable engine header button */
+.baeng-app .engine-header-button {
+    background: none;
+    border: none;
+    color: currentColor; /* Inherit color properly */
+    font: inherit;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: background-color 0.15s ease, transform 0.1s ease;
+    text-align: center;
+    white-space: nowrap;
+    width: 100%; /* Fill the module-header container */
+    display: block; /* Ensure button fills container */
+}
+
+.baeng-app .engine-header-button:hover {
+    transform: scale(1.05);
+}
+
+.baeng-app .engine-header-button:active {
+    transform: scale(0.95);
+}
+
+.baeng-app .engine-header-button:focus {
+    outline: none; /* Remove focus outline */
+}
+
+/* Prevent modulation styling from applying to engine header */
+.baeng-app .module-header .engine-header-button.mod-editing {
+    background-color: transparent !important;
+    border: none !important;
+    color: currentColor !important;
+}
+
+.gradient-mode .baeng-app .module-header .engine-header-button.mod-editing {
+    background: none !important;
+    -webkit-text-fill-color: currentColor !important;
+    color: currentColor !important;
+}
+
+.baeng-app .randomize-button {
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+    color: var(--theme-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.1s ease, color 0.1s ease;
+}
+.baeng-app .randomize-button svg {
+    width: 14px;
+    height: 14px;
+}
+.baeng-app .randomize-button:hover {
+    transform: scale(1.1);
+    color: var(--theme-color-hover);
+}
+.baeng-app .randomize-button:hover svg rect {
+    fill: var(--theme-color);
+}
+.baeng-app .randomize-button:hover svg circle {
+    fill: var(--bg-module);
+}
+.baeng-app .randomize-button.rolling {
+    animation: diceRoll 0.2s ease-in-out;
+}
+
+@keyframes diceRoll {
+    .baeng-app 0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+    .baeng-app 25% { transform: rotateX(180deg) rotateY(180deg) rotateZ(90deg); }
+    .baeng-app 50% { transform: rotateX(360deg) rotateY(360deg) rotateZ(180deg); }
+    .baeng-app 75% { transform: rotateX(540deg) rotateY(540deg) rotateZ(270deg); }
+    .baeng-app 100% { transform: rotateX(720deg) rotateY(720deg) rotateZ(360deg); }
+}
+
+/* Polyphony button (M/P2/P3/P4) - for DX7 and SAMPLE engines */
+.baeng-app .polyphony-button {
+    width: 32px;
+    height: 22px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--theme-color);
+    color: var(--theme-color);
+    font-family: 'Roboto Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin-left: 8px;
+}
+
+.baeng-app .polyphony-button:hover {
+    background: rgba(var(--theme-color-rgb), 0.2);
+    transform: scale(1.05);
+}
+
+.baeng-app .polyphony-button.active {
+    background: var(--theme-color);
+    color: var(--bg-module);
+}
+
+.baeng-app .polyphony-button:active {
+    transform: scale(0.95);
+}
+
+/* Output mode button (OUT/AUX) - for Analog engines */
+.baeng-app .output-mode-button {
+    width: 36px;
+    height: 22px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--theme-color);
+    color: var(--theme-color);
+    font-family: 'Roboto Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin-left: 8px;
+}
+
+.baeng-app .output-mode-button:hover {
+    background: rgba(var(--theme-color-rgb), 0.2);
+    transform: scale(1.05);
+}
+
+.baeng-app .output-mode-button.active {
+    background: var(--theme-color);
+    color: var(--bg-module);
+}
+
+.baeng-app .output-mode-button:active {
+    transform: scale(0.95);
+}
+
+/* Edit mode and engine toggle styles */
+.edit-mode-toggle,
+.baeng-app .engine-toggle { 
+    display: flex; 
+    align-items: center; 
+    gap: 5px;
+}
+.baeng-app .edit-mode-toggle {
+    margin-left: auto;
+}
+.edit-mode-toggle .toggle-button,
+.baeng-app .engine-toggle .toggle-button {
+    height: 14px;
+    padding: 0 4px;
+    cursor: pointer;
+    border: 1px solid var(--theme-color);
+    background-color: var(--bg-button);
+    color: var(--theme-color);
+    border-radius: 2px;
+    font-size: 7px;
+    font-weight: bold;
+    line-height: 12px;
+    display: flex;
+    align-items: center;
+}
+.baeng-app .engine-toggle .toggle-button:first-child { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+.baeng-app .engine-toggle .toggle-button:last-child { border-top-left-radius: 0; border-bottom-left-radius: 0; border-left: none;}
+.baeng-app .engine-toggle .toggle-button.active { background-color: var(--theme-color); color: var(--bg-module); }
+
+/* Engine selector buttons */
+.baeng-app .engine-selector {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 6px;
+    justify-content: center;
+}
+
+.baeng-app .engine-button {
+    flex: 1;
+    padding: 3px 4px;
+    font-size: 8px;
+    font-weight: bold;
+    background-color: var(--bg-button);
+    color: var(--text-grey-2);
+    border: 1px solid var(--border-grey-2);
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-family: 'Courier New', monospace;
+    min-width: 0; /* Allow buttons to shrink */
+}
+
+.baeng-app .engine-button:hover {
+    background-color: var(--bg-button-hover);
+    border-color: var(--theme-color);
+    color: var(--text-white);
+}
+
+.baeng-app .engine-button.active {
+    background-color: var(--theme-color);
+    color: var(--bg-module);
+    border-color: var(--theme-color);
+}
+
+/* DX7 Bank Loader Button in Header */
+.baeng-app .dx7-load-button {
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    background-color: transparent;
+    color: var(--theme-color);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.1s ease, color 0.1s ease;
+    flex-shrink: 0;
+}
+
+.baeng-app .dx7-load-button svg {
+    width: 16px;
+    height: 16px;
+}
+
+.baeng-app .dx7-load-button:hover {
+    transform: scale(1.1);
+    color: var(--theme-color-hover);
+}
+
+/* ===== VISUALISATION ZONE ===== */
+/* All canvases/sequencers have identical height for alignment */
+.baeng-app #baeng-engine-oscilloscope,
+.baeng-app #baeng-reverb-canvas,
+.baeng-app #baeng-delay-canvas,
+.baeng-app #baeng-clouds-canvas,
+.baeng-app #bus-canvas {
+    height: var(--baeng-vis-zone);
+    margin: var(--space-xs) auto 2px auto;  /* Reduced bottom margin by 2px */
+    flex-shrink: 0;
+}
+
+.baeng-app .sequence-grid.stacked {
+    height: var(--baeng-vis-zone);
+    margin: 2px 0 var(--space-xs) 0;  /* Reduced top margin to shift up 2px */
+    flex-shrink: 0;
+}
+
+/* ENGINE Oscilloscope - matches knob row width exactly */
+/* 5 knobs × 38px + 4 gaps × 4px = 206px */
+.baeng-app #baeng-engine-oscilloscope {
+    display: block;
+    width: 206px;
+    max-width: calc(100% - 10px);
+    background-color: var(--bg-canvas);
+    border: 1px solid var(--border-grey-2);
+    border-radius: 2px;
+}
+
+.baeng-app .dx7-patch-name {
+    font-size: 7px;
+    text-align: center;
+    color: var(--text-grey-2);
+    padding: 2px 4px;
+    background-color: var(--bg-display);
+    border: 1px solid var(--border-grey-3);
+    border-radius: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 60px;
+    min-width: 50px;
+}
+
+.baeng-app .settings-gear {
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    padding: 1px;
+}
+.baeng-app .settings-gear svg { width: 14px; height: 14px; } /* Reduced size */
+.baeng-app .settings-gear:hover svg path, .baeng-app .settings-gear:hover svg circle { stroke: var(--theme-color-hover); } /* Lighter yellow hover */
+
+/* --- Module Specific Widths --- */
+.baeng-app #time { width: 80px; }
+.baeng-app #voices { width: 240px; }
+.baeng-app #baeng-engine { width: 240px; }
+.baeng-app #reverb-fx { width: 100px; }
+.baeng-app #delay-fx { width: 140px; }
+.baeng-app #bus { width: 230px; }
+
+/* TIME module: controls + display + BPM in vis zone, SWING/LENGTH as knob rows */
+.baeng-app #time .module-controls {
+    margin-bottom: 4px;
+    flex-shrink: 0;
+}
+.baeng-app #time .display-box {
+    margin-bottom: 4px;
+    flex-shrink: 0;
+}
+/* BPM knob - part of vis zone, not fixed height */
+.baeng-app #time .knob-section:first-of-type {
+    margin-top: 0;
+    height: auto;  /* Override fixed height - BPM is in vis zone */
+    flex-shrink: 0;
+}
+/* SWING and LENGTH align with other modules' bottom knobs */
+.baeng-app #time .knob-section:nth-of-type(2) {
+    margin-top: auto;  /* Push to align with other modules' first knob row */
+}
+.baeng-app #time .knob-section:nth-of-type(3) {
+    margin-top: var(--baeng-knob-row-gap);
+}
+
+/* Canvas visualizations for reverb and delay - match knob row widths */
+/* RVB: 2 knobs - visually tuned to 85px */
+.baeng-app #baeng-reverb-canvas {
+    display: block;
+    width: 80px;
+    max-width: calc(100% - 10px);
+    background-color: var(--bg-canvas);
+    border: 1px solid var(--border-grey-2);
+    border-radius: var(--radius-sm);
+}
+
+.baeng-app #baeng-delay-canvas {
+    display: block;
+    width: calc(100% - 10px);
+    background-color: var(--bg-canvas);
+    border: 1px solid var(--border-grey-2);
+    border-radius: var(--radius-sm);
+}
+
+
+.baeng-app .module-controls, .baeng-app .voice-buttons, .baeng-app .sequence-grid.compact, .baeng-app .display-box {
+    flex-shrink: 0;
+}
+.baeng-app .module-controls { display: flex; justify-content: space-around; align-items: center; margin-bottom: 6px; gap: 8px;}
+.baeng-app .module-controls.compact { justify-content: center; gap: 8px; margin-bottom: 6px; }
+.baeng-app .play-control { display: flex; align-items: center; }
+.baeng-app .play-button {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background-color: var(--bg-button);
+    border: 1px solid var(--theme-color);
+    color: var(--theme-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.1s ease, color 0.1s ease;
+    font-size: 14px;
+}
+.baeng-app .play-button.square {
+    border-radius: 3px;
+}
+.baeng-app .play-button.active { background-color: var(--theme-color); color: var(--bg-module); }
+.baeng-app .reset-controls { display: flex; flex-direction: row; align-items: center; gap: 4px; }
+.baeng-app .reset-controls.compact { flex-direction: column; align-items: center; gap: 0px; }
+.baeng-app .reset-label { font-size: 8px; color: var(--theme-color); opacity: 0.8; line-height: 10px; }
+.baeng-app .reset-buttons { display: flex; gap: 4px; }
+.baeng-app .toggle-button { /* General toggle button style, used by reset */
+    font-size: 9px; /* Increased size */
+    padding: 4px 8px; /* Adjusted padding */
+    cursor: pointer;
+    border: 1px solid var(--theme-color);
+    background-color: var(--bg-button);
+    color: var(--theme-color);
+    border-radius: 3px;
+    white-space: nowrap;
+    height: 22px; /* Adjusted height */
+    line-height: normal;
+}
+.baeng-app .toggle-button.square {
+    width: 32px;
+    height: 14px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    border-radius: 2px;
+}
+.baeng-app .toggle-button.active { background-color: var(--theme-color); color: var(--bg-module); }
+
+/* Delay SYNC toggle button */
+.baeng-app .delay-sync-toggle {
+    padding: 2px 4px;
+    font-size: 8px;
+    font-weight: bold;
+    background-color: var(--bg-button);
+    color: var(--theme-color);
+    border: 1px solid var(--theme-color);
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    height: 18px; /* Match other button heights */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.baeng-app .delay-sync-toggle.active {
+    background-color: var(--theme-color);
+    color: var(--bg-module);
+    border-color: var(--theme-color);
+}
+
+.baeng-app .delay-sync-toggle:hover {
+    background-color: var(--bg-button-hover);
+    color: var(--theme-color-hover);
+    border-color: var(--theme-color);
+}
+
+.baeng-app .display-box {
+    border: 1px solid var(--theme-color);
+    border-radius: 3px;
+    padding: 4px;
+    font-size: 12px;
+    width: 56px;
+    text-align: center;
+    min-height: 20px;
+    margin: 0 auto 4px auto;
+    background-color: var(--bg-display);
+}
+.baeng-app .display-box.compact {
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+}
+
+/* OLD voice buttons - DEPRECATED - keeping for backwards compatibility only */
+.baeng-app .voice-buttons { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-bottom: 12px; }
+.baeng-app .voice-button { /* Square voice buttons - OLD LAYOUT */
+    width: 32px; height: 32px; /* Square and slightly larger */
+    background-color: var(--bg-button);
+    border: 1px solid var(--theme-color);
+    color: var(--theme-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px; /* Larger number */
+    font-weight: bold;
+    position: relative;
+    transition: background-color 0.1s ease, color 0.1s ease;
+    border-radius: 3px; /* Consistent rounding */
+}
+.baeng-app .voice-button.active { background-color: var(--theme-color); color: var(--bg-module); }
+.baeng-app .voice-button:hover:not(.active) { background-color: var(--bg-button-hover); }
+
+.baeng-app .voice-trigger { /* Subtle indicator, flashes on trigger - OLD LAYOUT */
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background-color: transparent; /* Default: invisible */
+    border: 1px solid transparent;
+    position: absolute;
+    top: 3px; right: 3px; /* Adjusted position */
+    transition: background-color 0.05s ease-out, border-color 0.05s ease-out;
+}
+.baeng-app .voice-trigger.triggered {
+    background-color: var(--theme-color); /* Yellow flash color */
+    border-color: var(--theme-color);
+}
+
+/* OLD compact grid - keeping for backwards compatibility */
+.baeng-app .sequence-grid.compact {
+    display: grid;
+    grid-template-rows: repeat(1, auto);
+    grid-gap: 2px;
+    margin: 10px 0;
+    background-color: var(--bg-darker); /* Slightly lighter than module bg for contrast */
+    border: 1px solid var(--border-grey-1);
+    border-radius: 3px;
+    padding: 5px; /* Increased padding */
+}
+
+/* Stacked sequencer grid - shows all 6 voices */
+/* Height and margin set in unified vis zone rule above */
+.baeng-app .sequence-grid.stacked {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    justify-content: flex-start;
+}
+
+/* Each voice row contains selector button + sequence */
+.baeng-app .voice-row {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 0px;
+    background-color: var(--bg-module);
+    border-radius: 2px;
+}
+
+/* REMOVED: .voice-row:hover - prevents row from highlighting when hovering steps */
+/* Individual steps still highlight via .sequence-step:hover */
+
+/* REMOVED: .voice-row.selected styling - button inversion is sufficient */
+
+/* Voice selector shape icons - borderless */
+.baeng-app .voice-selector {
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    flex-shrink: 0;
+    background: transparent;
+    border: none;
+    color: var(--theme-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    padding: 0;
+    margin: 0;
+}
+
+/* Remove focus outline from voice selector (keyboard triggers) */
+.baeng-app .voice-selector:focus {
+    outline: none;
+}
+
+/* Voice shape icon styling */
+.baeng-app .voice-selector .voice-icon {
+    width: 12px;
+    height: 12px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linejoin: round;
+}
+
+.baeng-app .voice-selector.active {
+    color: var(--theme-color);
+}
+
+/* Active state - filled icon */
+.baeng-app .voice-selector.active .voice-icon {
+    fill: currentColor;
+}
+
+.baeng-app .voice-selector.playing {
+    transform: scale(1.15);
+}
+
+/* Playing state - icon glow (follows shape contour) */
+.baeng-app .voice-selector.playing .voice-icon {
+    filter: drop-shadow(0 0 4px var(--theme-color)) drop-shadow(0 0 8px var(--theme-color));
+}
+
+.baeng-app .voice-selector:hover:not(.active) {
+    color: var(--text-white);
+}
+
+.baeng-app .voice-selector.muted {
+    opacity: 0.5;
+    color: var(--text-grey-2);
+}
+
+/* Muted state - dotted outline */
+.baeng-app .voice-selector.muted .voice-icon {
+    stroke-dasharray: 2 2;
+    fill: none !important;
+}
+
+.baeng-app .voice-selector.muted.active {
+    opacity: 0.6;
+    color: var(--theme-color);
+}
+
+/* Sequence row in stacked view
+   Total width calculation (11px steps):
+   - 16 steps × 11px = 176px
+   - 15 gaps × 1.5px = 22.5px
+   - Total = 198.5px (fits in 206px available with 7.5px margin) ✓
+*/
+.baeng-app .voice-row .sequence-row {
+    display: flex;
+    gap: 1px;
+    flex: 1;
+    justify-content: flex-start;
+    transition: transform 0.08s ease-out; /* Animation for step movement */
+}
+
+/* Animation: steps slide left when sequencer advances */
+@keyframes slide-left {
+    .baeng-app 0% {
+        transform: translateX(0);
+    }
+    .baeng-app 100% {
+        transform: translateX(-12.5px); /* Negative of step width (11px) + gap (1.5px) */
+    }
+}
+
+.baeng-app .voice-row .sequence-row.animating {
+    animation: slide-left 0.08s ease-out forwards;
+}
+
+/* ============================================ */
+/* Step Container - Grid-based pattern system */
+/* ============================================ */
+
+.baeng-app .step-container {
+    width: 11px;
+    height: 9px;
+    display: grid;
+    /* Gap is set per-pattern to create separator effect */
+    /* Background color shows through gaps as separator */
+    background-color: var(--bg-module);
+    position: relative;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* Sub-step styling - individual boxes within container */
+.baeng-app .sub-step {
+    background-color: var(--bg-button);
+    border-radius: 1px;
+    transition: background-color 0.1s ease;
+}
+
+/* Active (gate ON) state */
+.baeng-app .step-container.gate .sub-step {
+    background-color: var(--theme-color);
+}
+
+/* Hover state - subtle highlight for off steps */
+.baeng-app .step-container:hover .sub-step:not(.gate) {
+    background-color: #333;
+}
+
+/* Active playhead state */
+.baeng-app .step-container.active .sub-step {
+    background-color: var(--step-active-bg);
+}
+
+.baeng-app .step-container.gate.active .sub-step {
+    background-color: var(--theme-color-hover);
+    box-shadow: 0 0 4px var(--theme-color-hover);
+}
+
+/* ============================================ */
+/* Pattern Layouts - R2 through R8 */
+/* ============================================ */
+
+/* No Accent - Single small box (centered, 50% size) */
+.baeng-app .step-container[data-pattern="no-accent"] {
+    display: grid;
+    place-items: center;
+    gap: 0;
+}
+.baeng-app .step-container[data-pattern="no-accent"] .sub-step {
+    width: 50%;
+    height: 50%;
+}
+
+/* Accent - Single large box (fills container) */
+.baeng-app .step-container[data-pattern="accent"] {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    gap: 0;
+}
+
+/* R2 - 2 boxes horizontal (1×2 grid) */
+.baeng-app .step-container[data-pattern="r2"] {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: 1fr;
+    gap: 1px;
+}
+
+/* R3 - 3 boxes in 2×2 grid (bottom row spans) */
+.baeng-app .step-container[data-pattern="r3"] {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 1px;
+}
+.baeng-app .step-container[data-pattern="r3"] .sub-step:nth-child(3) {
+    grid-column: 1 / -1;
+}
+
+/* R4 - 4 boxes (2×2 grid) */
+.baeng-app .step-container[data-pattern="r4"] {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 1px;
+}
+
+/* R5 - 5 boxes in 3×2 grid */
+.baeng-app .step-container[data-pattern="r5"] {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 1px;
+}
+
+/* R6 - 6 boxes (3×2 grid) */
+.baeng-app .step-container[data-pattern="r6"] {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 1px;
+}
+
+/* R7 - 7 boxes in 4×2 grid */
+.baeng-app .step-container[data-pattern="r7"] {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 1px;
+}
+
+/* R8 - 8 boxes (4×2 grid)
+   At 11px: (11px - 3×1px) / 4 cols = 2px wide per box ✓
+            (11px - 1×1px) / 2 rows = 5px tall per box ✓
+*/
+.baeng-app .step-container[data-pattern="r8"] {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 1px;
+}
+
+/* Flam - Small box (left, 33% width) + Large box (right, 67% width), bottom-aligned */
+.baeng-app .step-container[data-pattern="flam"] {
+    grid-template-columns: 1fr 2fr;
+    grid-template-rows: 1fr;
+    gap: 1px;
+    align-items: end;
+}
+.baeng-app .step-container[data-pattern="flam"] .small-flam {
+    height: 50%;
+    align-self: end;
+}
+.baeng-app .step-container[data-pattern="flam"] .large-flam {
+    height: 100%;
+}
+
+/* Deviation indicator - horizontal arrow overlay (hide on flam/ratchet patterns) */
+.baeng-app .step-container.deviated:not(.flam):not(.ratchet)::before {
+    content: '↔';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 6px;
+    color: var(--theme-color);
+    pointer-events: none;
+    z-index: 10;
+}
+
+.baeng-app .step-container.gate.deviated:not(.flam):not(.ratchet)::before {
+    color: var(--bg-module);
+}
+.baeng-app .engine-param-group, .baeng-app .voices-param-group {
+    margin-bottom: 10px; 
+    flex-grow: 1; /* Allow param groups to fill space if module is tall */
+}
+
+.baeng-app .sequence-row {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 1.5px; /* Spacing between step containers */
+    justify-content: center; /* Center steps horizontally */
+}
+/* OLD .sequence-step styles removed - replaced with .step-container system */
+
+/* Deviation source - visual indicator for step that deviated to another step */
+.baeng-app .step-container.deviation-source {
+    border: 1px solid rgba(255, 220, 50, 0.5);
+    box-shadow: inset 0 0 3px rgba(255, 220, 50, 0.3);
+}
+
+/* Probability visualization overlay for step containers */
+.baeng-app .step-container.gate::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, calc(1 - var(--probability, 100) / 100));
+    pointer-events: none;
+    z-index: 5;
+    border-radius: 1px;
+}
+
+/* Cursor styles for different edit modes */
+.baeng-app body.mode-ratchet .step-container { cursor: ns-resize; }
+.baeng-app body.mode-probability .step-container { cursor: ns-resize; }
+.baeng-app body.mode-deviation .step-container { cursor: ns-resize; }
+
+/* Fader components */
+.baeng-app .fader-section {
+    display: flex;
+    justify-content: flex-start;
+    gap: 4px; /* Smaller gap for better fit */
+    margin-top: 10px;
+    flex-wrap: nowrap; /* Keep faders in a single row */
+    width: 100%;
+}
+
+/* OUTPUT module fader alignment - push to bottom like knob-section */
+.baeng-app #output .fader-section {
+    margin-top: auto;
+}
+
+/* Engine module fader section - extra compact for 6 faders */
+.baeng-app #baeng-engine .fader-section {
+    gap: 2px;
+    margin-top: 6px;
+}
+
+.baeng-app #baeng-engine .fader-container {
+    width: 38px; /* Standard size for 5 knobs */
+}
+
+.baeng-app #baeng-engine .fader-label {
+    font-size: 8px; /* Standard label size */
+}
+
+/* Reverb and Delay modules - compact faders */
+#reverb-fx .fader-container,
+.baeng-app #delay-fx .fader-container {
+    width: 34px; /* Slightly narrower than default 38px */
+}
+
+#reverb-fx .fader-label,
+.baeng-app #delay-fx .fader-label {
+    font-size: 7px; /* Smaller labels */
+}
+
+/* ============================================ */
+/* Rotary Knob Components (for ENGINE module) */
+/* ============================================ */
+
+.baeng-app .knob-section {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    flex-wrap: nowrap;
+    width: 100%;
+    flex-shrink: 0;
+    height: var(--baeng-knob-row-height);  /* Fixed height for alignment */
+}
+
+/* Push FIRST knob section to bottom for alignment across all modules */
+.baeng-app .knob-section:first-of-type {
+    margin-top: auto;
+}
+
+/* Subsequent knob sections have consistent spacing */
+.baeng-app .knob-section:not(:first-of-type) {
+    margin-top: var(--baeng-knob-row-gap);
+}
+
+.baeng-app .knob-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 38px;
+    flex-shrink: 0;
+}
+
+.baeng-app .knob-label {
+    font-size: var(--baeng-knob-label-font);
+    margin-bottom: var(--space-2xs);
+    text-align: center;
+    color: var(--theme-color);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    font-weight: normal;
+    height: 10px;
+    line-height: 10px;
+    padding: 1px 2px;
+    box-sizing: border-box;
+    display: inline-block;
+}
+
+.baeng-app .knob {
+    width: var(--baeng-knob-size);
+    height: var(--baeng-knob-size);
+    border-radius: var(--radius-round);
+    background: var(--bg-button);
+    border: 1px solid var(--theme-color);
+    position: relative;
+    cursor: ns-resize;
+    touch-action: none;
+    user-select: none;
+}
+
+/* Knob indicator line (solid - shows base value) */
+.baeng-app .knob::before {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 12px;
+    background-color: var(--theme-color);
+    top: 3px;
+    left: 50%;
+    transform-origin: center 14px;
+    transform: translateX(-50%) rotate(var(--knob-rotation, -135deg));
+    border-radius: 1px;
+}
+
+/* Knob modulation indicator element (replaces ::after pseudo-element) */
+.baeng-app .knob-modulation-indicator {
+    position: absolute;
+    width: 2px;
+    height: 12px;
+    background: var(--theme-color);
+    top: 3px;
+    left: 50%;
+    transform-origin: center 14px;
+    transform: translateX(-50%) rotate(var(--knob-modulated-rotation, -135deg));
+    border-radius: 1px;
+    opacity: 0;
+    transition: opacity 0.1s ease;
+    pointer-events: none;
+    box-shadow: 0 0 3px rgba(255, 220, 50, 0.5);
+}
+
+/* Show indicator when modulation is active */
+.baeng-app .knob.modulated .knob-modulation-indicator {
+    opacity: 0.8;
+}
+
+/* Apply gradient to indicator in gradient mode */
+.gradient-mode .baeng-app .knob-modulation-indicator {
+    background: repeating-linear-gradient(
+        to bottom,
+        var(--theme-color-1) 0px,
+        var(--theme-color-1) 1px,
+        transparent 1px,
+        transparent 2px,
+        var(--theme-color-2) 2px,
+        var(--theme-color-2) 3px,
+        transparent 3px,
+        transparent 4px
+    );
+}
+
+/* Knob value display */
+.baeng-app .knob-value {
+    font-size: 8px;
+    margin-top: 3px;
+    height: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--theme-color);
+    background-color: var(--bg-display);
+    border-radius: 2px;
+    padding: 0 2px;
+    min-width: 20px;
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* Knob row grouping */
+.baeng-app .knob-row {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.baeng-app .knob-row-label {
+    font-size: 8px;
+    color: var(--text-grey);
+    text-align: center;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.baeng-app .fader-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: var(--baeng-fader-container-width);
+    margin-bottom: var(--space-md);
+    flex-shrink: 0;
+}
+.baeng-app .fader-label {
+    font-size: var(--baeng-fader-label-font);
+    margin-bottom: var(--space-xs);
+    height: var(--baeng-fader-label-height);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: var(--theme-color);
+    white-space: normal;
+    line-height: 1.1;
+    font-weight: normal;
+}
+.baeng-app .fader { position: relative; }
+.baeng-app .fader-track {
+    width: var(--baeng-fader-width);
+    height: var(--baeng-fader-height);
+    background-color: var(--bg-button);
+    position: relative;
+    border: 1px solid var(--theme-color);
+    border-radius: var(--radius-md);
+    cursor: ns-resize;
+    touch-action: none;
+    user-select: none;
+}
+.baeng-app .fader-fill {
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%;
+    background-color: var(--theme-color);
+    border-radius: 3px; /* Match track rounding */
+}
+
+/* Fader base value reference line (shows original value) */
+.baeng-app .fader-track .fader-base-line {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--theme-color);
+    opacity: 0.7;
+    z-index: 10;
+    pointer-events: none;
+    display: none; /* Hidden by default */
+}
+
+.baeng-app .fader-track.modulated .fader-base-line {
+    display: block; /* Show when modulation active */
+}
+
+/* Fader modulated value overlay (shows real-time modulated value) */
+.baeng-app .fader-track .fader-fill-modulated {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    background: rgba(255, 220, 50, 0.3);
+    border-top: 2px solid rgba(255, 220, 50, 0.8);
+    z-index: 5;
+    pointer-events: none;
+    display: none; /* Hidden by default */
+    box-shadow: 0 0 5px rgba(255, 220, 50, 0.3);
+}
+
+.baeng-app .fader-track.modulated .fader-fill-modulated {
+    display: block; /* Show when modulation active */
+}
+.baeng-app .fader-value {
+    font-size: 10px; /* Slightly larger */
+    margin-top: 4px; /* Increased space */
+    height: 16px; /* Increased height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--theme-color);
+    background-color: var(--bg-display); /* Darker bg for value */
+    border-radius: 2px;
+    padding: 0 3px;
+    min-width: 28px; /* Ensure some width for text */
+    white-space: nowrap;
+}
+
+/* Stepped Fader Notches */
+.baeng-app .fader-track.stepped { position: relative; } /* Needed for absolute positioning of notches */
+.baeng-app .fader-track.stepped .step-notch {
+    position: absolute;
+    left: -4px; /* Position outside the track */
+    width: 24px; /* Span wider than track */
+    height: 1px;
+    background-color: var(--border-grey-3); /* Dark notch color */
+    z-index: -1; /* Behind the fill */
+}
+
+/* Notches for 5 options (0-4, e.g., Waveform, Choke) */
+/* Values are 0, 1, 2, 3, 4. Notches are between steps. */
+/* So for 5 values, there are 4 notches. */
+/* Notch for value 1 (25% from bottom if 0 is bottom) */
+.baeng-app .fader-track.steps-5 .step-notch-0 { bottom: 20%; } 
+.baeng-app .fader-track.steps-5 .step-notch-1 { bottom: 40%; }
+.baeng-app .fader-track.steps-5 .step-notch-2 { bottom: 60%; }
+.baeng-app .fader-track.steps-5 .step-notch-3 { bottom: 80%; }
+
+/* Notches for 3 options (0-2, e.g., WG Type) */
+/* Values 0, 1, 2. Two notches. */
+.baeng-app .fader-track.steps-3 .step-notch-0 { bottom: 33.33%; }
+.baeng-app .fader-track.steps-3 .step-notch-1 { bottom: 66.66%; }
+
+
+/* Settings panel */
+.baeng-app .settings-panel {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 500px;
+    min-height: 300px;
+    background-color: var(--bg-settings); /* Darker panel bg */
+    border: 2px solid var(--theme-color);
+    border-radius: 8px;
+    box-shadow: 0 0 25px rgba(var(--theme-color-r), var(--theme-color-g), var(--theme-color-b), 0.2); /* Softer shadow */
+    z-index: 1000;
+    color: var(--theme-color);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+.baeng-app .settings-panel.hidden { display: none; }
+
+.baeng-app .settings-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--theme-color);
+    padding-bottom: 12px; /* Increased padding */
+    margin-bottom: 18px; /* Increased margin */
+}
+.baeng-app .settings-panel-header h2 { font-size: 20px; margin: 0; color: var(--theme-color); } /* Larger title */
+.baeng-app .close-button {
+    background: none !important;
+    background-color: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    color: var(--theme-color) !important;
+    font-size: 30px !important;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0 !important;
+    margin: 0 !important;
+    line-height: 1 !important;
+    transition: transform 0.2s ease;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+.baeng-app .close-button:hover {
+    color: var(--theme-color) !important;
+    transform: scale(1.2) !important;
+    background: none !important;
+    border: none !important;
+}
+.baeng-app .close-button:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+.baeng-app .close-button:active {
+    background: none !important;
+    border: none !important;
+}
+
+.baeng-app .settings-panel-content {
+    flex-grow: 1;
+    max-height: 70vh;
+    overflow-y: auto;
+    padding-right: 10px; /* Space for scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: var(--theme-color) var(--bg-settings-content);
+}
+.baeng-app .settings-panel-content::-webkit-scrollbar { width: 8px; }
+.baeng-app .settings-panel-content::-webkit-scrollbar-track { background: var(--bg-settings-content); border-radius: 4px; }
+.baeng-app .settings-panel-content::-webkit-scrollbar-thumb { background: var(--theme-color); border-radius: 4px; }
+.baeng-app .settings-panel-content::-webkit-scrollbar-thumb:hover { background: var(--theme-color-hover); }
+
+.baeng-app .settings-section {
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed var(--border-grey-1);
+}
+.baeng-app .settings-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+.baeng-app .settings-section h3 {
+    font-size: 15px;
+    margin-bottom: 6px;
+    color: var(--theme-color);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.baeng-app .settings-section p {
+    font-size: 12px;
+    color: var(--theme-color);
+    opacity:0.8;
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+.baeng-app .settings-section select, .baeng-app .settings-section .settings-button {
+    background-color: var(--bg-input);
+    color: var(--theme-color);
+    border: 1px solid var(--theme-color);
+    padding: 10px 14px;
+    border-radius: 4px;
+    width: 100%;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+    margin-bottom: 8px;
+    text-align: left;
+}
+.baeng-app .settings-section .settings-button { text-align: center; }
+
+/* Horizontal button row for Save/Load */
+.baeng-app .settings-button-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+.baeng-app .settings-button-row .settings-button {
+    flex: 1;
+    margin-bottom: 0;
+}
+@media (max-width: 480px) {
+    .baeng-app .settings-button-row {
+        flex-direction: column;
+    }
+    .baeng-app .settings-button-row .settings-button {
+        margin-bottom: 8px;
+    }
+    .baeng-app .settings-button-row .settings-button:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.baeng-app .settings-section select:hover, .baeng-app .settings-section .settings-button:hover {
+    background-color: var(--bg-input-hover);
+    border-color: var(--theme-color-hover);
+}
+.baeng-app .settings-section select:focus, .baeng-app .settings-section .settings-button:focus {
+    outline: none;
+    box-shadow: 0 0 6px rgba(var(--theme-color-r), var(--theme-color-g), var(--theme-color-b), 0.6); /* Stronger focus shadow */
+}
+.baeng-app .settings-section .settings-button:disabled {
+    background-color: var(--bg-button);
+    border-color: var(--border-grey-1);
+    color: var(--text-grey-5);
+    cursor: not-allowed;
+}
+
+/* FX Mode toggle buttons - active state */
+.baeng-app .settings-section .fx-mode-btn.active {
+    background-color: var(--theme-color);
+    color: var(--bg-module);
+    border-color: var(--theme-color);
+}
+.baeng-app .settings-section .fx-mode-btn.active:hover {
+    background-color: var(--theme-color-hover);
+    border-color: var(--theme-color-hover);
+}
+
+.baeng-app .settings-feedback {
+    font-size: 12px;
+    margin-top: 8px;
+    min-height: 18px;
+    color: var(--theme-color);
+    font-style: italic;
+}
+
+/* Checkbox styling for settings */
+.baeng-app .settings-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--theme-color);
+}
+.baeng-app .settings-checkbox input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--theme-color);
+    border-radius: 3px;
+    cursor: pointer;
+    position: relative;
+    background-color: transparent;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+.baeng-app .settings-checkbox input[type="checkbox"]:hover {
+    border-color: var(--theme-color-hover);
+}
+.baeng-app .settings-checkbox input[type="checkbox"]:checked {
+    background-color: var(--theme-color);
+    border-color: var(--theme-color);
+}
+.baeng-app .settings-checkbox input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 4px;
+    height: 8px;
+    border: solid var(--bg-settings-content);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+.baeng-app .settings-checkbox span {
+    user-select: none;
+}
+
+/* Scale/Root select row layout */
+.baeng-app .scale-select-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+.baeng-app .scale-select-column {
+    flex: 1;
+}
+.baeng-app .scale-select-column h4 {
+    margin-top: 0;
+}
+.baeng-app .scale-select-column select {
+    width: 100%;
+}
+@media (max-width: 480px) {
+    .baeng-app .scale-select-row {
+        flex-direction: column;
+    }
+}
+
+/* MIDI Mapping Specific Styles */
+.baeng-app .midi-mapping-controls {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end;
+    margin-bottom: 20px; padding: 10px; border: 1px solid var(--border-grey-2);
+    border-radius: 4px; background-color: var(--bg-settings-content);
+}
+.baeng-app .midi-mapping-form-item { display: flex; flex-direction: column; gap: 4px; }
+.baeng-app .midi-mapping-form-item label { font-size: 10px; color: var(--theme-color); opacity: 0.7; }
+.baeng-app .midi-mapping-form-item select, .baeng-app .midi-mapping-form-item input[type="number"] {
+    background-color: var(--bg-input); color: var(--theme-color); border: 1px solid var(--border-grey-1);
+    padding: 6px 8px; border-radius: 3px; font-size: 11px; width: 100%;
+}
+.midi-mapping-form-item input[type=number]::-webkit-inner-spin-button,
+.baeng-app .midi-mapping-form-item input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none; 
+  appearance: none; /* Standard property */
+  margin: 0;
+}
+.baeng-app .midi-mapping-form-item input[type=number] { 
+  -moz-appearance: textfield; /* Firefox */
+  appearance: textfield; /* Standard property */
+}
+.baeng-app .settings-button-small {
+    background-color: var(--bg-input); color: var(--theme-color); border: 1px solid var(--theme-color);
+    padding: 6px 10px; border-radius: 4px; font-size: 11px; cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s; height: 31px; line-height: normal;
+}
+.baeng-app .settings-button-small:hover { background-color: var(--bg-input-hover); border-color: var(--theme-color-hover); }
+.baeng-app .settings-button-small:disabled {
+    background-color: var(--bg-button); border-color: var(--border-grey-1); color: var(--text-grey-5); cursor: not-allowed;
+}
+.baeng-app #midi-mappings-list {
+    list-style: none; padding: 0; margin-top: 10px; max-height: 150px;
+    overflow-y: auto; border: 1px solid var(--border-grey-2); border-radius: 4px;
+    padding: 8px; background-color: var(--bg-settings-content);
+}
+.baeng-app #midi-mappings-list li {
+    font-size: 11px; color: var(--theme-color); opacity: 0.9; padding: 6px 0;
+    border-bottom: 1px dotted var(--border-grey-1); display: flex;
+    justify-content: space-between; align-items: center;
+}
+.baeng-app #midi-mappings-list li:last-child { border-bottom: none; }
+.baeng-app #midi-mappings-list li.no-mappings { color: var(--text-grey-4); font-style: italic; text-align: center; }
+.baeng-app #midi-mappings-list .mapping-details { flex-grow: 1; }
+.baeng-app #midi-mappings-list .mapping-param { font-weight: bold; color: var(--theme-color); }
+.baeng-app #midi-mappings-list .mapping-cc { color: var(--theme-color); opacity: 0.8; }
+.baeng-app #midi-mappings-list .mapping-channel, .baeng-app #midi-mappings-list .mapping-port {
+    color: var(--theme-color); opacity: 0.7; font-size: 10px; margin-left: 5px;
+}
+.baeng-app #midi-mappings-list .delete-mapping-btn {
+    background: none; border: 1px solid var(--theme-color); color: var(--theme-color);
+    font-size: 10px; font-weight: bold; cursor: pointer;
+    padding: 3px 6px; border-radius: 3px; margin-left: 10px;
+}
+.baeng-app #midi-mappings-list .delete-mapping-btn:hover { background-color: var(--theme-color); color: var(--bg-settings); }
+
+/* Theme Color Hue Fader */
+.baeng-app .theme-hue-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 0px;
+}
+
+.baeng-app .theme-hue-fader {
+    flex: 1;
+    height: 30px;
+    display: flex;
+    align-items: center;
+}
+
+.baeng-app .theme-hue-track {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right,
+        hsl(0, 100%, 60%),
+        hsl(30, 100%, 60%),
+        hsl(60, 100%, 60%),
+        hsl(90, 100%, 60%),
+        hsl(120, 100%, 60%),
+        hsl(150, 100%, 60%),
+        hsl(180, 100%, 60%),
+        hsl(210, 100%, 60%),
+        hsl(240, 100%, 60%),
+        hsl(270, 100%, 60%),
+        hsl(300, 100%, 60%),
+        hsl(330, 100%, 60%),
+        hsl(360, 100%, 60%)
+    );
+    border: 1px solid var(--border-grey-1);
+    border-radius: 4px;
+    position: relative;
+    cursor: pointer;
+}
+
+.baeng-app .theme-hue-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 3px 0 0 3px;
+    pointer-events: none;
+}
+
+.baeng-app .theme-hue-value {
+    font-size: 12px;
+    color: var(--theme-color);
+    min-width: 35px;
+    text-align: center;
+}
+
+/* Responsive adjustments */
+
+/* 2-row layout for medium screens */
+@media (max-width: 950px) {
+    .baeng-app .main-row {
+        flex-wrap: wrap;
+        justify-content: center;
+        max-width: 580px; /* Force wrapping after ~2 modules */
+        margin: 0 auto;
+    }
+
+    /* Row 1: VOICES, ENGINE */
+    .baeng-app #voices { order: 1; }
+    .baeng-app #baeng-engine { order: 2; }
+
+    /* Row 2: TIME, REVERB, DELAY, OUTPUT */
+    .baeng-app #time { order: 3; }
+    .baeng-app #reverb-fx { order: 4; }
+    .baeng-app #delay-fx { order: 5; }
+    .baeng-app #output { order: 6; }
+}
+
+@media (max-width: 768px) {
+    .baeng-app body { padding: 10px; }
+    .baeng-app #app { padding: 5px; }
+    .baeng-app h1 { font-size: 22px; margin-bottom: 15px;}
+    .baeng-app .main-row { gap: 8px; padding-bottom: 10px;}
+    .baeng-app .module { padding: 8px; }
+    .baeng-app .module-header-container { padding-bottom: 5px; margin-bottom: 10px; min-height: 20px;}
+    .baeng-app .module-header { font-size: 14px; }
+    .baeng-app .engine-toggle .toggle-button { font-size: 6px; padding: 0 3px; height: 12px; }
+
+    .baeng-app .fader-track { height: 120px; width: 14px; } /* Reduced from 150px for mobile */
+    .baeng-app .fader-label { height: 25px; font-size: 8px; }
+    .baeng-app .fader-value { font-size: 9px; height: 14px;}
+    .baeng-app .fader-container { width: 30px; margin-bottom: 8px;} /* Narrower fader units */
+    .baeng-app .fader-section { gap: 4px; }
+
+
+    /* Adjust module widths for smaller screens if they become too wide */
+    /* Example: make them a bit more flexible or reduce fixed widths */
+    .baeng-app #voices { width: 240px; } /* Slightly reduced for mobile */
+    .baeng-app #baeng-engine { width: 200px; } /* Proportionally reduced from 240px */
+    /* #waveguide-fx removed - not used */
+
+
+    .baeng-app .settings-panel { width: 95%; padding: 15px; }
+    .baeng-app .settings-panel-header h2 { font-size: 16px; }
+    .baeng-app .settings-section h3 { font-size: 13px; }
+    .baeng-app .settings-section p, .baeng-app .settings-section select, .baeng-app .settings-section .settings-button { font-size: 11px; }
+    
+    .baeng-app .midi-mapping-controls { flex-direction: column; align-items: stretch; }
+    .midi-mapping-form-item select, .midi-mapping-form-item input[type="number"],
+    .baeng-app .settings-button-small { width: 100%; }
+}
+
+@media (max-width: 480px) {
+    .baeng-app h1 { font-size: 20px; }
+    .baeng-app .play-button { width: 28px; height: 28px; font-size: 14px;}
+    .baeng-app .voice-button { width: 28px; height: 28px; font-size: 12px;}
+
+    /* Stacked sequencer adjustments for mobile */
+    .baeng-app .step-container { width: 12px; height: 10px; gap: 1px; }
+    .baeng-app .voice-selector { width: 14px; height: 14px; }
+    .baeng-app .voice-selector .voice-icon { width: 10px; height: 10px; }
+    .baeng-app .voice-row { gap: 2px; }
+    .baeng-app .voice-row .sequence-row { gap: 1px; }
+    .baeng-app .step-container.deviated::before { font-size: 6px; }
+
+    /* Further reduce module widths or allow them to stack if necessary */
+    /* This might require changing .main-row to flex-wrap: wrap at this breakpoint */
+}
+
+/* ===== PER-PARAMETER MODULATION STYLES ===== */
+
+/* Modulatable parameters - indicate clickable with cursor */
+.fader-label.modulatable,
+.baeng-app .knob-label.modulatable {
+    cursor: pointer;
+    position: relative;
+    padding: 2px 4px;
+    border-radius: 2px;
+    transition: all 0.15s ease;
+}
+
+/* Hover box with inverted colors */
+.fader-label.modulatable:hover,
+.baeng-app .knob-label.modulatable:hover {
+    background-color: var(--theme-color);
+    color: var(--bg-module);
+    /* Keep exact same padding/border as normal state */
+}
+
+/* Edit mode - inverted colors with border to distinguish from live modulation */
+/* CRITICAL: Must have IDENTICAL dimensions to normal state to prevent layout shift */
+.fader-label.mod-editing,
+.baeng-app .knob-label.mod-editing {
+    background-color: var(--theme-color) !important;
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+    font-weight: bold !important;
+    border: 1px solid #000000 !important;
+    /* Keep padding/sizing identical to normal .knob-label state */
+    padding: 1px 2px !important;
+    box-sizing: border-box !important;
+}
+
+/* Muted modulation - dimmed appearance */
+.fader-label.mod-muted,
+.baeng-app .knob-label.mod-muted {
+    opacity: 0.5;
+    color: var(--text-grey-4);
+}
+
+/* Dragging base value while modulation is active */
+/* Shows that user is adjusting the modulation centre point */
+.baeng-app .led-ring-knob.dragging-base {
+    /* Subtle glow instead of ugly dashed square */
+    filter: drop-shadow(0 0 3px var(--theme-color));
+}
+
+.fader-label.mod-muted:hover,
+.baeng-app .knob-label.mod-muted:hover {
+    opacity: 0.7;
+    color: var(--text-grey-3);
+}
+
+/* LED brightness effect for active modulation */
+/* The label brightness is controlled by --mod-intensity CSS variable set from JS */
+.fader-label.mod-active,
+.baeng-app .knob-label.mod-active {
+    color: var(--theme-color);
+    opacity: var(--mod-intensity, 1.0);
+    transition: opacity 0.05s linear;
+}
+
+/* Additional glow intensity variation via CSS variable (set from JS) */
+.fader-label.mod-active[style*="--mod-intensity"],
+.baeng-app .knob-label.mod-active[style*="--mod-intensity"] {
+    opacity: var(--mod-intensity, 1.0);
+}
+
+/* Modulated parameters in gradient mode - gradient text with opacity animation */
+.gradient-mode .baeng-app .fader-label.mod-active,
+.gradient-mode .baeng-app .knob-label.mod-active {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    opacity: var(--mod-intensity, 1.0);
+}
+
+/* Modulation indicator dot (optional - for future use) */
+.fader-label.mod-enabled::before,
+.baeng-app .knob-label.mod-enabled::before {
+    content: '●';
+    position: absolute;
+    left: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 6px;
+    color: var(--theme-color);
+    opacity: 0.6;
+}
+
+/* Control All visual feedback */
+body.control-all-active .fader-track,
+body.control-all-active .knob,
+body.control-all-active .led-ring-knob {
+    cursor: crosshair !important;
+}
+
+body.control-all-active .fader-track.control-all-dragging,
+body.control-all-active .knob.control-all-dragging {
+    box-shadow: 0 0 8px var(--theme-color);
+}
+
+body.control-all-active .fader-track::before,
+body.control-all-active .led-ring-knob.control-all-dragging::before {
+    content: '📡 CONTROL ALL VOICES';
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 16px;
+    background: var(--theme-color);
+    color: var(--bg-body);
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 12px;
+    z-index: 10000;
+    pointer-events: none;
+    animation: fadeIn 0.2s ease-in;
+}
+
+/* Control All message with gradient in gradient mode */
+body.control-all-active.gradient-mode .fader-track::before,
+body.control-all-active.gradient-mode .led-ring-knob.control-all-dragging::before {
+    background: var(--theme-gradient-h);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* ============================================
+   Gradient Mode Overrides
+   Apply gradients ONLY when .gradient-mode class is present on :root
+   ONLY to elements that use theme color for backgrounds/fills
+   ============================================ */
+
+/* Active buttons get horizontal gradient */
+.gradient-mode .baeng-app .engine-toggle .toggle-button.active {
+    background: var(--theme-gradient-h);
+}
+
+.gradient-mode .baeng-app .play-button.active {
+    background: var(--theme-gradient-h);
+}
+
+.gradient-mode .baeng-app .toggle-button.active {
+    background: var(--theme-gradient-h);
+}
+
+/* Inactive toggle buttons - gradient text */
+.gradient-mode .baeng-app .toggle-button:not(.active) {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
+.gradient-mode .baeng-app .voice-button.active {
+    background: var(--theme-gradient-h);
+}
+
+/* Output mode button (OUT/AUX) - gradient text and border */
+.gradient-mode .baeng-app .output-mode-button {
+    position: relative;
+    border-color: transparent;
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.gradient-mode .baeng-app .output-mode-button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: var(--theme-gradient-h);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+.gradient-mode .baeng-app .output-mode-button.aux-mode {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    -webkit-text-fill-color: var(--bg-module);
+    color: var(--bg-module);
+}
+
+/* Delay sync/free toggle button gradient border and text */
+.gradient-mode .baeng-app .delay-sync-toggle {
+    position: relative;
+    border-color: transparent;
+
+    /* Gradient text */
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.gradient-mode .baeng-app .delay-sync-toggle::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: var(--theme-gradient-h);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+/* Delay sync/free toggle button hover - fill with gradient, text becomes black */
+.gradient-mode .baeng-app .delay-sync-toggle:hover {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: border-box;
+    background-clip: border-box;
+    -webkit-text-fill-color: var(--bg-module);
+    color: var(--bg-module);
+}
+
+/* Active sequencer steps get horizontal gradient */
+.gradient-mode .baeng-app .step-container.gate .sub-step {
+    background: var(--theme-gradient-h);
+}
+
+/* Fader fills get vertical gradient */
+.gradient-mode .baeng-app .fader-fill {
+    background: var(--theme-gradient-v);
+}
+
+/* Knob indicators get vertical gradient */
+.gradient-mode .baeng-app .knob::before {
+    background: var(--theme-gradient-v);
+}
+
+/* Voice trigger flash */
+.gradient-mode .baeng-app .voice-trigger.flash {
+    background-color: transparent;
+    background: var(--theme-gradient-h);
+}
+
+/* Step active playhead */
+.gradient-mode .baeng-app .step-container.gate.active .sub-step {
+    background: var(--theme-gradient-h);
+}
+
+/* ============================================
+   Display Box Gradient Styling
+   ============================================ */
+
+.gradient-mode .baeng-app .display-box {
+    position: relative;
+    border-color: transparent;
+
+    /* Text gradient */
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.gradient-mode .baeng-app .display-box::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 3px;
+    padding: 1px;
+    background: var(--theme-gradient-h);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* ============================================
+   Gradient Borders Using Pseudo-Element Technique
+   This technique preserves border-radius unlike border-image
+   ============================================ */
+
+/* Module gradient borders */
+.gradient-mode .baeng-app .module {
+    position: relative;
+    border-color: transparent;
+}
+
+.gradient-mode .baeng-app .module::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 6px; /* Match module border-radius */
+    padding: 1px; /* Border width */
+    background: var(--theme-gradient-h);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Knob gradient borders */
+.gradient-mode .baeng-app .knob {
+    position: relative;
+    border-color: transparent;
+}
+
+.gradient-mode .baeng-app .knob::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%; /* Circular */
+    padding: 1px; /* Border width */
+    background: var(--theme-gradient-h);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+/* Fader track gradient borders */
+/* IMPORTANT: Use ::after instead of ::before because ::before is used for Control All message */
+.gradient-mode .baeng-app .fader-track {
+    position: relative;
+    border-color: transparent;
+}
+
+.gradient-mode .baeng-app .fader-track::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 3px; /* Match fader track border-radius */
+    padding: 1px; /* Border width */
+    background: var(--theme-gradient-h);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+/* Button gradient borders */
+.gradient-mode .baeng-app .toggle-button,
+.gradient-mode .baeng-app .play-button,
+.gradient-mode .baeng-app .voice-button {
+    position: relative;
+    border-color: transparent;
+}
+
+.gradient-mode .baeng-app .toggle-button::before,
+.gradient-mode .baeng-app .play-button::before,
+.gradient-mode .baeng-app .voice-button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px; /* Border width */
+    background: var(--theme-gradient-h);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+/* Settings panel gradient border */
+/* NOTE: Do NOT set position here - it overrides position:fixed and breaks the modal */
+.gradient-mode .baeng-app .settings-panel {
+    border-color: transparent;
+}
+
+.gradient-mode .baeng-app .settings-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 8px; /* Match settings panel border-radius */
+    padding: 2px; /* Border width */
+    background: var(--theme-gradient-h);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+/* ============================================
+   Gradient Text (Headers and Labels)
+   ============================================ */
+
+/* Header text gradient */
+.gradient-mode .baeng-app h1 {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Module header elements */
+.gradient-mode .baeng-app .module-header {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block; /* Required for background-clip to work */
+}
+
+/* Fix for engine header button in gradient mode */
+.gradient-mode .baeng-app .module-header .engine-header-button {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.gradient-mode .baeng-app .module-header .engine-header-button:hover {
+    /* Keep gradient text, just add subtle background */
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Labels - gradient text in normal state (not hover/editing) */
+.gradient-mode .baeng-app .knob-label:not(:hover):not(.mod-editing),
+.gradient-mode .baeng-app .fader-label:not(:hover):not(.mod-editing),
+.gradient-mode .baeng-app .module-label:not(:hover),
+.gradient-mode .baeng-app .reset-label:not(:hover) {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Knob value displays - gradient text */
+.gradient-mode .baeng-app .knob-value {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Fader value displays - gradient text */
+.gradient-mode .baeng-app .fader-value {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Apply gradient to hover/editing states for visual consistency */
+.gradient-mode .baeng-app .knob-label.modulatable:hover,
+.gradient-mode .baeng-app .fader-label.modulatable:hover,
+.gradient-mode .baeng-app .knob-label.mod-editing,
+.gradient-mode .baeng-app .fader-label.mod-editing {
+    background: var(--theme-gradient-h) !important;
+    -webkit-background-clip: border-box !important;
+    background-clip: border-box !important;
+    -webkit-text-fill-color: #000000 !important;
+    color: #000000 !important;
+}
+
+/* ============================================
+   Voice Selector Gradients
+   ============================================ */
+
+/* Voice selector shape icons - gradient mode uses theme colour (SVG doesn't support CSS gradients directly) */
+/* Icons inherit colour from parent, which uses --theme-color */
+
+
+/* ============================================
+   SVG Icon Gradients
+   ============================================ */
+
+/* Settings gear icon - gradient stroke */
+.gradient-mode .baeng-app .settings-gear svg path,
+.gradient-mode .baeng-app .settings-gear svg circle {
+    stroke: url(#gradient-stroke);
+}
+
+/* Play button text (triangle character) - gradient text when not active */
+.gradient-mode .baeng-app .play-button:not(.active) {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Randomize button gradient border */
+.gradient-mode .baeng-app .randomize-button {
+    position: relative;
+    border-radius: 3px;
+}
+
+.gradient-mode .baeng-app .randomize-button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 3px;
+    padding: 1px;
+    background: var(--theme-gradient-h);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+/* Randomize button icon - gradient stroke for rect, gradient fill for dots */
+.gradient-mode .baeng-app .randomize-button svg rect {
+    stroke: url(#gradient-stroke);
+}
+
+.gradient-mode .baeng-app .randomize-button svg circle {
+    fill: url(#gradient-fill);
+}
+
+/* Randomize button hover state in gradient mode - background fills with gradient, icons invert */
+.gradient-mode .baeng-app .randomize-button:hover {
+    background: var(--theme-gradient-h);
+}
+
+.gradient-mode .baeng-app .randomize-button:hover svg rect {
+    stroke: var(--bg-module);
+    fill: transparent;
+}
+
+.gradient-mode .baeng-app .randomize-button:hover svg circle {
+    fill: var(--bg-module);
+}
+
+/* Save/Load button gradient borders */
+.gradient-mode .baeng-app .voice-patch-button,
+.gradient-mode .baeng-app .dx7-load-button {
+    position: relative;
+}
+
+.gradient-mode .baeng-app .voice-patch-button::before,
+.gradient-mode .baeng-app .dx7-load-button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 3px;
+    padding: 1px;
+    background: var(--theme-gradient-h);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+/* Save/Load icons - gradient stroke, preserve fill="none" */
+.gradient-mode .baeng-app .voice-patch-button svg path,
+.gradient-mode .baeng-app .voice-patch-button svg polyline,
+.gradient-mode .baeng-app .dx7-load-button svg path,
+.gradient-mode .baeng-app .dx7-load-button svg polyline {
+    stroke: url(#gradient-stroke) !important;
+}
+
+/* Line elements - some browsers don't support url() gradients on line elements */
+/* Use midpoint color as fallback */
+.gradient-mode .baeng-app .voice-patch-button svg line,
+.gradient-mode .baeng-app .dx7-load-button svg line {
+    stroke: var(--theme-color) !important;
+}
+
+/* Don't override fill on SVG elements - let them keep their original fill attributes */
+
+/* Settings panel buttons - gradient borders and text */
+.gradient-mode .baeng-app .settings-button,
+.gradient-mode .baeng-app .settings-button-small {
+    position: relative;
+    border-color: transparent;
+}
+
+.gradient-mode .baeng-app .settings-button::before,
+.gradient-mode .baeng-app .settings-button-small::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 4px;
+    padding: 1px;
+    background: var(--theme-gradient-h);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+/* Gradient text colour for settings buttons */
+.gradient-mode .baeng-app .settings-button,
+.gradient-mode .baeng-app .settings-button-small {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Hover state - fill with gradient, text becomes dark */
+.gradient-mode .baeng-app .settings-button:hover,
+.gradient-mode .baeng-app .settings-button-small:hover {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: border-box;
+    background-clip: border-box;
+    -webkit-text-fill-color: var(--bg-module);
+    color: var(--bg-module);
+}
+
+/* FX Mode active state - fill with gradient */
+.gradient-mode .baeng-app .fx-mode-btn.active {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: border-box;
+    background-clip: border-box;
+    -webkit-text-fill-color: var(--bg-module);
+    color: var(--bg-module);
+}
+
+/* Disabled state - revert to greyscale */
+.gradient-mode .baeng-app .settings-button:disabled,
+.gradient-mode .baeng-app .settings-button-small:disabled {
+    background: var(--bg-button);
+    border-color: var(--border-grey-1);
+    -webkit-text-fill-color: var(--text-grey-5);
+    color: var(--text-grey-5);
+}
+
+.gradient-mode .baeng-app .settings-button:disabled::before,
+.gradient-mode .baeng-app .settings-button-small:disabled::before {
+    display: none;
+}
+
+/* Module icon gradients - use currentColor to inherit from parent */
+.gradient-mode .baeng-app .module-icon-container {
+    color: var(--theme-color);
+}
+
+/* ============================================
+   Gradient Mode UI Styles
+   ============================================ */
+
+.baeng-app .theme-color-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.baeng-app .theme-color-row .theme-hue-container {
+    flex: 1;
+}
+
+.baeng-app .theme-color-label {
+    font-size: 11px;
+    color: var(--theme-color);
+    min-width: 60px;
+}
+
+.baeng-app .gradient-preview-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.baeng-app .gradient-preview {
+    flex: 1;
+    height: 40px;
+    border-radius: 4px;
+    border: 1px solid var(--border-grey-1);
+    background: var(--theme-gradient-h);
+}
+
+.baeng-app .gradient-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.baeng-app .gradient-preset-btn {
+    padding: 6px 10px;
+    font-size: 10px;
+    background-color: var(--bg-input);
+    color: var(--theme-color);
+    border: 1px solid var(--theme-color);
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.baeng-app .gradient-preset-btn:hover {
+    background-color: var(--bg-input-hover);
+    transform: scale(1.05);
+}
+
+.baeng-app .gradient-preset-btn:active {
+    transform: scale(0.98);
+}
+
+/* ============================================
+   Engine Dropdown Component
+   ============================================ */
+
+/* Container */
+.baeng-app .engine-dropdown-container {
+    position: relative;
+    width: 100%;
+}
+
+/* Fixed-width text span to prevent button resizing when engine name changes */
+.baeng-app .dropdown-selected-text {
+    display: inline-block;
+    min-width: 42px;
+    width: 42px;
+    flex-shrink: 0;
+    text-align: center;
+}
+
+/* Dropdown Button (replaces .engine-header-button) */
+.baeng-app .engine-dropdown-button {
+    background: none;
+    border: none;
+    color: currentColor;
+    font: inherit;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: background-color 0.15s ease, transform 0.1s ease;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.baeng-app .engine-dropdown-button:hover {
+    transform: scale(1.05);
+}
+
+.baeng-app .engine-dropdown-button:active {
+    transform: scale(0.95);
+}
+
+.baeng-app .engine-dropdown-button:focus {
+    outline: none;
+}
+
+/* Dropdown Arrow Icon */
+.baeng-app .dropdown-arrow {
+    width: 10px;
+    height: 6px;
+    transition: transform 0.2s ease;
+}
+
+.baeng-app .engine-dropdown-button[aria-expanded="true"] .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+/* Dropdown Menu */
+.baeng-app .engine-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50%;
+    background-color: var(--bg-module);
+    border: 1px solid var(--theme-color);
+    border-radius: 4px;
+    z-index: 1000;
+    max-height: 300px;
+    overflow-y: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.baeng-app .engine-dropdown-menu.hidden {
+    display: none;
+}
+
+/* Dropdown Option */
+.baeng-app .dropdown-option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: none;
+    border: none;
+    color: var(--theme-color);
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+    width: 100%;
+    text-align: center;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    position: relative;
+}
+
+.baeng-app .dropdown-option:hover {
+    background-color: var(--theme-color);
+    color: var(--bg-module);
+}
+
+.baeng-app .dropdown-option:focus-visible {
+    outline: 2px solid var(--theme-color);
+    outline-offset: -2px;
+}
+
+.baeng-app .dropdown-option[aria-selected="true"] {
+    font-weight: bold;
+}
+
+.baeng-app .dropdown-option-text {
+    flex: 1;
+}
+
+/* Scrollbar styling for dropdown */
+.baeng-app .engine-dropdown-menu::-webkit-scrollbar {
+    width: 8px;
+}
+
+.baeng-app .engine-dropdown-menu::-webkit-scrollbar-track {
+    background: var(--bg-darker);
+    border-radius: 4px;
+}
+
+.baeng-app .engine-dropdown-menu::-webkit-scrollbar-thumb {
+    background: var(--theme-color);
+    border-radius: 4px;
+}
+
+/* Prevent modulation styling from applying to engine dropdown button */
+.baeng-app .module-header .engine-dropdown-button.mod-editing {
+    background-color: transparent !important;
+    border: none !important;
+    color: currentColor !important;
+}
+
+.gradient-mode .baeng-app .module-header .engine-dropdown-button.mod-editing {
+    background: none !important;
+    -webkit-text-fill-color: currentColor !important;
+    color: currentColor !important;
+}
+
+/* ============================================
+   Engine Dropdown - Gradient Mode Support
+   ============================================ */
+
+/* Dropdown button text gradient */
+.gradient-mode .baeng-app .engine-dropdown-button {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Dropdown arrow stroke gradient */
+.gradient-mode .baeng-app .dropdown-arrow path {
+    stroke: url(#gradient-stroke);
+}
+
+/* Dropdown menu border gradient */
+.gradient-mode .baeng-app .engine-dropdown-menu {
+    border-color: transparent;
+    background:
+        linear-gradient(var(--bg-module), var(--bg-module)) padding-box,
+        var(--theme-gradient-h) border-box;
+}
+
+/* Dropdown options gradient text */
+.gradient-mode .baeng-app .dropdown-option {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Hover state - inverted gradient background */
+.gradient-mode .baeng-app .dropdown-option:hover {
+    background: var(--theme-gradient-h) !important;
+    -webkit-background-clip: border-box !important;
+    background-clip: border-box !important;
+    -webkit-text-fill-color: var(--bg-module) !important;
+    color: var(--bg-module);
+}
+
+/* Scrollbar in gradient mode */
+.gradient-mode .baeng-app .engine-dropdown-menu::-webkit-scrollbar-thumb {
+    background: var(--theme-gradient-v);
+}
+/* ============================================
+   Slice Editor Modal
+   ============================================ */
+
+.baeng-app .slice-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 850px;
+    max-width: 95vw;
+    background-color: var(--bg-module);
+    border: 2px solid var(--theme-color);
+    border-radius: 6px;
+    box-shadow: 0 0 25px rgba(255, 220, 50, 0.3);
+    z-index: 1000;
+    display: none;
+}
+
+.baeng-app .slice-modal.active {
+    display: block;
+}
+
+.baeng-app .slice-modal .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--theme-color);
+    cursor: move;
+    user-select: none;
+}
+
+.baeng-app .slice-modal .modal-header h2 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--theme-color);
+    margin: 0;
+}
+
+/* Sample name display in header */
+.baeng-app .slice-modal .modal-header .header-sample-name {
+    font-size: 13px;
+    font-weight: normal;
+    color: var(--text-grey-2);
+    font-style: italic;
+    max-width: 400px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Config badge (checkmark when config exists) */
+.baeng-app .slice-modal .modal-header .header-config-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    background: var(--theme-color);
+    color: var(--bg-module);
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: help;
+}
+
+.baeng-app .slice-modal .modal-content {
+    padding: 20px;
+    max-height: 70vh;
+    overflow-y: auto;
+    /* Custom scrollbar */
+    scrollbar-color: var(--theme-color) var(--bg-module);
+}
+.baeng-app .slice-modal .modal-content::-webkit-scrollbar { width: 8px; }
+.baeng-app .slice-modal .modal-content::-webkit-scrollbar-track { background: var(--bg-module); border-radius: 4px; }
+.baeng-app .slice-modal .modal-content::-webkit-scrollbar-thumb { background: var(--theme-color); border-radius: 4px; }
+.baeng-app .slice-modal .modal-content::-webkit-scrollbar-thumb:hover { background: var(--theme-color-hover); }
+
+.baeng-app .slice-modal .modal-footer {
+    display: flex;
+    gap: 10px;
+    padding: 15px 20px;
+    border-top: 1px solid var(--border-grey-2);
+}
+
+/* Waveform Canvas */
+.baeng-app .waveform-container {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.baeng-app #slice-waveform {
+    width: 100%;
+    height: 200px;
+    border: 1px solid var(--border-grey-2);
+    border-radius: 2px;
+    background-color: var(--bg-canvas);
+    cursor: crosshair;
+    display: block;
+}
+
+.baeng-app .waveform-info {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 11px;
+    color: var(--text-grey-2);
+}
+
+/* Custom Scrollbar */
+.baeng-app .waveform-scrollbar-container {
+    margin-top: 12px;
+}
+
+.baeng-app .scrollbar-track {
+    width: 100%;
+    height: 20px;
+    background: var(--bg-darker);
+    border: 1px solid var(--border-grey-2);
+    border-radius: 2px;
+    position: relative;
+    cursor: pointer;
+}
+
+.baeng-app .scrollbar-thumb {
+    position: absolute;
+    height: 100%;
+    background: var(--theme-color);
+    border-radius: 2px;
+    cursor: grab;
+    min-width: 20px;
+}
+
+.baeng-app .scrollbar-thumb:hover {
+    background: var(--theme-color-hover);
+}
+
+.baeng-app .scrollbar-thumb:active {
+    cursor: grabbing;
+}
+
+/* Control Section */
+.baeng-app .slice-modal .control-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.baeng-app .slice-modal .control-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.baeng-app .slice-modal .control-label {
+    min-width: 100px;
+    font-size: 12px;
+    color: var(--text-grey-1);
+}
+
+.baeng-app .slice-modal input[type="range"] {
+    flex: 1;
+    height: 6px;
+    background: var(--bg-button);
+    border: 1px solid var(--border-grey-2);
+    border-radius: 3px;
+    outline: none;
+    -webkit-appearance: none;
+}
+
+.baeng-app .slice-modal input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--theme-color);
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+.baeng-app .slice-modal input[type="range"]::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: var(--theme-color);
+    cursor: pointer;
+    border-radius: 50%;
+    border: none;
+}
+
+.baeng-app .slice-modal .slider-value {
+    min-width: 40px;
+    text-align: right;
+    font-size: 12px;
+    color: var(--text-grey-2);
+    font-family: var(--font-mono);
+}
+
+/* Gradient mode slider styling */
+.gradient-mode .baeng-app .slice-modal input[type="range"] {
+    border-color: transparent;
+    position: relative;
+}
+
+.gradient-mode .baeng-app .slice-modal input[type="range"]::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 3px;
+    padding: 1px;
+    background: var(--theme-gradient-h);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+.gradient-mode .baeng-app .slice-modal input[type="range"]::-webkit-slider-thumb {
+    background: var(--theme-gradient-h);
+}
+
+.gradient-mode .baeng-app .slice-modal input[type="range"]::-moz-range-thumb {
+    background: var(--theme-gradient-h);
+}
+
+.baeng-app .slice-modal button {
+    padding: 8px 16px;
+    font-size: 13px;
+    background: var(--bg-button);
+    color: var(--text-primary);
+    border: 1px solid var(--border-grey-2);
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.baeng-app .slice-modal button:hover {
+    background: var(--theme-color);
+    color: var(--bg-module);
+    border-color: var(--theme-color);
+}
+
+.baeng-app .slice-modal button:active {
+    transform: translateY(1px);
+}
+
+/* Gradient Mode Support */
+.gradient-mode .baeng-app .slice-modal {
+    border-color: transparent;
+    background:
+        linear-gradient(var(--bg-module), var(--bg-module)) padding-box,
+        var(--theme-gradient-h) border-box;
+}
+
+.gradient-mode .baeng-app .slice-modal .modal-header h2 {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Gradient mode support for config badge */
+.gradient-mode .baeng-app .slice-modal .modal-header .header-config-badge {
+    background: var(--theme-gradient-h);
+}
+
+.gradient-mode .baeng-app .slice-modal button:hover {
+    background: var(--theme-gradient-h);
+    border-color: transparent;
+}
+
+/* Slice Edit Button (Scissors) */
+.baeng-app .slice-edit-button {
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    background: none;
+    border: none;
+    color: var(--theme-color);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.baeng-app .slice-edit-button svg {
+    width: 16px;
+    height: 16px;
+}
+
+.baeng-app .slice-edit-button:hover {
+    transform: scale(1.1);
+    color: var(--theme-color-hover);
+}
+
+.baeng-app .slice-edit-button:active {
+    transform: scale(0.95);
+}
+
+.gradient-mode .baeng-app .slice-edit-button {
+    position: relative;
+}
+
+.gradient-mode .baeng-app .slice-edit-button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 3px;
+    padding: 1px;
+    background: var(--theme-gradient-h);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+.gradient-mode .baeng-app .slice-edit-button svg path,
+.gradient-mode .baeng-app .slice-edit-button svg polyline {
+    stroke: url(#gradient-stroke) !important;
+}
+
+.gradient-mode .baeng-app .slice-edit-button svg line,
+.gradient-mode .baeng-app .slice-edit-button svg circle {
+    stroke: var(--theme-color) !important;
+}
+
+/* ============================================
+   Browser Modals (Sample & DX7)
+   ============================================ */
+
+/* Browser Modal Base Styling (inherits from slice-modal) */
+.baeng-app .browser-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    max-height: 80vh;
+    background: var(--bg-module);
+    border: 2px solid var(--theme-color);
+    border-radius: 4px;
+    box-shadow: 0 0 25px rgba(255, 220, 50, 0.3);
+    z-index: 1000;
+    display: none;
+}
+
+.baeng-app .browser-modal.active {
+    display: flex;
+    flex-direction: column;
+}
+
+.baeng-app .browser-modal .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--theme-color);
+    user-select: none;
+    flex-shrink: 0;
+    position: relative;
+    gap: 12px;
+}
+
+.baeng-app .browser-modal .modal-header h2 {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--theme-color);
+    margin: 0;
+    flex: 1;
+    text-align: center;
+}
+
+/* Ensure header buttons don't inherit generic button styles */
+.browser-modal .modal-header .favorites-filter-btn,
+.baeng-app .browser-modal .modal-header .close-button {
+    padding: 0 !important;
+    margin: 0 !important;
+    background: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+}
+
+.baeng-app .browser-modal-content {
+    padding: 15px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow: hidden;
+    flex: 1;
+}
+
+.baeng-app .browser-modal .modal-footer {
+    display: flex;
+    gap: 10px;
+    padding: 15px 20px;
+    border-top: 1px solid var(--border-grey-2);
+    flex-shrink: 0;
+}
+
+/* Search Container */
+.baeng-app .browser-search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.baeng-app .browser-search {
+    width: 100%;
+    padding: 10px 35px 10px 12px;
+    font-size: 14px;
+    background: var(--bg-button);
+    color: var(--text-primary);
+    border: 1px solid var(--border-grey-2);
+    border-radius: 3px;
+    outline: none;
+    font-family: var(--font-mono);
+}
+
+.baeng-app .browser-search:focus {
+    border-color: var(--theme-color);
+}
+
+.baeng-app .browser-search-icon {
+    position: absolute;
+    right: 12px;
+    pointer-events: none;
+    font-size: 14px;
+    opacity: 0.5;
+}
+
+/* Favorites Filter Button in Modal Header */
+.baeng-app .favorites-filter-btn {
+    background: none !important;
+    background-color: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    color: var(--theme-color) !important;
+    font-size: 28px !important;
+    cursor: pointer;
+    padding: 0 !important;
+    margin: 0 !important;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    opacity: 0.6;
+    flex-shrink: 0;
+    line-height: 1 !important;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.baeng-app .favorites-filter-btn:hover {
+    opacity: 1 !important;
+    transform: scale(1.3) !important;
+    background: none !important;
+    border: none !important;
+    color: var(--theme-color) !important;
+}
+
+.baeng-app .favorites-filter-btn:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.baeng-app .favorites-filter-btn:active {
+    background: none !important;
+    border: none !important;
+}
+
+.baeng-app .favorites-filter-btn.active {
+    opacity: 1;
+    color: var(--theme-color) !important;
+}
+
+/* Browser List */
+.baeng-app .browser-list {
+    flex: 1;
+    overflow-y: auto;
+    background: var(--bg-button);
+    border: 1px solid var(--border-grey-2);
+    border-radius: 3px;
+    min-height: 300px;
+    max-height: 400px;
+    /* Custom scrollbar */
+    scrollbar-color: var(--theme-color) var(--bg-button);
+}
+.baeng-app .browser-list::-webkit-scrollbar { width: 8px; }
+.baeng-app .browser-list::-webkit-scrollbar-track { background: var(--bg-button); border-radius: 4px; }
+.baeng-app .browser-list::-webkit-scrollbar-thumb { background: var(--theme-color); border-radius: 4px; }
+.baeng-app .browser-list::-webkit-scrollbar-thumb:hover { background: var(--theme-color-hover); }
+
+.baeng-app .browser-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-grey-1);
+    transition: background 0.1s ease;
+}
+
+.baeng-app .browser-list-item:last-child {
+    border-bottom: none;
+}
+
+.baeng-app .browser-list-item:hover {
+    background: rgba(255, 220, 50, 0.1);
+}
+
+.baeng-app .browser-list-item.selected {
+    background: var(--theme-color);
+    color: var(--bg-module);
+}
+
+.baeng-app .browser-item-name {
+    flex: 1;
+    font-size: 13px;
+    font-family: var(--font-mono);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.baeng-app .browser-item-size {
+    font-size: 11px;
+    color: var(--text-grey-2);
+    margin-left: 12px;
+    flex-shrink: 0;
+}
+
+.baeng-app .browser-list-item.selected .browser-item-size {
+    color: var(--bg-module);
+    opacity: 0.7;
+}
+
+/* Favorite Star Button */
+.baeng-app .favorite-star-button {
+    background: none !important;
+    background-color: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    color: var(--theme-color);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0 !important;
+    margin: 0 8px 0 0 !important;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    opacity: 0.7;
+    flex-shrink: 0;
+    line-height: 1;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.baeng-app .favorite-star-button:hover {
+    opacity: 1;
+    transform: scale(1.3);
+    background: none !important;
+    border: none !important;
+    color: var(--theme-color);
+}
+
+.baeng-app .favorite-star-button:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.baeng-app .favorite-star-button:active {
+    background: none !important;
+    border: none !important;
+}
+
+.baeng-app .browser-list-item.selected .favorite-star-button {
+    color: var(--bg-module);
+}
+
+/* Tuning Icon Button */
+.baeng-app .tuning-icon {
+    background: none !important;
+    background-color: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    cursor: pointer;
+    font-size: 14px;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    margin: 0 4px;
+    color: var(--text-dim);
+    opacity: 0.3;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.baeng-app .tuning-icon svg {
+    width: 14px;
+    height: 14px;
+}
+
+.baeng-app .tuning-icon:hover {
+    opacity: 1;
+    transform: scale(1.2);
+    background: none !important;
+    border: none !important;
+}
+
+.baeng-app .tuning-icon:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Tuning icon states */
+.baeng-app .tuning-icon.in-tune {
+    opacity: 0.6;
+    color: #4ade80; /* green - in tune, no correction needed */
+}
+
+.baeng-app .tuning-icon.active {
+    opacity: 1;
+    color: var(--theme-color); /* theme colour - correction active */
+}
+
+.baeng-app .tuning-icon.disabled {
+    opacity: 0.5;
+    color: #f59e0b; /* amber/orange - has correction but disabled */
+}
+
+.baeng-app .tuning-icon.detecting {
+    opacity: 1;
+    color: var(--theme-color);
+    animation: tuning-pulse 1s ease-in-out infinite;
+}
+
+@keyframes tuning-pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+.baeng-app .tuning-icon:hover.in-tune {
+    color: #22c55e;
+}
+
+.baeng-app .tuning-icon:hover.active {
+    color: var(--theme-color);
+}
+
+.baeng-app .tuning-icon:hover.disabled {
+    color: #d97706;
+}
+
+/* Selected item tuning icon */
+.baeng-app .browser-list-item.selected .tuning-icon {
+    color: var(--bg-module);
+}
+
+.baeng-app .browser-list-item.selected .tuning-icon.in-tune {
+    color: #166534; /* dark green for contrast */
+}
+
+.baeng-app .browser-list-item.selected .tuning-icon.disabled {
+    color: #92400e; /* dark amber for contrast */
+}
+
+/* Folder Items */
+.baeng-app .browser-folder-item {
+    display: flex;
+    align-items: center;
+}
+
+.baeng-app .browser-folder-icon {
+    margin-right: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.baeng-app .browser-folder-icon svg {
+    width: 16px;
+    height: 16px;
+    color: var(--theme-color);
+}
+
+/* Invert folder icon color when item is selected */
+.baeng-app .browser-list-item.selected .browser-folder-icon svg {
+    color: var(--bg-module);
+}
+
+/* Folder Expansion Icons */
+.baeng-app .expand-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+    cursor: pointer;
+    user-select: none;
+    flex-shrink: 0;
+    font-size: 10px;
+    color: var(--text-grey-2);
+    transition: color 0.15s ease;
+}
+
+.baeng-app .expand-icon:hover {
+    color: var(--theme-color);
+}
+
+.baeng-app .browser-list-item.selected .expand-icon {
+    color: var(--bg-module);
+}
+
+.baeng-app .browser-list-item.selected .expand-icon:hover {
+    color: var(--bg-module);
+    opacity: 0.8;
+}
+
+/* Folder Contents Container */
+.baeng-app .folder-contents {
+    margin-left: 20px;
+    border-left: 1px solid var(--border-color-2);
+    padding-left: 4px;
+}
+
+.baeng-app .browser-folder-container {
+    position: relative;
+}
+
+.baeng-app .nested-folder {
+    font-size: 12px;
+}
+
+/* Loading/Empty States */
+.browser-loading,
+.browser-empty,
+.baeng-app .browser-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    color: var(--text-grey-2);
+    font-size: 13px;
+}
+
+.baeng-app .browser-error {
+    flex-direction: column;
+    gap: 8px;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Info Bar */
+.baeng-app .browser-info {
+    font-size: 11px;
+    color: var(--text-grey-2);
+    padding: 8px 0 0 0;
+    text-align: center;
+}
+
+/* Breadcrumb Navigation */
+.baeng-app .browser-breadcrumb {
+    font-size: 12px;
+    color: var(--text-grey-2);
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-grey-1);
+    user-select: none;
+}
+
+.baeng-app .browser-breadcrumb .crumb {
+    cursor: pointer;
+    transition: color 0.1s ease;
+}
+
+.baeng-app .browser-breadcrumb .crumb:hover {
+    color: var(--theme-color);
+}
+
+.baeng-app .browser-breadcrumb .crumb.active {
+    color: var(--text-primary);
+    font-weight: bold;
+    cursor: default;
+}
+
+/* Patch Preview (DX7 Browser) */
+.baeng-app .patch-preview {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-grey-1);
+}
+
+.baeng-app .patch-preview h3 {
+    font-size: 13px;
+    color: var(--text-grey-1);
+    margin: 0 0 8px 0;
+}
+
+.baeng-app .patch-list {
+    max-height: 150px;
+    overflow-y: auto;
+    background: var(--bg-button);
+    border: 1px solid var(--border-grey-2);
+    border-radius: 3px;
+    /* Custom scrollbar */
+    scrollbar-color: var(--theme-color) var(--bg-button);
+}
+.baeng-app .patch-list::-webkit-scrollbar { width: 8px; }
+.baeng-app .patch-list::-webkit-scrollbar-track { background: var(--bg-button); border-radius: 4px; }
+.baeng-app .patch-list::-webkit-scrollbar-thumb { background: var(--theme-color); border-radius: 4px; }
+.baeng-app .patch-list::-webkit-scrollbar-thumb:hover { background: var(--theme-color-hover); }
+
+.baeng-app .patch-item {
+    display: flex;
+    gap: 12px;
+    padding: 6px 10px;
+    font-size: 12px;
+    border-bottom: 1px solid var(--border-grey-1);
+}
+
+.baeng-app .patch-item:last-child {
+    border-bottom: none;
+}
+
+.baeng-app .patch-number {
+    color: var(--text-grey-2);
+    font-family: var(--font-mono);
+    flex-shrink: 0;
+}
+
+.baeng-app .patch-name {
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+}
+
+/* Browser Buttons */
+.baeng-app .browser-modal button:not(.favorites-filter-btn):not(.close-button):not(.favorite-star-button):not(.tuning-icon) {
+    padding: 8px 16px;
+    font-size: 13px;
+    background: var(--bg-button);
+    color: var(--text-primary);
+    border: 1px solid var(--border-grey-2);
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.baeng-app .browser-modal button:hover:not(:disabled):not(.favorites-filter-btn):not(.close-button):not(.favorite-star-button):not(.tuning-icon) {
+    background: var(--theme-color);
+    color: var(--bg-module);
+    border-color: var(--theme-color);
+}
+
+.baeng-app .browser-modal button:active:not(:disabled):not(.favorites-filter-btn):not(.close-button):not(.favorite-star-button):not(.tuning-icon) {
+    transform: translateY(1px);
+}
+
+.baeng-app .browser-modal button:disabled:not(.favorites-filter-btn):not(.close-button):not(.favorite-star-button):not(.tuning-icon) {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Browse Buttons (Sample & DX7) */
+.sample-browse-button,
+.baeng-app .dx7-browse-button {
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    background: none;
+    border: none;
+    color: var(--theme-color);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.sample-browse-button svg,
+.baeng-app .dx7-browse-button svg {
+    width: 16px;
+    height: 16px;
+}
+
+.sample-browse-button:hover,
+.baeng-app .dx7-browse-button:hover {
+    transform: scale(1.1);
+    color: var(--theme-color-hover);
+}
+
+.sample-browse-button:active,
+.baeng-app .dx7-browse-button:active {
+    transform: scale(0.95);
+}
+
+/* Gradient Mode Support */
+.gradient-mode .baeng-app .browser-modal {
+    border-color: transparent;
+    background:
+        linear-gradient(var(--bg-module), var(--bg-module)) padding-box,
+        var(--theme-gradient-h) border-box;
+}
+
+.gradient-mode .baeng-app .browser-modal .modal-header h2 {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.gradient-mode .baeng-app .browser-modal button:hover:not(:disabled):not(.favorites-filter-btn):not(.close-button):not(.favorite-star-button):not(.tuning-icon) {
+    background: var(--theme-gradient-h);
+    border-color: transparent;
+}
+
+.gradient-mode .baeng-app .browser-list-item:hover {
+    background: linear-gradient(90deg,
+        rgba(255, 220, 50, 0.1) 0%,
+        rgba(50, 220, 255, 0.1) 100%);
+}
+
+.gradient-mode .baeng-app .browser-list-item.selected {
+    background: var(--theme-gradient-h);
+}
+
+.gradient-mode .baeng-app .browser-search:focus {
+    border-color: transparent;
+    box-shadow: 0 0 0 1px var(--theme-gradient-h);
+}
+
+.gradient-mode .sample-browse-button svg path,
+.gradient-mode .sample-browse-button svg circle,
+.gradient-mode .dx7-browse-button svg path,
+.gradient-mode .baeng-app .dx7-browse-button svg circle {
+    stroke: url(#gradient-stroke) !important;
+}
+
+/* Kit Browser Specific Styles */
+.baeng-app .kit-browser-split {
+    display: flex;
+    gap: 15px;
+    flex: 1;
+    min-height: 0;
+}
+
+.baeng-app .kit-list-container {
+    flex: 1;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+.baeng-app .kit-preview-panel {
+    flex: 1;
+    min-width: 250px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-grey-2);
+    border-radius: 4px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    /* Custom scrollbar */
+    scrollbar-color: var(--theme-color) var(--bg-panel);
+}
+
+.baeng-app .kit-preview-panel::-webkit-scrollbar {
+    width: 8px;
+}
+
+.baeng-app .kit-preview-panel::-webkit-scrollbar-track {
+    background: var(--bg-panel);
+    border-radius: 4px;
+}
+
+.baeng-app .kit-preview-panel::-webkit-scrollbar-thumb {
+    background: var(--theme-color);
+    border-radius: 4px;
+}
+
+.baeng-app .kit-preview-panel::-webkit-scrollbar-thumb:hover {
+    background: var(--theme-color-hover);
+}
+
+.baeng-app .kit-preview-panel h3 {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    color: var(--theme-color);
+    border-bottom: 1px solid var(--border-grey-2);
+    padding-bottom: 8px;
+}
+
+.baeng-app .kit-sample-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.baeng-app .kit-sample-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    background: var(--bg-module);
+    border: 1px solid var(--border-grey-2);
+    border-radius: 3px;
+    font-size: 13px;
+    transition: background 0.15s ease;
+}
+
+.baeng-app .kit-sample-item:hover {
+    background: var(--bg-button);
+}
+
+.baeng-app .kit-sample-item.playing {
+    background: var(--theme-color);
+    color: var(--bg-module);
+    border-color: var(--theme-color);
+}
+
+.baeng-app .sample-preview-btn {
+    width: 24px;
+    height: 24px;
+    padding: 0 !important;
+    background: transparent !important;
+    border: 1px solid currentColor !important;
+    border-radius: 50%;
+    color: var(--theme-color);
+    font-size: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+    margin: 0 !important;
+}
+
+.baeng-app .sample-preview-btn:hover {
+    background: var(--theme-color) !important;
+    color: var(--bg-module);
+}
+
+.baeng-app .kit-sample-item.playing .sample-preview-btn {
+    color: var(--bg-module);
+    border-color: var(--bg-module) !important;
+}
+
+.baeng-app .kit-sample-item.playing .sample-preview-btn:hover {
+    background: var(--bg-module) !important;
+    color: var(--theme-color);
+}
+
+.baeng-app .sample-name {
+    flex: 1;
+    font-weight: 500;
+}
+
+.baeng-app .sample-note {
+    font-size: 11px;
+    opacity: 0.6;
+}
+
+.baeng-app .kit-sample-item.playing .sample-note {
+    opacity: 0.8;
+}
+
+.baeng-app .kit-item-content {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex: 1;
+    min-width: 0;
+}
+
+.baeng-app .kit-item-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.baeng-app .kit-item-description {
+    font-size: 12px;
+    opacity: 0.7;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.baeng-app .browser-list-item.selected .kit-item-description {
+    opacity: 0.8;
+}
+
+.baeng-app .kit-item-count {
+    font-size: 11px;
+    padding: 2px 6px;
+    background: var(--bg-panel);
+    border-radius: 3px;
+    color: var(--theme-color);
+    flex-shrink: 0;
+}
+
+.baeng-app .browser-list-item.selected .kit-item-count {
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--bg-module);
+}
+
+/* Browse Buttons (Sample, DX7, Kit) */
+.baeng-app .sample-browse-button,
+.baeng-app .dx7-browse-button,
+.baeng-app .kit-browse-button {
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    background: none;
+    border: none;
+    color: var(--theme-color);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.baeng-app .sample-browse-button svg,
+.baeng-app .dx7-browse-button svg,
+.baeng-app .kit-browse-button svg {
+    width: 16px;
+    height: 16px;
+}
+
+.baeng-app .sample-browse-button:hover,
+.baeng-app .dx7-browse-button:hover,
+.baeng-app .kit-browse-button:hover {
+    transform: scale(1.1);
+    color: var(--theme-color-hover);
+}
+
+.baeng-app .sample-browse-button:active,
+.baeng-app .dx7-browse-button:active,
+.baeng-app .kit-browse-button:active {
+    transform: scale(0.95);
+}
+
+/* Gradient Mode Support for Kit Browse Button */
+.gradient-mode .baeng-app .kit-browse-button svg path,
+.gradient-mode .baeng-app .kit-browse-button svg circle {
+    stroke: url(#gradient-stroke) !important;
+}
+
+/* =========================
+   FAVORITES SYSTEM STYLES
+   ========================= */
+
+/* Favorites controls container */
+.baeng-app .favorites-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 0;
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--border-grey-2);
+}
+
+/* Favorites filter toggle button */
+.baeng-app .favorites-filter-toggle {
+    padding: 6px 12px;
+    background: var(--bg-button);
+    border: 1px solid var(--border-grey-2);
+    color: var(--theme-color);
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: background 0.15s ease, transform 0.1s ease;
+    font-family: inherit;
+}
+
+.baeng-app .favorites-filter-toggle:hover {
+    background: var(--bg-button-hover);
+    transform: translateY(-1px);
+}
+
+.baeng-app .favorites-filter-toggle:active {
+    transform: translateY(0);
+}
+
+.baeng-app .favorites-filter-toggle.active {
+    background: var(--theme-color);
+    color: var(--bg-module);
+    border-color: var(--theme-color);
+}
+
+/* Favorites count display */
+.baeng-app .favorites-count {
+    font-size: 11px;
+    color: var(--text-grey-2);
+    white-space: nowrap;
+}
+
+/* Sample browser config indicator */
+.baeng-app .browser-item-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.baeng-app .browser-config-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 18px;
+    padding: 0 6px;
+    background: var(--theme-color);
+    color: var(--bg-module);
+    border-radius: 9px;
+    font-size: 10px;
+    font-weight: bold;
+    cursor: help;
+}
+
+.baeng-app .browser-list-item:hover .browser-config-badge {
+    background: var(--theme-color-hover);
+}
+
+.baeng-app .browser-list-item.selected .browser-config-badge {
+    background: var(--bg-module);
+    color: var(--theme-color);
+}
+
+/* Playing indicator */
+.baeng-app .playing-indicator {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    margin-right: 4px;
+    color: var(--theme-color);
+    font-size: 10px;
+    flex-shrink: 0;
+}
+
+.baeng-app .browser-list-item.selected .playing-indicator {
+    color: var(--bg-module);
+}
+
+.baeng-app .browser-list-item.playing .playing-indicator {
+    animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    .baeng-app 0%, .baeng-app 100% {
+        opacity: 1;
+    }
+    .baeng-app 50% {
+        opacity: 0.4;
+    }
+}
+
+/* Gradient mode support for favorites */
+.gradient-mode .baeng-app .favorites-filter-toggle.active {
+    background: var(--theme-gradient-h);
+    color: var(--bg-module);
+}
+
+.gradient-mode .baeng-app .favorites-filter-btn {
+    color: transparent !important;
+    background: var(--theme-gradient-h) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+}
+
+.gradient-mode .baeng-app .favorites-filter-btn:hover {
+    color: transparent !important;
+    background: var(--theme-gradient-h) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+}
+
+.gradient-mode .baeng-app .favorite-star-button {
+    color: transparent;
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.gradient-mode .baeng-app .favorite-star-button:hover {
+    color: transparent;
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.gradient-mode .baeng-app .browser-list-item.selected .favorite-star-button {
+    color: var(--bg-module);
+    background: var(--bg-module);
+    -webkit-text-fill-color: var(--bg-module);
+}
+
+/* Gradient mode tuning icon */
+.gradient-mode .baeng-app .tuning-icon.active {
+    color: transparent;
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.gradient-mode .baeng-app .tuning-icon.active svg path,
+.gradient-mode .baeng-app .tuning-icon.active svg line {
+    stroke: url(#gradient-stroke) !important;
+}
+
+.gradient-mode .baeng-app .tuning-icon:hover.active {
+    color: transparent;
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.gradient-mode .baeng-app .browser-list-item.selected .tuning-icon {
+    color: var(--bg-module);
+    background: var(--bg-module);
+    -webkit-text-fill-color: var(--bg-module);
+}
+
+.gradient-mode .baeng-app .close-button {
+    color: var(--theme-color-1, var(--theme-color)) !important;
+    background: none !important;
+    -webkit-text-fill-color: var(--theme-color-1, var(--theme-color)) !important;
+}
+
+.gradient-mode .baeng-app .close-button:hover {
+    color: var(--theme-color-2, var(--theme-color)) !important;
+    background: none !important;
+    -webkit-text-fill-color: var(--theme-color-2, var(--theme-color)) !important;
+    transform: scale(1.2) !important;
+}
+
+.gradient-mode .baeng-app .browser-config-badge {
+    background: var(--theme-gradient-h);
+}
+
+.gradient-mode .baeng-app .browser-list-item.selected .browser-config-badge {
+    background: var(--bg-module);
+    color: transparent;
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+    .baeng-app .favorites-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .baeng-app .favorites-filter-toggle {
+        width: 100%;
+        text-align: center;
+    }
+
+    .baeng-app .favorites-count {
+        text-align: center;
+    }
+}
+
+/* ==========================================
+   Master Compressor Section (OUTPUT module)
+   ========================================== */
+
+/* BUS module canvas (waveform oscilloscope + boom meter) */
+/* Height and margin set in unified vis zone rule */
+.baeng-app #bus-canvas {
+    display: block;
+    width: calc(100% - 10px);
+    background: var(--bg-canvas);
+    border: 1px solid var(--border-grey-2);
+    border-radius: var(--radius-sm);
+}
+
+/* Disabled state for compressor knob sections */
+.baeng-app .knob-section.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+/* BUS module header toggle buttons (drive type, comp enable) */
+.baeng-app #bus .header-toggle {
+    padding: 2px 5px;
+    cursor: pointer;
+    border: 1px solid var(--theme-color);
+    background-color: var(--bg-button);
+    color: var(--theme-color);
+    border-radius: 2px;
+    font-size: 9px;
+    font-weight: bold;
+    font-family: inherit;
+    min-width: 32px;
+    text-align: center;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.baeng-app #bus .header-toggle:hover {
+    background: rgba(255, 220, 50, 0.2);
+}
+
+.baeng-app #bus .header-toggle.active {
+    background-color: var(--theme-color);
+    color: var(--bg-module);
+}
+
+/* Gradient mode bus toggles */
+.gradient-mode .baeng-app #bus .header-toggle.active {
+    background: var(--theme-gradient-h);
+    color: var(--bg-module);
+}
+
+/* BUS inactive toggle - gradient text */
+.gradient-mode .baeng-app #bus .header-toggle:not(.active) {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* BUS header toggle gradient borders */
+.gradient-mode .baeng-app #bus .header-toggle {
+    position: relative;
+    border-color: transparent;
+}
+
+.gradient-mode .baeng-app #bus .header-toggle::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: var(--theme-gradient-h);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+/* Voice selector polygon gradients */
+.gradient-mode .baeng-app .voice-selector {
+    color: transparent;
+}
+
+.gradient-mode .baeng-app .voice-selector .voice-icon {
+    stroke: url(#gradient-stroke);
+    fill: none;
+}
+
+.gradient-mode .baeng-app .voice-selector.active .voice-icon {
+    fill: url(#gradient-stroke);
+}
+
+/* SEQ reset button gradient */
+.gradient-mode .baeng-app .seq-reset:not(.active) {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* ==========================================
+   Sidechain Ducking Modal
+   ========================================== */
+
+.baeng-app .duck-btn {
+    width: 16px;
+    height: 16px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: opacity 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.baeng-app .duck-btn svg {
+    width: 14px;
+    height: 14px;
+    stroke: var(--theme-color);
+    fill: none;
+}
+
+/* Active state - filled duck when ducking enabled */
+.baeng-app .duck-btn.active svg {
+    fill: var(--theme-color);
+}
+
+[data-theme="light"] .baeng-app .duck-btn svg {
+    stroke: var(--theme-color);
+}
+
+#sidechain-modal {
+    position: fixed;
+    z-index: 10000;
+    background: var(--bg-module);
+    border: 1px solid var(--theme-color);
+    border-radius: 6px;
+    width: 280px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+#sidechain-modal.hidden {
+    display: none;
+}
+
+#sidechain-modal .modal-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: var(--bg-darker);
+    border-bottom: 1px solid var(--theme-color);
+    cursor: grab;
+    border-radius: 6px 6px 0 0;
+}
+
+#sidechain-modal .modal-header:active {
+    cursor: grabbing;
+}
+
+#sidechain-modal .modal-header .duck-icon {
+    width: 20px;
+    height: 20px;
+    fill: var(--theme-color);
+}
+
+#sidechain-modal #duck-modal-title {
+    flex: 1;
+    font-size: 11px;
+    font-weight: bold;
+    color: var(--theme-color);
+    text-transform: uppercase;
+}
+
+#sidechain-modal .close-btn {
+    background: transparent;
+    border: none;
+    color: var(--theme-color);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+}
+
+#sidechain-modal .close-btn:hover {
+    color: var(--theme-color-hover);
+}
+
+#sidechain-modal .modal-content {
+    padding: 12px;
+}
+
+/* Sidechain waveform visualiser */
+#sidechain-modal .duck-visualiser {
+    margin-bottom: 10px;
+    border: 1px solid var(--border-grey-2);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+#sidechain-modal #duck-waveform-canvas {
+    display: block;
+    width: 100%;
+    background: var(--bg-canvas, #1a1a1a);
+}
+
+#sidechain-modal .voice-checkboxes {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+    padding: 8px;
+    background: var(--bg-darker);
+    border-radius: 4px;
+}
+
+#sidechain-modal .voice-checkboxes label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 10px;
+    color: var(--theme-color);
+    cursor: pointer;
+}
+
+/* Custom checkbox styling - hide native checkbox */
+#sidechain-modal .voice-checkboxes input[type="checkbox"],
+#sidechain-modal .duck-enable-row input[type="checkbox"] {
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    box-sizing: border-box;
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    min-height: 16px;
+    border: 1px solid var(--theme-color) !important;
+    border-radius: 2px;
+    background: transparent !important;
+    cursor: pointer;
+    position: relative;
+    margin: 0 0 2px 0;
+    padding: 0;
+    vertical-align: middle;
+    flex-shrink: 0;
+    outline: none;
+}
+
+/* Checked state - show checkmark */
+#sidechain-modal .voice-checkboxes input[type="checkbox"]:checked,
+#sidechain-modal .duck-enable-row input[type="checkbox"]:checked {
+    background: var(--theme-color) !important;
+    border-color: var(--theme-color) !important;
+}
+
+#sidechain-modal .voice-checkboxes input[type="checkbox"]:checked::after,
+#sidechain-modal .duck-enable-row input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 5px;
+    height: 9px;
+    border: solid var(--bg-module);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* Hover state */
+#sidechain-modal .voice-checkboxes input[type="checkbox"]:hover,
+#sidechain-modal .duck-enable-row input[type="checkbox"]:hover {
+    border-color: var(--theme-color-hover, var(--theme-color));
+    box-shadow: 0 0 4px var(--theme-color);
+}
+
+/* Enable ducking row */
+#sidechain-modal .duck-enable-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--theme-color);
+    cursor: pointer;
+    margin-bottom: 8px;
+}
+
+#sidechain-modal .duck-params {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+}
+
+#sidechain-modal .duck-param {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#sidechain-modal .duck-param label {
+    font-size: 9px;
+    color: var(--theme-color);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+}
+
+#sidechain-modal .duck-param input[type="range"] {
+    width: 100%;
+    height: 6px;
+    background: var(--bg-button);
+    border: 1px solid var(--theme-color);
+    border-radius: 3px;
+    cursor: pointer;
+    -webkit-appearance: none;
+}
+
+#sidechain-modal .duck-param input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    background: var(--theme-color);
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+#sidechain-modal .duck-param input[type="range"]::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    background: var(--theme-color);
+    cursor: pointer;
+    border-radius: 50%;
+    border: none;
+}
+
+#sidechain-modal .duck-param .param-value {
+    font-size: 10px;
+    color: var(--theme-color);
+    margin-top: 2px;
+}
+
+/* Gradient mode sidechain modal */
+.gradient-mode #sidechain-modal {
+    border-color: transparent;
+    background:
+        linear-gradient(var(--bg-module), var(--bg-module)) padding-box,
+        var(--theme-gradient-h) border-box;
+}
+
+.gradient-mode #sidechain-modal .modal-header {
+    border-bottom-color: transparent;
+    background:
+        linear-gradient(var(--bg-darker), var(--bg-darker)) padding-box,
+        var(--theme-gradient-h) border-box;
+    border-bottom: 1px solid transparent;
+}
+
+.gradient-mode #sidechain-modal #duck-modal-title {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Gradient mode - duck icon */
+.gradient-mode #sidechain-modal .duck-icon {
+    fill: url(#gradient-fill);
+}
+
+/* Gradient mode - duck button icons (target path element) */
+.gradient-mode .baeng-app .duck-btn svg path {
+    stroke: url(#gradient-stroke) !important;
+}
+
+.gradient-mode .baeng-app .duck-btn.active svg path {
+    stroke: url(#gradient-stroke) !important;
+    fill: url(#gradient-fill) !important;
+}
+
+/* Gradient mode - labels and text */
+.gradient-mode #sidechain-modal .duck-enable-row,
+.gradient-mode #sidechain-modal .voice-checkboxes label,
+.gradient-mode #sidechain-modal .duck-param label,
+.gradient-mode #sidechain-modal .duck-param .param-value {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Gradient mode - checkboxes */
+.gradient-mode #sidechain-modal .voice-checkboxes input[type="checkbox"],
+.gradient-mode #sidechain-modal .duck-enable-row input[type="checkbox"] {
+    border-image: var(--theme-gradient-h) 1;
+}
+
+.gradient-mode #sidechain-modal .voice-checkboxes input[type="checkbox"]:checked,
+.gradient-mode #sidechain-modal .duck-enable-row input[type="checkbox"]:checked {
+    background: var(--theme-gradient-h);
+    border-image: none;
+}
+
+/* Gradient mode - sliders */
+.gradient-mode #sidechain-modal .duck-param input[type="range"] {
+    border-color: transparent;
+    background:
+        linear-gradient(var(--bg-button), var(--bg-button)) padding-box,
+        var(--theme-gradient-h) border-box;
+}
+
+.gradient-mode #sidechain-modal .duck-param input[type="range"]::-webkit-slider-thumb {
+    background: var(--theme-gradient-h);
+}
+
+.gradient-mode #sidechain-modal .duck-param input[type="range"]::-moz-range-thumb {
+    background: var(--theme-gradient-h);
+}
+
+/* Gradient mode - close button */
+.gradient-mode #sidechain-modal .close-btn {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* ============================================
+   Bæng Clouds FX Module
+   ============================================ */
+
+/* Clouds module header - random left, mode centre, buttons right */
+.baeng-app #baeng-clouds-fx .module-header-container {
+    justify-content: flex-start;
+    gap: var(--space-sm, 8px);
+}
+
+/* Randomise button stays left */
+.baeng-app #baeng-clouds-fx .randomize-button {
+    flex-shrink: 0;
+}
+
+/* Mode dropdown expands to push buttons right */
+.baeng-app #baeng-clouds-fx .clouds-mode-dropdown {
+    flex-grow: 1;
+}
+
+/* Prevent header buttons from shrinking */
+.baeng-app #baeng-clouds-fx .clouds-freeze-btn,
+.baeng-app #baeng-clouds-fx .clouds-sync-btn,
+.baeng-app #baeng-clouds-fx .clouds-quality-btn,
+.baeng-app #baeng-clouds-fx .duck-btn {
+    flex-shrink: 0;
+}
+
+/* Hidden state for FX mode toggling */
+.baeng-app #baeng-clouds-fx.hidden,
+.baeng-app #reverb-fx.hidden,
+.baeng-app #delay-fx.hidden {
+    display: none;
+}
+
+/* Clouds module canvas */
+.baeng-app #baeng-clouds-canvas {
+    display: block;
+    width: calc(100% - 10px);
+    background: var(--bg-canvas);
+    border: 1px solid var(--border-grey-2);
+    border-radius: var(--radius-sm);
+}
+
+/* Clouds mode dropdown */
+.baeng-app .clouds-mode-dropdown {
+    position: relative;
+}
+
+.baeng-app .clouds-mode-btn {
+    background: none;
+    border: none;
+    color: var(--theme-color);
+    font: inherit;
+    font-weight: bold;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    padding: 2px 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: transform 0.1s ease;
+}
+
+.baeng-app .clouds-mode-btn:hover {
+    transform: scale(1.05);
+}
+
+.baeng-app .clouds-mode-btn:active {
+    transform: scale(0.95);
+}
+
+.baeng-app .clouds-mode-btn:focus {
+    outline: none;
+}
+
+.baeng-app .clouds-mode-btn .dropdown-arrow {
+    width: 8px;
+    height: 6px;
+    transition: transform 0.2s ease;
+}
+
+.baeng-app .clouds-mode-btn[aria-expanded="true"] .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.baeng-app .clouds-mode-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 90px;
+    background: var(--bg-module);
+    border: 1px solid var(--theme-color);
+    border-radius: 4px;
+    padding: 4px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.baeng-app .clouds-mode-menu.hidden {
+    display: none;
+}
+
+.baeng-app .mode-option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 10px;
+    background: transparent;
+    border: none;
+    color: var(--theme-color);
+    font-size: 10px;
+    font-weight: normal;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.15s ease;
+}
+
+.baeng-app .mode-option:hover {
+    background-color: var(--theme-color);
+    color: var(--bg-module);
+}
+
+.baeng-app .mode-option.selected {
+    font-weight: bold;
+}
+
+/* Clouds quality button */
+.baeng-app .clouds-quality-btn {
+    width: auto;
+    min-width: 24px;
+    height: 18px;
+    padding: 0 4px;
+    border: 1px solid var(--theme-color);
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--theme-color);
+    border-radius: 2px;
+    transition: all 0.1s ease;
+    font-size: 8px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+.baeng-app .clouds-quality-btn:hover {
+    background-color: var(--theme-color);
+    color: var(--bg-module);
+}
+
+.baeng-app .clouds-quality-btn:active {
+    transform: scale(0.95);
+}
+
+/* Clouds freeze button */
+.baeng-app .clouds-freeze-btn {
+    width: 16px;
+    height: 16px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: transform 0.1s ease, stroke 0.2s ease;
+}
+
+.baeng-app .clouds-freeze-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.baeng-app .clouds-freeze-btn svg polyline,
+.baeng-app .clouds-freeze-btn svg polygon {
+    stroke: var(--theme-color);
+    fill: none;
+    transition: stroke 0.2s ease;
+}
+
+.baeng-app .clouds-freeze-btn:hover {
+    transform: scale(1.1);
+}
+
+.baeng-app .clouds-freeze-btn:hover svg polyline,
+.baeng-app .clouds-freeze-btn:hover svg polygon {
+    opacity: 0.8;
+}
+
+.baeng-app .clouds-freeze-btn.active svg polyline,
+.baeng-app .clouds-freeze-btn.active svg polygon {
+    stroke: #4fc3f7;
+}
+
+/* Gradient mode - Clouds module */
+.gradient-mode .baeng-app .clouds-mode-btn {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.gradient-mode .baeng-app .clouds-mode-btn .dropdown-arrow path {
+    stroke: url(#gradient-stroke);
+}
+
+.gradient-mode .baeng-app .clouds-mode-menu {
+    border-image: var(--theme-gradient-h) 1;
+}
+
+.gradient-mode .baeng-app .mode-option {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.gradient-mode .baeng-app .mode-option:hover {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: unset;
+    -webkit-text-fill-color: var(--bg-module);
+}
+
+.gradient-mode .baeng-app .clouds-quality-btn {
+    position: relative;
+    border-color: transparent;
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.gradient-mode .baeng-app .clouds-quality-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: var(--theme-gradient-h);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+.gradient-mode .baeng-app .clouds-freeze-btn svg polyline,
+.gradient-mode .baeng-app .clouds-freeze-btn svg polygon {
+    stroke: url(#gradient-stroke);
+}
+
+.gradient-mode .baeng-app .clouds-freeze-btn.active svg polyline,
+.gradient-mode .baeng-app .clouds-freeze-btn.active svg polygon {
+    stroke: url(#gradient-stroke);
+}
+
+/* Clouds clock sync button */
+.baeng-app .clouds-sync-btn {
+    width: 16px;
+    height: 16px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    opacity: 0.6;
+    transition: transform 0.1s ease, opacity 0.2s ease;
+    color: var(--theme-color);
+}
+
+.baeng-app .clouds-sync-btn svg {
+    width: 14px;
+    height: 14px;
+    stroke: var(--theme-color);
+}
+
+.baeng-app .clouds-sync-btn:hover {
+    transform: scale(1.1);
+    opacity: 0.8;
+}
+
+.baeng-app .clouds-sync-btn.active {
+    opacity: 1;
+}
+
+.baeng-app .clouds-sync-btn.active svg {
+    stroke: #4fc3f7;
+}
+
+.gradient-mode .baeng-app .clouds-sync-btn svg path {
+    stroke: url(#gradient-stroke);
+}
+
+.gradient-mode .baeng-app .clouds-sync-btn.active svg path {
+    stroke: url(#gradient-stroke);
+}
+
+/* ============================================
+   FX Mode Toggle Button (Classic / Clouds)
+   ============================================ */
+
+.baeng-app .fx-mode-button {
+    padding: 2px 6px;
+    cursor: pointer;
+    border: 1px solid var(--theme-color);
+    background-color: var(--bg-button);
+    color: var(--theme-color);
+    border-radius: 3px;
+    font-size: 9px;
+    font-weight: bold;
+    font-family: inherit;
+    min-width: 26px;
+    text-align: center;
+    transition: background-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+}
+
+.baeng-app .fx-mode-button:hover {
+    background: rgba(255, 220, 50, 0.2);
+    transform: scale(1.05);
+}
+
+.baeng-app .fx-mode-button:active {
+    transform: scale(0.95);
+}
+
+.baeng-app .fx-mode-button.active {
+    background-color: var(--theme-color);
+    color: var(--bg-module);
+}
+
+/* Gradient mode - FX mode button */
+.gradient-mode .baeng-app .fx-mode-button {
+    border-image: var(--theme-gradient-h) 1;
+    background: var(--gradient-theme);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.gradient-mode .baeng-app .fx-mode-button.active {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: unset;
+    -webkit-text-fill-color: var(--bg-module);
+}
+
+/* ============================================
+   Manual Modal Styles
+   ============================================ */
+
+.baeng-app #baeng-manual-modal {
+    max-width: 900px;
+    height: 80vh;
+    max-height: 80vh;
+}
+
+.baeng-app .manual-layout {
+    display: flex;
+    gap: 20px;
+    position: relative;
+    flex: 1;
+    min-height: 0; /* Critical for flex children to scroll */
+    overflow: hidden;
+}
+
+.baeng-app .sidebar-toggle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    background: var(--bg-button);
+    border: 1px solid var(--theme-color);
+    color: var(--theme-color);
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.baeng-app .sidebar-toggle:hover {
+    background: var(--bg-button-hover);
+    color: var(--text-white);
+}
+
+.baeng-app .manual-sidebar {
+    width: 200px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--border-grey-1);
+    padding-right: 15px;
+    padding-top: 35px;
+    font-size: 11px;
+    overflow-y: auto;
+    max-height: 100%;
+}
+
+.baeng-app .manual-sidebar.hidden {
+    display: none;
+}
+
+.baeng-app .manual-sidebar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.baeng-app .manual-sidebar > ul > li {
+    margin-bottom: 8px;
+}
+
+.baeng-app .manual-sidebar ul ul {
+    margin-left: 12px;
+    margin-top: 4px;
+}
+
+.baeng-app .manual-sidebar ul ul li {
+    margin-bottom: 4px;
+}
+
+.baeng-app .manual-sidebar a {
+    color: var(--theme-color);
+    text-decoration: none;
+    display: block;
+    padding: 2px 0;
+    transition: all 0.2s;
+    font-size: 11px;
+}
+
+.baeng-app .manual-sidebar a:hover {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.baeng-app .manual-sidebar a.active {
+    font-weight: bold;
+}
+
+.baeng-app #baeng-manual-modal .settings-panel-content {
+    overflow-y: hidden;
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 50px); /* Account for header */
+}
+
+.baeng-app .manual-main-content {
+    flex: 1;
+    min-height: 0; /* Critical for flex children to scroll */
+    padding-top: 35px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--theme-color);
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.baeng-app .manual-main-content h3 {
+    font-size: 16px;
+    margin-top: 0;
+    margin-bottom: 12px;
+    color: var(--theme-color);
+}
+
+.baeng-app .manual-main-content h4 {
+    font-size: 14px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    color: var(--theme-color);
+}
+
+.baeng-app .manual-main-content h5 {
+    font-size: 13px;
+    margin-top: 15px;
+    margin-bottom: 8px;
+    color: var(--theme-color);
+}
+
+.baeng-app .manual-main-content p {
+    margin: 0 0 8px 0;
+}

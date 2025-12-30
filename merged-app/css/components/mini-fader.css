@@ -1,0 +1,100 @@
+/* File: merged-app/css/components/mini-fader.css
+ * MiniFader Component Styles
+ * Minimal canvas-based horizontal fader with LED brightness fill
+ */
+
+/* ============================================
+   MINI FADER CONTAINER
+   ============================================ */
+.mini-fader-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.mini-fader-label {
+    font-size: 9px;
+    color: var(--theme-color);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    height: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* SVG icon labels */
+.mini-fader-label.waveform-icon {
+    height: 14px;
+}
+
+.mini-fader-label.waveform-icon svg {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
+}
+
+.mini-fader-value {
+    font-size: 8px;
+    color: var(--text-grey-1);
+    height: 10px;
+    min-width: 24px;
+    text-align: center;
+}
+
+/* ============================================
+   MINI FADER BODY
+   ============================================ */
+.mini-fader {
+    cursor: ew-resize;
+    touch-action: none;
+    user-select: none;
+}
+
+.mini-fader canvas {
+    display: block;
+}
+
+.mini-fader-container.dragging .mini-fader {
+    cursor: grabbing;
+}
+
+/* ============================================
+   MODULATION STATE
+   ============================================ */
+.mini-fader-container.modulated .mini-fader-label {
+    animation: mini-fader-pulse 1s ease-in-out infinite;
+}
+
+@keyframes mini-fader-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* ============================================
+   MODULATABLE LABEL (clickable for PPMod)
+   ============================================ */
+.mini-fader-label.modulatable {
+    cursor: pointer;
+}
+
+.mini-fader-label.modulatable:hover {
+    text-decoration: underline;
+}
+
+.mini-fader-label.mod-editing {
+    background-color: var(--theme-color);
+    color: var(--bg-module);
+    padding: 1px 3px;
+    border-radius: 2px;
+}
+
+.mini-fader-label.mod-active {
+    font-weight: bold;
+}
+
+.mini-fader-label.mod-muted {
+    opacity: 0.4;
+    text-decoration: line-through;
+}

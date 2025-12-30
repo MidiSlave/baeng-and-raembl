@@ -1,0 +1,35 @@
+{
+  "name": "HR-16B",
+  "description": "Alesis HR-16B drum machine samples",
+  "type": "factory",
+  "samples": {
+    "36": "samples/banks/factory/hr16b/kick.wav",
+    "38": "samples/banks/factory/hr16b/snare.wav",
+    "40": "samples/banks/factory/hr16b/rim.wav",
+    "42": "samples/banks/factory/hr16b/clhat.wav",
+    "44": "samples/banks/factory/hr16b/clap.wav",
+    "46": "samples/banks/factory/hr16b/ophat.wav",
+    "47": "samples/banks/factory/hr16b/lotom.wav",
+    "48": "samples/banks/factory/hr16b/midtom.wav",
+    "50": "samples/banks/factory/hr16b/hitom.wav",
+    "51": "samples/banks/factory/hr16b/crash.wav",
+    "53": "samples/banks/factory/hr16b/ride.wav",
+    "54": "samples/banks/factory/hr16b/tamb.wav",
+    "56": "samples/banks/factory/hr16b/shaker.wav"
+  },
+  "mapping": {
+    "36": "Bass Drum",
+    "38": "Snare Drum",
+    "40": "Sidestick",
+    "42": "Closed Hi-Hat",
+    "44": "Clap",
+    "46": "Open Hi-Hat",
+    "47": "Low Tom",
+    "48": "Mid Tom",
+    "50": "High Tom",
+    "51": "Crash Cymbal",
+    "53": "Ride Cymbal",
+    "54": "Tambourine",
+    "56": "Cabasa"
+  }
+}

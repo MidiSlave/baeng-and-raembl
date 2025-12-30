@@ -1,0 +1,13 @@
+/**
+ * iPad Landscape Styles
+ *
+ * Scaling is handled dynamically by js/shared/viewport-scale.js
+ * This file only contains touch-specific behaviour.
+ */
+
+/* Prevent double-tap zoom on touch devices */
+@media (hover: none) and (pointer: coarse) {
+    * {
+        touch-action: manipulation;
+    }
+}

@@ -1,0 +1,31 @@
+{
+  "name": "MS-20 Grain",
+  "description": "MS-20 synthesiser grainy and punchy drum samples",
+  "type": "factory",
+  "samples": {
+    "36": "samples/banks/factory/ms20-grain/kick1.wav",
+    "37": "samples/banks/factory/ms20-grain/kick2.wav",
+    "38": "samples/banks/factory/ms20-grain/snare1.wav",
+    "39": "samples/banks/factory/ms20-grain/snare2.wav",
+    "40": "samples/banks/factory/ms20-grain/rim.wav",
+    "41": "samples/banks/factory/ms20-grain/kick3.wav",
+    "42": "samples/banks/factory/ms20-grain/clhat.wav",
+    "44": "samples/banks/factory/ms20-grain/snare3.wav",
+    "46": "samples/banks/factory/ms20-grain/ophat.wav",
+    "54": "samples/banks/factory/ms20-grain/perc1.wav",
+    "56": "samples/banks/factory/ms20-grain/perc2.wav"
+  },
+  "mapping": {
+    "36": "Grain Punch 1",
+    "37": "Grain Punch 2",
+    "38": "Grain Swish",
+    "39": "Pulse 1",
+    "40": "Punch Smack",
+    "41": "Grain Punch 3",
+    "42": "Punch Short",
+    "44": "Pulse 2",
+    "46": "Punch Deep",
+    "54": "Grit Smack 1",
+    "56": "Grit Smack 2"
+  }
+}

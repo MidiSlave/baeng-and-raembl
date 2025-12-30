@@ -1,0 +1,24 @@
+# Development folders
+thoughts/
+backups/
+Individual-web-apps/
+tests/
+
+# Claude/editor files
+.claude/
+*.claude
+.DS_Store
+
+# Python tools (development only)
+*.py
+__pycache__/
+
+# Prototype files
+merged-app/clouds-prototype.html
+merged-app/test/
+
+# Adobe source files
+*.ai
+
+# Node modules (if any)
+node_modules/

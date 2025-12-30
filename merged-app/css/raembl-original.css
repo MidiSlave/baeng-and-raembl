@@ -1,0 +1,1462 @@
+/* File: style.css */
+
+:root {
+    /* Default (Dark) Theme */
+    --bg-body: #222222;
+    --bg-module: #111111;
+    --bg-canvas: #222222;
+    --bg-canvas-alt: #1C1C1A;
+    --bg-settings: #1e1e1e;
+    --bg-settings-content: #2a2a2a;
+    --bg-input: #2c2c2c;
+    --bg-input-hover: #383838;
+    --bg-button: #222222;
+    --bg-button-hover: #333333;
+
+    --border-grey-1: #444444;
+    --border-grey-2: #333333;
+    --border-grey-3: #555555;
+    --border-grey-4: #666666;
+
+    --text-white: #ffffff;
+    --text-grey-1: #cccccc;
+    --text-grey-2: #aaa;
+    --text-grey-3: #999;
+    --text-grey-4: #888;
+    --text-grey-5: #666666;
+
+    --grid-1: #333333;
+    --grid-2: #444444;
+    --grid-3: #555555;
+
+    /* Theme color (default yellow: hue 45°, sat 100%, light 60%) */
+    --theme-color: #FFDC32;
+    --theme-color-r: 255;
+    --theme-color-g: 220;
+    --theme-color-b: 50;
+
+    /* RGB components for bg-module (for color blending) */
+    --bg-module-r: 17;
+    --bg-module-g: 17;
+    --bg-module-b: 17;
+}
+
+[data-theme="light"] {
+    /* Inverted (Light) Theme */
+    --bg-body: #dddddd;
+    --bg-module: #eeeeee;
+    --bg-canvas: #dddddd;
+    --bg-canvas-alt: #e3e3e5;
+    --bg-settings: #e1e1e1;
+    --bg-settings-content: #d5d5d5;
+    --bg-input: #d3d3d3;
+    --bg-input-hover: #c7c7c7;
+    --bg-button: #dddddd;
+    --bg-button-hover: #cccccc;
+
+    --border-grey-1: #bbbbbb;
+    --border-grey-2: #cccccc;
+    --border-grey-3: #aaaaaa;
+    --border-grey-4: #999999;
+
+    --text-white: #000000;
+    --text-grey-1: #333333;
+    --text-grey-2: #555555;
+    --text-grey-3: #666666;
+    --text-grey-4: #777777;
+    --text-grey-5: #999999;
+
+    --grid-1: #cccccc;
+    --grid-2: #bbbbbb;
+    --grid-3: #aaaaaa;
+
+    /* RGB components for bg-module (for color blending) */
+    --bg-module-r: 238;
+    --bg-module-g: 238;
+    --bg-module-b: 238;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: monospace;
+}
+
+body {
+    background-color: var(--bg-body);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 1200px;
+}
+
+#title-canvas {
+    display: block;
+    margin: 0 auto 30px auto;
+    width: 300px;
+    height: 50px;
+}
+
+.top-row, .bottom-row {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: stretch;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.module {
+    background-color: var(--bg-module);
+    border: 1px solid var(--theme-color);
+    padding: 10px;
+    border-radius: 5px;
+    color: var(--theme-color);
+}
+
+.module-header-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--theme-color);
+    padding-bottom: 5px;
+}
+
+#clock .module-header-container {
+    margin-bottom: 8px;
+}
+
+.module > .module-header {
+    text-align: center;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--theme-color);
+    padding-bottom: 5px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.mod-rate-led {
+    display: block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--theme-color);
+    opacity: 0.3;
+    transition: opacity 0.05s linear;
+    position: absolute;
+    right: 0;
+}
+
+.viz-toggle-button {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    background-color: var(--bg-button);
+    border: 1px solid var(--theme-color);
+    color: var(--theme-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 8px;
+    transition: all 0.1s ease;
+    position: absolute;
+    right: 0;
+}
+
+.viz-toggle-button:hover {
+    background-color: var(--bg-button-hover);
+}
+
+.viz-toggle-button.active {
+    background-color: var(--theme-color);
+    color: var(--bg-module);
+}
+
+.module-header-container .module-header {
+    flex-grow: 1;
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.settings-gear {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    position: absolute;
+    right: 0;
+}
+
+.settings-gear svg {
+    width: 16px;
+    height: 16px;
+}
+
+.settings-gear svg path {
+    stroke: var(--theme-color) !important;
+    fill: none !important;
+}
+
+.settings-gear:hover svg path {
+    stroke: var(--bg-module) !important;
+    fill: var(--theme-color) !important;
+}
+
+/* Random button styles */
+.random-button {
+    width: 16px;
+    height: 16px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    position: absolute;
+    left: 0;
+    transition: transform 0.1s ease;
+}
+
+.random-button:hover {
+    transform: scale(1.1);
+}
+
+/* Random button SVG colors */
+.random-button svg rect {
+    stroke: var(--theme-color) !important;
+    fill: none !important;
+}
+
+.random-button svg circle {
+    fill: var(--theme-color) !important;
+}
+
+.random-button:hover svg rect {
+    stroke: var(--theme-color);
+    fill: var(--theme-color);
+}
+
+.random-button:hover svg circle {
+    fill: #111111;
+}
+
+.random-button.rolling {
+    animation: diceRoll 0.2s ease-in-out;
+}
+
+@keyframes diceRoll {
+    0% {
+        transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+    }
+    25% {
+        transform: rotateX(180deg) rotateY(180deg) rotateZ(90deg);
+    }
+    50% {
+        transform: rotateX(360deg) rotateY(360deg) rotateZ(180deg);
+    }
+    75% {
+        transform: rotateX(540deg) rotateY(540deg) rotateZ(270deg);
+    }
+    100% {
+        transform: rotateX(720deg) rotateY(720deg) rotateZ(360deg);
+    }
+}
+
+#clock {
+    width: 126px;
+}
+
+
+.play-button {
+    width: 30px;
+    height: auto;
+    padding: 7px 2px;
+    border-radius: 2px;
+    background-color: var(--bg-button);
+    border: 1px solid var(--theme-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+    font-size: 10px;
+}
+
+.play-button.active {
+    background-color: var(--theme-color);
+    color: var(--bg-module);
+}
+
+
+.toggle-button {
+    font-size: 8px;
+    padding: 3px 5px;
+    width: auto;
+    min-width: 35px;
+    cursor: pointer;
+    border: 1px solid var(--theme-color);
+    background-color: var(--bg-button);
+    color: var(--theme-color);
+    border-radius: 2px;
+    white-space: nowrap;
+    height: 20px;
+    line-height: normal;
+    vertical-align: middle;
+    position: relative;
+}
+
+.toggle-button.active {
+    background-color: var(--theme-color);
+    color: var(--bg-module);
+    border-color: var(--bg-module);
+}
+
+.display-box {
+    border: 1px solid var(--theme-color);
+    border-radius: 3px;
+    padding: 5px;
+    font-size: 10px;
+    width: 60px;
+    text-align: center;
+    min-height: 18px;
+    margin: 0 auto 10px auto;
+}
+
+.time-fader-section {
+    margin-top: -5px;
+}
+
+/* Time Controls - Grid Layout aligned with faders */
+.time-controls {
+    display: grid;
+    grid-template-columns: 30px 8px 30px 8px 30px;
+    margin-top: 11px;
+    margin-bottom: 10px;
+    height: 60px;
+    justify-content: center;
+}
+
+.play-display-column {
+    grid-column: 1 / 4; /* Spans BPM + gap + SWING columns */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.reset-column {
+    grid-column: 5; /* LENGTH column */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+}
+
+.time-controls .display-box {
+    width: 60px;
+    margin: 0;
+}
+
+.reset-column .toggle-button {
+    width: 100%;
+    min-width: unset;
+    height: auto;
+    padding: 4px 2px;
+    font-size: 7px;
+    line-height: 1.2;
+    text-align: center;
+    white-space: normal;
+}
+
+#factors {
+    width: 230px;
+}
+
+.factors-canvas {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    width: 210px;
+    height: 60px;
+    background-color: var(--bg-canvas);
+    border: 1px solid var(--border-grey-1);
+    border-radius: 3px;
+}
+
+.step {
+    width: 10px;
+    height: 10px;
+    background-color: var(--bg-button);
+    border: 1px solid var(--theme-color);
+    border-radius: 2px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 7px;
+    position: relative;
+    margin-bottom: 2px;
+}
+
+.step.active {
+    background-color: var(--theme-color);
+    color: var(--bg-module);
+    box-shadow: 0 0 5px var(--theme-color);
+}
+
+.step.gate {
+    background-color: var(--border-grey-1);
+}
+
+.step.accented {
+    border-width: 2px;
+}
+
+.step.slide::after {
+    content: '';
+    position: absolute;
+    right: -4px; 
+    top: 50%;    
+    transform: translateY(-50%);
+    width: 3px;  
+    height: 1.5px; 
+    background-color: var(--theme-color); 
+    border-radius: 1px; 
+    pointer-events: none; 
+}
+
+.step:not(.gate).slide::after {
+    display: none;
+}
+
+.step.active.slide::after {
+    background-color: #111111;
+}
+
+.step.trill {
+    /* Double chevron shape - both top and bottom angles point upward ^ */
+    clip-path: polygon(0% 40%, 50% 0%, 100% 40%, 100% 80%, 50% 60%, 0% 80%);
+    background-color: var(--theme-color); /* Yellow fill for trill */
+    border-radius: 0;
+}
+
+.step.active.trill {
+    background-color: var(--theme-color); /* Keep yellow when active */
+    box-shadow: 0 0 5px var(--theme-color);
+}
+
+.step.gate.trill {
+    background-color: var(--theme-color); /* Yellow fill overrides gate gray */
+}
+
+
+#lfo {
+    width: 160px;
+}
+
+#lfo-canvas {
+    width: 120px;
+    height: 60px;
+    background-color: var(--bg-canvas);
+    border: 1px solid var(--border-grey-1);
+    border-radius: 3px;
+    display: block;
+    margin: 15px auto;
+}
+
+#path {
+    width: 140px;
+}
+
+#path-canvas {
+    width: 120px;
+    height: 60px;
+    background-color: var(--bg-canvas);
+    border: 1px solid var(--border-grey-1);
+    border-radius: 3px;
+    display: block;
+    margin: 15px auto;
+}
+
+#reverb {
+    width: 210px;
+}
+
+#reverb-canvas {
+    width: 190px;
+    height: 60px;
+    background-color: var(--bg-canvas-alt);
+    border: 1px solid var(--border-grey-1);
+    border-radius: 3px;
+    display: block;
+    margin: 15px auto;
+}
+
+#delay {
+    width: 250px;
+}
+
+#delay-canvas {
+    width: 230px;
+    height: 60px;
+    background-color: var(--bg-canvas-alt);
+    border: 1px solid var(--border-grey-1);
+    border-radius: 3px;
+    display: block;
+    margin: 15px auto;
+}
+
+#mod {
+    width: 80px;
+}
+
+.wave-icons {
+    position: absolute;
+    left: -18px;
+    height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.wave-icon {
+    width: 18px;
+    height: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 9px;
+}
+
+.wave-icon.active {
+    color: var(--bg-module);
+    background-color: var(--theme-color);
+    border-radius: 3px;
+}
+
+#oscillator {
+    width: 350px;
+}
+
+.mode-switch {
+    width: 50px;
+    height: 14px;
+    background-color: var(--bg-button);
+    border: 1px solid var(--theme-color);
+    border-radius: 2px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.module-header-container .mode-switch {
+    position: absolute;
+    right: 0;
+}
+
+.mode-switch .switch-option {
+    width: 50%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--theme-color);
+    font-size: 7px;
+}
+
+.mode-switch .switch-option.active {
+    background-color: var(--theme-color);
+    color: var(--bg-module);
+}
+
+.fader-switch-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.switch {
+    width: 14px;
+    height: 60px;
+    background-color: var(--bg-button);
+    border: 1px solid var(--theme-color);
+    border-radius: 3px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-left: 8px;
+}
+
+.switch-option {
+    width: 100%;
+    height: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--theme-color);
+    font-size: 7px;
+}
+
+.switch-option.active {
+    background-color: var(--theme-color);
+    color: var(--bg-module);
+}
+
+#mixer {
+    width: 210px;
+}
+
+#filter {
+    width: 250px;
+}
+
+#envelope {
+    width: 170px;
+}
+
+#output {
+    width: 50px;
+}
+
+.fader-section {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 15px;
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+.fader-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 30px;
+}
+
+.fader-with-switch {
+    width: 50px;
+}
+
+.fader-label {
+    font-size: 10px;
+    margin-bottom: 5px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.fader {
+    position: relative;
+}
+
+.fader-track {
+    width: 16px;
+    height: 150px;
+    background-color: var(--bg-button);
+    position: relative;
+    border: 1px solid var(--theme-color);
+    border-radius: 3px;
+    cursor: pointer;
+    touch-action: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.fader-fill {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: var(--theme-color);
+}
+
+/* Hide solid fill when modulation is active */
+.fader-fill.modulation-active {
+    display: none;
+}
+
+/* Reference line showing base value when modulation is active */
+.fader-base-line {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--theme-color);
+    pointer-events: none;
+    transition: bottom 0.033s linear;
+    z-index: 3;
+    display: none;
+}
+
+.fader-base-line.active {
+    display: block;
+}
+
+.center-zero .zero-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: var(--theme-color);
+    top: 50%;
+}
+
+.fader-value {
+    font-size: 9px;
+    margin-top: 3px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* --- Per-Parameter Modulation Styles --- */
+
+/* Modulatable parameter labels */
+.fader-label.modulatable {
+    cursor: pointer;
+    position: relative;
+    padding: 2px 4px;
+    border-radius: 2px;
+}
+
+.fader-label.modulatable:hover {
+    background-color: var(--theme-color);
+    color: var(--bg-module);
+    border-radius: 2px;
+    padding: 2px 4px;
+}
+
+/* Make waveform icons black when hovered (on yellow background) */
+/* Waveform icon base colors */
+.fader-label.waveform-icon svg path,
+.fader-value.waveform-icon svg path {
+    stroke: var(--theme-color) !important;
+}
+
+.fader-label.waveform-icon svg circle,
+.fader-label.waveform-icon svg rect,
+.fader-value.waveform-icon svg circle,
+.fader-value.waveform-icon svg rect {
+    fill: var(--theme-color) !important;
+}
+
+.fader-label.modulatable.waveform-icon:hover svg path {
+    stroke: var(--bg-module) !important;
+}
+
+.fader-label.modulatable.waveform-icon:hover svg circle,
+.fader-label.modulatable.waveform-icon:hover svg rect {
+    fill: var(--bg-module) !important;
+}
+
+/* Brightness modulation for parameter labels - theme color to bg-module with automation */
+.fader-label.modulated {
+    color: rgb(
+        calc(var(--theme-color-r) * var(--led-opacity, 0.6) + var(--bg-module-r) * (1 - var(--led-opacity, 0.6))),
+        calc(var(--theme-color-g) * var(--led-opacity, 0.6) + var(--bg-module-g) * (1 - var(--led-opacity, 0.6))),
+        calc(var(--theme-color-b) * var(--led-opacity, 0.6) + var(--bg-module-b) * (1 - var(--led-opacity, 0.6)))
+    );
+    transition: color 0.05s linear;
+}
+
+/* Brightness modulation for SVG icon labels - theme color to bg-module */
+.fader-label.modulated.waveform-icon svg path,
+.fader-value.modulated.waveform-icon svg path {
+    stroke: rgb(
+        calc(var(--theme-color-r) * var(--led-opacity, 0.6) + var(--bg-module-r) * (1 - var(--led-opacity, 0.6))),
+        calc(var(--theme-color-g) * var(--led-opacity, 0.6) + var(--bg-module-g) * (1 - var(--led-opacity, 0.6))),
+        calc(var(--theme-color-b) * var(--led-opacity, 0.6) + var(--bg-module-b) * (1 - var(--led-opacity, 0.6)))
+    ) !important;
+    transition: stroke 0.05s linear;
+}
+
+/* Brightness modulation for noise waveform dots (uses fill) */
+.fader-label.modulated.waveform-icon svg circle,
+.fader-label.modulated.waveform-icon svg rect,
+.fader-value.modulated.waveform-icon svg circle,
+.fader-value.modulated.waveform-icon svg rect {
+    fill: rgb(
+        calc(var(--theme-color-r) * var(--led-opacity, 0.6) + var(--bg-module-r) * (1 - var(--led-opacity, 0.6))),
+        calc(var(--theme-color-g) * var(--led-opacity, 0.6) + var(--bg-module-g) * (1 - var(--led-opacity, 0.6))),
+        calc(var(--theme-color-b) * var(--led-opacity, 0.6) + var(--bg-module-b) * (1 - var(--led-opacity, 0.6)))
+    ) !important;
+    transition: fill 0.05s linear;
+}
+
+/* Modulation overlay showing modulated value */
+.fader-fill-modulated {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    background: rgba(var(--theme-color-r), var(--theme-color-g), var(--theme-color-b), 0.35);
+    pointer-events: none;
+    transition: height 0.033s linear, bottom 0.033s linear;
+    z-index: 2;
+}
+
+/* Vertical modulation text inside fader - container for layered approach */
+.fader-modulation-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-90deg);
+    font-size: 9px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    pointer-events: none;
+    z-index: 3;
+    white-space: nowrap;
+    width: 150px; /* Match fader height */
+    height: 16px;
+    text-align: center;
+}
+
+/* Yellow text layer (visible above fill) */
+.fader-modulation-text::before {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    color: var(--theme-color);
+    clip-path: var(--yellow-clip, inset(0 0 0 50%));
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Black text layer (visible in fill) */
+.fader-modulation-text::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    color: var(--bg-body);
+    clip-path: var(--black-clip, inset(0 50% 0 0));
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Muted modulation - grayed out appearance */
+.fader-label.muted,
+.fader-value.muted {
+    color: var(--text-grey-5);
+    opacity: 0.5;
+}
+
+.fader-label.muted.waveform-icon svg path,
+.fader-value.muted.waveform-icon svg path {
+    stroke: var(--text-grey-5);
+    opacity: 0.5;
+}
+
+.fader-label.muted.waveform-icon svg circle,
+.fader-label.muted.waveform-icon svg rect,
+.fader-value.muted.waveform-icon svg circle,
+.fader-value.muted.waveform-icon svg rect {
+    fill: var(--text-grey-5);
+    opacity: 0.5;
+}
+
+.fader-label.muted:hover,
+.fader-value.muted:hover {
+    background-color: transparent;
+    color: var(--text-grey-4);
+    opacity: 0.7;
+}
+
+.fader-label.muted.waveform-icon:hover svg path,
+.fader-value.muted.waveform-icon:hover svg path {
+    stroke: var(--text-grey-4);
+    opacity: 0.7;
+}
+
+.fader-label.muted.waveform-icon:hover svg circle,
+.fader-label.muted.waveform-icon:hover svg rect,
+.fader-value.muted.waveform-icon:hover svg circle,
+.fader-value.muted.waveform-icon:hover svg rect {
+    fill: var(--text-grey-4);
+    opacity: 0.7;
+}
+
+/* --- End Per-Parameter Modulation Styles --- */
+
+.stepped .step-notch {
+    position: absolute;
+    left: -3px;
+    width: 22px;
+    height: 1px;
+    background-color: var(--grid-3);
+}
+
+#mod .stepped .fader-track {
+    position: relative;
+}
+
+#mod .stepped .step-notch {
+    content: "";
+    position: absolute;
+    left: -3px;
+    width: 22px;
+    height: 1px;
+    background-color: var(--grid-3);
+}
+
+#mod .stepped .fader-track .step-notch-1 {
+    top: 25%;
+}
+
+#mod .stepped .fader-track .step-notch-2 {
+    top: 50%;
+}
+
+#mod .stepped .fader-track .step-notch-3 {
+    top: 75%;
+}
+
+.waveform-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 18px;
+}
+
+.waveform-icon svg {
+    margin-top: 2px;
+}
+
+.settings-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 500px;
+    min-height: 300px;
+    background-color: var(--bg-settings);
+    border: 2px solid var(--theme-color);
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(var(--theme-color-r), var(--theme-color-g), var(--theme-color-b), 0.3);
+    z-index: 1000;
+    color: var(--theme-color);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.settings-panel.hidden {
+    display: none;
+}
+
+#manual-modal {
+    max-width: 900px;
+}
+
+.manual-layout {
+    display: flex;
+    gap: 20px;
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+}
+
+.sidebar-toggle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    background: var(--bg-button);
+    border: 1px solid var(--theme-color);
+    color: var(--theme-color);
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.sidebar-toggle:hover {
+    background: var(--bg-button-hover);
+    color: var(--text-white);
+}
+
+.manual-sidebar {
+    width: 200px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--border-grey-1);
+    padding-right: 15px;
+    padding-top: 35px;
+    font-size: 11px;
+    overflow-y: auto;
+    max-height: 100%;
+}
+
+.manual-sidebar.hidden {
+    display: none;
+}
+
+.manual-sidebar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.manual-sidebar > ul > li {
+    margin-bottom: 8px;
+}
+
+.manual-sidebar ul ul {
+    margin-left: 12px;
+    margin-top: 4px;
+}
+
+.manual-sidebar ul ul li {
+    margin-bottom: 4px;
+}
+
+.manual-sidebar a {
+    color: var(--theme-color);
+    text-decoration: none;
+    display: block;
+    padding: 2px 0;
+    transition: all 0.2s;
+    font-size: 11px;
+}
+
+.manual-sidebar a:hover {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.manual-sidebar a.active {
+    font-weight: bold;
+}
+
+.manual-main-content {
+    flex-grow: 1;
+    padding-top: 35px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--theme-color);
+    overflow-y: auto;
+    max-height: 100%;
+    padding-right: 10px;
+}
+
+.manual-main-content h5 {
+    font-size: 14px;
+    margin-top: 0;
+    margin-bottom: 8px;
+    color: var(--theme-color);
+}
+
+#manual-content {
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--theme-color);
+}
+
+.settings-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--theme-color);
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.settings-panel-header h2 {
+    font-size: 18px;
+    margin: 0;
+    color: var(--theme-color);
+}
+
+.close-button {
+    background: none;
+    border: none;
+    color: var(--theme-color);
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0 5px;
+    line-height: 1;
+    transition: all 0.2s;
+}
+.close-button:hover {
+    color: var(--bg-body);
+    background: var(--theme-color);
+    border-radius: 4px;
+    padding: 0 8px;
+}
+
+.settings-panel-content {
+    flex-grow: 1;
+    max-height: 90vh;
+    overflow-y: hidden;
+    padding-right: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--theme-color) var(--bg-settings-content);
+}
+
+#manual-modal .settings-panel-content {
+    overflow-y: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.settings-panel-content::-webkit-scrollbar {
+    width: 8px;
+}
+.settings-panel-content::-webkit-scrollbar-track {
+    background: var(--bg-settings-content);
+    border-radius: 4px;
+}
+.settings-panel-content::-webkit-scrollbar-thumb {
+    background: var(--theme-color);
+    border-radius: 4px;
+}
+.settings-panel-content::-webkit-scrollbar-thumb:hover {
+    background: var(--theme-color);
+}
+
+
+.settings-section {
+    margin-bottom: 8px;
+    padding-bottom: 0px;
+}
+.settings-section:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.settings-section h3 {
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: var(--theme-color);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.settings-section p {
+    font-size: 12px;
+    color: var(--theme-color);
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+.settings-section select,
+.settings-section .settings-button {
+    background-color: var(--bg-input);
+    color: var(--theme-color);
+    border: 1px solid var(--theme-color);
+    padding: 8px 12px;
+    border-radius: 4px;
+    width: 100%;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+    margin-bottom: 0px;
+}
+
+.button-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 0px;
+}
+
+.button-row .settings-button {
+    flex: 1;
+    width: auto;
+}
+.settings-section .settings-button {
+    text-align: center;
+}
+
+.settings-section select:hover,
+.settings-section .settings-button:hover {
+    background-color: var(--bg-input-hover);
+    border-color: var(--theme-color);
+}
+.settings-section select:focus,
+.settings-section .settings-button:focus {
+    outline: none;
+    box-shadow: 0 0 5px rgba(var(--theme-color-r), var(--theme-color-g), var(--theme-color-b), 0.5);
+}
+
+.settings-section .settings-button:disabled {
+    background-color: #222;
+    border-color: #444;
+    color: #666;
+    cursor: not-allowed;
+}
+
+.settings-feedback {
+    font-size: 11px;
+    margin-top: 5px;
+}
+
+.midi-mapping-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: flex-end;
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid var(--border-grey-2);
+    border-radius: 4px;
+    background-color: var(--bg-settings-content);
+}
+
+.midi-mapping-form-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px; 
+}
+
+.midi-mapping-form-item label {
+    font-size: 10px;
+    color: var(--theme-color);
+}
+
+.midi-mapping-form-item select,
+.midi-mapping-form-item input[type="number"] {
+    background-color: var(--bg-input);
+    color: var(--theme-color);
+    border: 1px solid var(--border-grey-1);
+    padding: 6px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    width: 100%;
+}
+
+.midi-mapping-form-item input[type="number"]::placeholder {
+    color: var(--theme-color);
+    opacity: 0.6;
+}
+.midi-mapping-form-item select {
+    min-width: 150px; 
+}
+.midi-mapping-form-item input[type="number"] {
+    width: 70px; 
+    text-align: center;
+}
+
+.midi-mapping-form-item input[type=number]::-webkit-inner-spin-button,
+.midi-mapping-form-item input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.midi-mapping-form-item input[type=number] {
+  -moz-appearance: textfield; 
+}
+
+
+.settings-button-small {
+    background-color: var(--bg-input);
+    color: var(--theme-color);
+    border: 1px solid var(--theme-color);
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+    height: 31px;
+}
+.settings-button-small:hover {
+    background-color: var(--bg-input-hover);
+    border-color: var(--theme-color);
+}
+.settings-button-small:disabled {
+    background-color: #222;
+    border-color: #444;
+    color: #666;
+    cursor: not-allowed;
+}
+
+
+#midi-mappings-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 10px;
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1px solid var(--border-grey-2);
+    border-radius: 4px;
+    padding: 8px;
+    background-color: var(--bg-settings-content);
+}
+
+#midi-mappings-list li {
+    font-size: 11px;
+    color: var(--text-grey-1);
+    padding: 6px 0;
+    border-bottom: 1px dotted var(--border-grey-1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+#midi-mappings-list li:last-child {
+    border-bottom: none;
+}
+#midi-mappings-list li.no-mappings {
+    color: var(--theme-color);
+    font-style: italic;
+    text-align: center;
+}
+#midi-mappings-list .mapping-details {
+    flex-grow: 1;
+}
+#midi-mappings-list .mapping-param {
+    font-weight: bold;
+    color: var(--theme-color);
+}
+#midi-mappings-list .mapping-arrow {
+    color: var(--theme-color);
+}
+#midi-mappings-list .mapping-cc {
+    color: var(--theme-color);
+}
+#midi-mappings-list .mapping-channel,
+#midi-mappings-list .mapping-port {
+    color: var(--theme-color);
+    font-size: 10px;
+    margin-left: 5px;
+}
+
+#midi-mappings-list .delete-mapping-btn {
+    background: none;
+    border: 1px solid #FF6B6B; 
+    color: #FF6B6B;
+    font-size: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 3px 6px;
+    border-radius: 3px;
+    margin-left: 10px;
+}
+#midi-mappings-list .delete-mapping-btn:hover {
+    background-color: #FF6B6B;
+    color: #1e1e1e;
+}
+
+/* Theme Color Hue Fader */
+.theme-hue-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 0px;
+}
+
+.theme-hue-fader {
+    flex: 1;
+    height: 30px;
+    display: flex;
+    align-items: center;
+}
+
+.theme-hue-track {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right,
+        hsl(0, 100%, 60%),
+        hsl(30, 100%, 60%),
+        hsl(60, 100%, 60%),
+        hsl(90, 100%, 60%),
+        hsl(120, 100%, 60%),
+        hsl(150, 100%, 60%),
+        hsl(180, 100%, 60%),
+        hsl(210, 100%, 60%),
+        hsl(240, 100%, 60%),
+        hsl(270, 100%, 60%),
+        hsl(300, 100%, 60%),
+        hsl(330, 100%, 60%),
+        hsl(360, 100%, 60%)
+    );
+    border: 1px solid var(--border-grey-1);
+    border-radius: 4px;
+    position: relative;
+    cursor: pointer;
+}
+
+.theme-hue-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 3px 0 0 3px;
+    pointer-events: none;
+}
+
+.theme-hue-value {
+    font-size: 12px;
+    color: var(--theme-color);
+    min-width: 35px;
+    text-align: center;
+}
+
+
+@media (max-width: 1200px) {
+    .top-row, .bottom-row {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 768px) {
+    #app {
+        padding: 10px;
+    }
+
+    .module {
+        margin-bottom: 10px;
+    }
+
+    .settings-panel {
+        width: 95%;
+        padding: 15px;
+    }
+    .settings-panel-header h2 {
+        font-size: 16px;
+    }
+    .settings-section h3 {
+        font-size: 13px;
+    }
+    .settings-section p,
+    .settings-section select,
+    .settings-section .settings-button {
+        font-size: 11px;
+    }
+}

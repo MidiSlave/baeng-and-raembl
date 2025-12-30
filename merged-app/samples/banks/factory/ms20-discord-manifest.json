@@ -1,0 +1,35 @@
+{
+  "name": "MS-20 Discord",
+  "description": "MS-20 synthesiser discordant and detuned drum samples",
+  "type": "factory",
+  "samples": {
+    "36": "samples/banks/factory/ms20-discord/kick1.wav",
+    "37": "samples/banks/factory/ms20-discord/kick2.wav",
+    "38": "samples/banks/factory/ms20-discord/snare1.wav",
+    "39": "samples/banks/factory/ms20-discord/snare2.wav",
+    "40": "samples/banks/factory/ms20-discord/rim.wav",
+    "41": "samples/banks/factory/ms20-discord/snare3.wav",
+    "42": "samples/banks/factory/ms20-discord/clhat.wav",
+    "51": "samples/banks/factory/ms20-discord/fizz1.wav",
+    "52": "samples/banks/factory/ms20-discord/fizz2.wav",
+    "53": "samples/banks/factory/ms20-discord/fizz3.wav",
+    "54": "samples/banks/factory/ms20-discord/perc1.wav",
+    "55": "samples/banks/factory/ms20-discord/perc2.wav",
+    "56": "samples/banks/factory/ms20-discord/perc3.wav"
+  },
+  "mapping": {
+    "36": "Discord Tom 1",
+    "37": "Discord Tom 2",
+    "38": "Discord Perc 1",
+    "39": "Discord Perc 2",
+    "40": "Discord Perc 4",
+    "41": "Discord Perc 3",
+    "42": "Detuned Cymbal",
+    "51": "Fizz 1",
+    "52": "Fizz 2",
+    "53": "Fizz 3",
+    "54": "Harmony",
+    "55": "Harmony 1",
+    "56": "Harmony 2"
+  }
+}

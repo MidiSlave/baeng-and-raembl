@@ -1,0 +1,2514 @@
+/* File: raembl.css
+ * Ræmbl-specific styles - theme variables are in shared-base.css
+ */
+
+/* ===== RÆMBL LAYOUT VARIABLES ===== */
+.raembl-app {
+    /* Fader dimensions */
+    --raembl-fader-height: 120px;
+    --raembl-fader-width: 16px;
+    --raembl-fader-container-width: 30px;
+    --raembl-fader-label-height: 25px;
+    --raembl-fader-label-font: var(--font-md);
+    --raembl-fader-value-font: var(--font-sm);
+    --raembl-fader-gap: 6px;
+    --raembl-fader-value-height: 18px;
+
+    /* Canvas dimensions */
+    --raembl-canvas-height: 60px;
+    --raembl-canvas-margin-top: 0;
+    --raembl-canvas-margin-bottom: var(--space-sm);
+
+    /* Canvas width calculation: matches fader section width */
+    /* Formula: (fader-count * slide-pot-body-width) - edge inset on each side */
+    /* Edge inset aligns canvas with outer edges of first/last knob */
+    --raembl-canvas-edge-inset: 5px;
+    --slide-pot-body-width: 35px;
+
+    /* Button dimensions */
+    --raembl-button-size: 16px;
+    --raembl-button-gap: 4px;
+
+    /* Module spacing - reduced by 50% for tighter layout */
+    --raembl-header-to-content: var(--space-2xs);
+    --raembl-content-to-faders: var(--space-2xs);
+    --raembl-canvas-margin: var(--space-sm);
+    --header-margin-bottom: var(--space-2xs);
+
+    /* Module margin beyond first/last fader */
+    --raembl-module-margin: 2px;
+
+    /* Row gap */
+    --raembl-row-gap: 10px;
+
+    /* Switch dimensions */
+    --raembl-switch-width: 14px;
+    --raembl-switch-height: 60px;
+}
+
+/* Ræmbl app-specific styles */
+
+.raembl-app .top-row, .raembl-app .bottom-row {
+    display: flex;
+    flex-direction: row;
+    gap: var(--dynamic-module-gap);
+    align-items: stretch;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.raembl-app .top-row {
+    margin-bottom: var(--dynamic-module-gap);
+}
+
+.raembl-app .module {
+    background-color: var(--bg-module);
+    border: 1px solid var(--theme-color);
+    padding: var(--module-padding);
+    border-radius: var(--module-radius);
+    color: var(--theme-color);
+    display: flex;
+    flex-direction: column;
+}
+
+.raembl-app .module-header-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    margin-bottom: var(--header-margin-bottom);
+    border-bottom: none;
+    padding-bottom: var(--header-padding-bottom);
+    min-height: var(--header-min-height);
+    gap: var(--space-sm);
+    flex-shrink: 0; /* Don't compress headers */
+}
+
+/* Clock module uses standard header margin - no special override needed */
+
+.raembl-app #raembl-clock .fader-container:last-child .fader-label {
+    font-size: 150%;
+    line-height: 1;
+}
+
+.raembl-app .module > .module-header {
+    text-align: center;
+    margin-bottom: var(--header-margin-bottom);
+    border-bottom: none;
+    padding-bottom: var(--header-padding-bottom);
+    font-weight: bold;
+    font-size: var(--header-font-size);
+}
+
+.raembl-app .mod-rate-led {
+    display: block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--theme-color);
+    opacity: 0.3;
+    transition: opacity 0.05s linear;
+    position: absolute;
+    right: 0;
+}
+
+.raembl-app .viz-toggle-button {
+    width: var(--raembl-button-size);
+    height: var(--raembl-button-size);
+    border-radius: 3px;
+    background-color: var(--bg-button);
+    border: 1px solid var(--theme-color);
+    color: var(--theme-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 8px;
+    transition: all 0.1s ease;
+    position: absolute;
+    right: 0;
+}
+
+.raembl-app .viz-toggle-button:hover {
+    background-color: var(--bg-button-hover);
+}
+
+.raembl-app .viz-toggle-button.active {
+    background-color: var(--theme-color);
+    color: var(--bg-module);
+}
+
+/* Module header toggle buttons (SEQ, RST) - standardised to 16px */
+.raembl-app .module-header-container .toggle-button.seq-reset,
+.raembl-app .module-header-container .toggle-button.lfo-reset {
+    height: var(--raembl-button-size);
+    min-width: unset;
+    width: auto;
+    padding: 0 4px;
+    font-size: 7px;
+    line-height: var(--raembl-button-size);
+}
+
+.raembl-app .module-header-container .module-header {
+    flex-grow: 1;
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.raembl-app .settings-gear {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    position: absolute;
+    right: 0;
+}
+
+.raembl-app .settings-gear svg {
+    width: 16px;
+    height: 16px;
+}
+
+.raembl-app .settings-gear svg path {
+    stroke: var(--theme-color) !important;
+    fill: none !important;
+}
+
+.raembl-app .settings-gear:hover svg path {
+    stroke: var(--bg-module) !important;
+    fill: var(--theme-color) !important;
+}
+
+/* Random button styles */
+.raembl-app .random-button {
+    width: var(--raembl-button-size);
+    height: var(--raembl-button-size);
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    position: absolute;
+    left: 0;
+    z-index: 10;
+    transition: transform 0.1s ease;
+}
+
+.raembl-app .random-button:hover {
+    transform: scale(1.1);
+}
+
+/* Random button SVG colors */
+.raembl-app .random-button svg rect {
+    stroke: var(--theme-color) !important;
+    fill: none !important;
+}
+
+.raembl-app .random-button svg circle {
+    fill: var(--theme-color) !important;
+}
+
+.raembl-app .random-button:hover svg rect {
+    stroke: var(--theme-color);
+    fill: var(--theme-color);
+}
+
+.raembl-app .random-button:hover svg circle {
+    fill: var(--bg-module);
+}
+
+.raembl-app .random-button.rolling {
+    animation: diceRoll 0.2s ease-in-out;
+}
+
+@keyframes diceRoll {
+    .raembl-app 0% {
+        transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+    }
+    .raembl-app 25% {
+        transform: rotateX(180deg) rotateY(180deg) rotateZ(90deg);
+    }
+    .raembl-app 50% {
+        transform: rotateX(360deg) rotateY(360deg) rotateZ(180deg);
+    }
+    .raembl-app 75% {
+        transform: rotateX(540deg) rotateY(540deg) rotateZ(270deg);
+    }
+    .raembl-app 100% {
+        transform: rotateX(720deg) rotateY(720deg) rotateZ(360deg);
+    }
+}
+
+/* Freeze button styles (for Clouds module) */
+.raembl-app .freeze-button {
+    width: 16px;
+    height: 16px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: transform 0.1s ease, fill 0.2s ease;
+}
+
+.raembl-app .freeze-button:hover {
+    transform: scale(1.1);
+}
+
+.raembl-app .freeze-button svg polyline,
+.raembl-app .freeze-button svg polygon {
+    stroke: var(--theme-color) !important;
+    fill: none !important;
+    transition: stroke 0.2s ease;
+}
+
+.raembl-app .freeze-button:hover svg polyline,
+.raembl-app .freeze-button:hover svg polygon {
+    opacity: 0.8;
+}
+
+.raembl-app .freeze-button.active svg polyline,
+.raembl-app .freeze-button.active svg polygon {
+    stroke: #4fc3f7 !important;
+}
+
+/* Duck button styles (for sidechain ducking modal) */
+.raembl-app .duck-btn {
+    width: 16px;
+    height: 16px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: opacity 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.raembl-app .duck-btn svg {
+    width: 14px;
+    height: 14px;
+    stroke: var(--theme-color);
+    fill: none;
+}
+
+/* Active state - filled duck when ducking enabled */
+.raembl-app .duck-btn.active svg {
+    fill: var(--theme-color);
+}
+
+[data-theme="light"] .raembl-app .duck-btn svg {
+    stroke: var(--theme-color);
+}
+
+/* Gradient mode - duck button icons (target path element) */
+.gradient-mode .raembl-app .duck-btn svg path {
+    stroke: url(#raembl-gradient-stroke) !important;
+}
+
+.gradient-mode .raembl-app .duck-btn.active svg path {
+    stroke: url(#raembl-gradient-stroke) !important;
+    fill: url(#raembl-gradient-fill) !important;
+}
+
+/* Quality button styles (for Clouds module - cycles buffer quality modes) */
+.raembl-app .quality-button {
+    width: auto;
+    min-width: 24px;
+    height: 18px;
+    padding: 0 4px;
+    border: 1px solid var(--theme-color);
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--theme-color);
+    border-radius: 2px;
+    transition: all 0.1s ease;
+    font-size: 8px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+.raembl-app .quality-button:hover {
+    background-color: var(--theme-color);
+    color: var(--bg-module);
+}
+
+.raembl-app .quality-label {
+    line-height: 1;
+}
+
+/* Clock sync button styles (for Clouds module header) */
+.raembl-app .clock-sync-button {
+    width: var(--raembl-button-size);
+    height: var(--raembl-button-size);
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-size: 14px;
+    opacity: 0.6;
+    transition: transform 0.1s ease, opacity 0.2s ease;
+    color: var(--theme-color);
+}
+
+.raembl-app .clock-sync-button svg {
+    stroke: var(--theme-color);
+}
+
+.raembl-app .clock-sync-button:hover {
+    transform: scale(1.1);
+    opacity: 0.8;
+}
+
+.raembl-app .clock-sync-button.active {
+    opacity: 1;
+}
+
+.raembl-app #raembl-clock {
+    width: auto;
+}
+
+
+.raembl-app .play-button {
+    width: 30px;
+    height: auto;
+    padding: 7px 2px;
+    border-radius: 2px;
+    background-color: var(--bg-button);
+    border: 1px solid var(--theme-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+    font-size: 10px;
+}
+
+.raembl-app .play-button.active {
+    background-color: var(--theme-color);
+    color: var(--bg-module);
+}
+
+
+.raembl-app .toggle-button {
+    font-size: 8px;
+    padding: 3px 5px;
+    width: auto;
+    min-width: 35px;
+    cursor: pointer;
+    border: 1px solid var(--theme-color);
+    background-color: var(--bg-button);
+    color: var(--theme-color);
+    border-radius: 3px;
+    white-space: nowrap;
+    height: 20px;
+    line-height: normal;
+    vertical-align: middle;
+    position: relative;
+}
+
+.raembl-app .toggle-button.active {
+    background-color: var(--theme-color);
+    color: var(--bg-module);
+    border-color: var(--bg-module);
+    border-radius: 3px;
+}
+
+.raembl-app .display-box {
+    border: 1px solid var(--theme-color);
+    border-radius: var(--radius-sm);
+    padding: var(--space-xs);
+    font-size: var(--font-md);
+    width: 60px;
+    text-align: center;
+    min-height: 18px;
+    margin: 0 auto var(--space-md) auto;
+}
+
+.raembl-app .time-fader-section {
+    margin-top: auto; /* Override the auto margin from .fader-section for clock module */
+    padding-top: 0;
+}
+
+/* Time Controls - Grid Layout aligned with faders */
+.raembl-app .time-controls {
+    display: grid;
+    grid-template-columns: 30px var(--space-xs) 30px var(--space-xs) 30px;
+    margin: var(--raembl-canvas-margin) auto;
+    justify-content: center;
+    align-content: center;
+}
+
+.raembl-app .play-display-column {
+    grid-column: 1 / 4; /* Spans BPM + gap + SWING columns */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.raembl-app .reset-column {
+    grid-column: 5; /* LENGTH column */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+}
+
+.raembl-app .time-controls .display-box {
+    width: 60px;
+    margin: 0;
+}
+
+.raembl-app .reset-column .toggle-button {
+    width: 100%;
+    min-width: unset;
+    height: auto;
+    padding: 4px 2px;
+    font-size: 7px;
+    line-height: 1.2;
+    text-align: center;
+    white-space: normal;
+}
+
+.raembl-app #raembl-factors {
+    width: auto;
+    --fader-count: 7;
+}
+
+.raembl-app .factors-canvas {
+    margin: var(--raembl-canvas-margin) auto;
+    display: block;
+    width: calc(var(--fader-count) * var(--slide-pot-body-width) - var(--raembl-canvas-edge-inset) * 2);
+    height: var(--raembl-canvas-height);
+    background-color: var(--bg-canvas);
+    border: 1px solid var(--border-grey-1);
+    border-radius: var(--radius-sm);
+}
+
+.raembl-app .step {
+    width: 10px;
+    height: 10px;
+    background-color: var(--bg-button);
+    border: 1px solid var(--theme-color);
+    border-radius: 2px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 7px;
+    position: relative;
+    margin-bottom: 2px;
+}
+
+.raembl-app .step.active {
+    background-color: var(--theme-color);
+    color: var(--bg-module);
+    box-shadow: 0 0 5px var(--theme-color);
+}
+
+.raembl-app .step.gate {
+    background-color: var(--border-grey-1);
+}
+
+.raembl-app .step.accented {
+    border-width: 2px;
+}
+
+.raembl-app .step.slide::after {
+    content: '';
+    position: absolute;
+    right: -4px; 
+    top: 50%;    
+    transform: translateY(-50%);
+    width: 3px;  
+    height: 1.5px; 
+    background-color: var(--theme-color); 
+    border-radius: 1px; 
+    pointer-events: none; 
+}
+
+.raembl-app .step:not(.gate).slide::after {
+    display: none;
+}
+
+.raembl-app .step.active.slide::after {
+    background-color: var(--bg-module);
+}
+
+.raembl-app .step.trill {
+    /* Double chevron shape - both top and bottom angles point upward ^ */
+    clip-path: polygon(0% 40%, 50% 0%, 100% 40%, 100% 80%, 50% 60%, 0% 80%);
+    background-color: var(--theme-color); /* Yellow fill for trill */
+    border-radius: 0;
+}
+
+.raembl-app .step.active.trill {
+    background-color: var(--theme-color); /* Keep yellow when active */
+    box-shadow: 0 0 5px var(--theme-color);
+}
+
+.raembl-app .step.gate.trill {
+    background-color: var(--theme-color); /* Yellow fill overrides gate gray */
+}
+
+
+.raembl-app #raembl-lfo {
+    width: auto;
+    --fader-count: 4;
+}
+
+.raembl-app #raembl-lfo-canvas {
+    width: calc(var(--fader-count) * var(--slide-pot-body-width) - var(--raembl-canvas-edge-inset) * 2);
+    height: var(--raembl-canvas-height);
+    background-color: var(--bg-canvas);
+    border: 1px solid var(--border-grey-1);
+    border-radius: var(--radius-sm);
+    display: block;
+    margin: var(--raembl-canvas-margin) auto;
+}
+
+.raembl-app #raembl-path {
+    width: auto;
+    --fader-count: 3;
+}
+
+/* Fix SCALE fader value width to prevent module resizing when cycling scales */
+.raembl-app #raembl-path .slide-pot-container[data-param-id="path.scale"] .slide-pot-value {
+    width: 30px;
+    max-width: 30px;
+    overflow: hidden;
+}
+
+.raembl-app #raembl-path-canvas {
+    width: calc(var(--fader-count) * var(--slide-pot-body-width) - var(--raembl-canvas-edge-inset) * 2);
+    height: var(--raembl-canvas-height);
+    background-color: var(--bg-canvas);
+    border: 1px solid var(--border-grey-1);
+    border-radius: var(--radius-sm);
+    display: block;
+    margin: var(--raembl-canvas-margin) auto;
+}
+
+.raembl-app #raembl-reverb {
+    width: auto;
+    --fader-count: 5;
+}
+
+.raembl-app #raembl-reverb-canvas {
+    width: calc(var(--fader-count) * var(--slide-pot-body-width) - var(--raembl-canvas-edge-inset) * 2);
+    height: var(--raembl-canvas-height);
+    background-color: var(--bg-canvas-alt);
+    border: 1px solid var(--border-grey-1);
+    border-radius: var(--radius-sm);
+    display: block;
+    margin: var(--raembl-canvas-margin) auto;
+}
+
+.raembl-app #raembl-delay {
+    width: auto;
+    --fader-count: 6;
+}
+
+.raembl-app #raembl-delay-canvas {
+    width: calc(var(--fader-count) * var(--slide-pot-body-width) - var(--raembl-canvas-edge-inset) * 2);
+    height: var(--raembl-canvas-height);
+    background-color: var(--bg-canvas-alt);
+    border: 1px solid var(--border-grey-1);
+    border-radius: var(--radius-sm);
+    display: block;
+    margin: var(--raembl-canvas-margin) auto;
+}
+
+/* DELAY header layout - centre title with absolute positioned buttons */
+.raembl-app #raembl-delay .module-header-container {
+    position: relative;
+}
+
+.raembl-app #raembl-delay .random-button {
+    position: absolute;
+    left: 0;
+}
+
+.raembl-app #raembl-delay .duck-btn {
+    position: absolute;
+    right: 32px; /* Space for sync toggle */
+}
+
+.raembl-app .delay-sync-toggle {
+    position: absolute;
+    right: 0;
+    background: transparent;
+    border: 1px solid var(--theme-color);
+    color: var(--theme-color);
+    font-size: 7px;
+    font-weight: bold;
+    padding: 2px 4px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.1s ease;
+}
+
+.raembl-app .delay-sync-toggle:hover {
+    background-color: var(--bg-button-hover);
+}
+
+.raembl-app .delay-sync-toggle.active {
+    background-color: var(--theme-color);
+    color: var(--bg-module);
+}
+
+/* Mode toggle (MONO/POLY) - single button showing current mode */
+.raembl-app .mode-toggle {
+    position: absolute;
+    right: 0;
+    background: transparent;
+    border: 1px solid var(--theme-color);
+    color: var(--theme-color);
+    font-size: 7px;
+    font-weight: bold;
+    padding: 2px 4px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.1s ease;
+}
+
+.raembl-app .mode-toggle:hover {
+    background-color: var(--bg-button-hover);
+}
+
+.raembl-app .mode-toggle.active {
+    background-color: var(--theme-color);
+    color: var(--bg-module);
+}
+
+.raembl-app #raembl-mod {
+    width: auto;
+}
+
+
+.raembl-app .wave-icons {
+    position: absolute;
+    left: -18px;
+    height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.raembl-app .wave-icon {
+    width: 18px;
+    height: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 9px;
+}
+
+.raembl-app .wave-icon.active {
+    color: var(--bg-module);
+    background-color: var(--theme-color);
+    border-radius: 3px;
+}
+
+.raembl-app #raembl-oscillator {
+    width: auto;
+}
+
+.raembl-app .mode-switch {
+    width: 50px;
+    height: 14px;
+    background-color: var(--bg-button);
+    border: 1px solid var(--theme-color);
+    border-radius: 2px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.raembl-app .module-header-container .mode-switch {
+    position: absolute;
+    right: 0;
+}
+
+.raembl-app .mode-switch .switch-option {
+    width: 50%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--theme-color);
+    font-size: 7px;
+}
+
+.raembl-app .mode-switch .switch-option.active {
+    background-color: var(--theme-color);
+    color: var(--bg-module);
+}
+
+.raembl-app .fader-switch-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.raembl-app .switch {
+    width: 14px;
+    height: 60px;
+    background-color: var(--bg-button);
+    border: 1px solid var(--theme-color);
+    border-radius: 3px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-left: 8px;
+}
+
+.raembl-app .switch-option {
+    width: 100%;
+    height: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--theme-color);
+    font-size: 7px;
+}
+
+.raembl-app .switch-option.active {
+    background-color: var(--theme-color);
+    color: var(--bg-module);
+}
+
+/* Switch Toggle Container */
+.raembl-app .switch-toggle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: 2px; /* Reduced from 8px (75% reduction) */
+    gap: 1px;
+}
+
+.raembl-app .switch-label {
+    font-size: 6px;
+    color: var(--theme-color);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+/* Switch Icon (SVG-based toggle) */
+.raembl-app .switch-icon {
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    color: var(--theme-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.raembl-app .switch-icon svg {
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
+}
+
+/* LFO state: rotated 90° counter-clockwise (pointing up) */
+.raembl-app .switch-icon[data-state="lfo"] {
+    transform: rotate(-90deg);
+}
+
+/* ENV state: rotated 90° clockwise (pointing down) */
+.raembl-app .switch-icon[data-state="env"] {
+    transform: rotate(90deg);
+}
+
+.raembl-app #raembl-mixer {
+    width: auto;
+}
+
+.raembl-app #raembl-filter {
+    width: auto;
+}
+
+
+.raembl-app #raembl-envelope {
+    width: auto;
+}
+
+
+.raembl-app #raembl-output {
+    width: auto;
+}
+
+.raembl-app .fader-section {
+    display: flex;
+    justify-content: center;
+    gap: 0px;
+    margin-top: auto;
+    padding-top: var(--raembl-content-to-faders);
+    padding-left: var(--raembl-module-margin);
+    padding-right: var(--raembl-module-margin);
+}
+
+.raembl-app .fader-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: var(--raembl-fader-container-width);
+}
+
+.raembl-app .fader-with-switch {
+    width: 50px;
+}
+
+.raembl-app .fader-label {
+    font-size: var(--raembl-fader-label-font);
+    margin-bottom: var(--space-xs);
+    height: var(--raembl-fader-label-height);
+    min-height: var(--raembl-fader-label-height);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+/* SVG icon labels for FACTORS module */
+.raembl-app .fader-label-icon {
+    color: var(--theme-color);
+}
+
+.raembl-app .fader-label-icon svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+/* Icon labels hover for per-param modulation */
+.raembl-app .fader-label-icon.modulatable:hover svg {
+    fill: var(--bg-module);
+    stroke: var(--bg-module);
+}
+
+.raembl-app .fader-label-icon.modulatable:hover svg path,
+.raembl-app .fader-label-icon.modulatable:hover svg circle,
+.raembl-app .fader-label-icon.modulatable:hover svg polygon,
+.raembl-app .fader-label-icon.modulatable:hover svg rect {
+    fill: var(--bg-module);
+    stroke: var(--bg-module);
+}
+
+/* Prevent stroke-only icons from appearing filled on hover */
+.raembl-app .fader-label-icon.modulatable:hover svg path[fill="none"],
+.raembl-app .fader-label-icon.modulatable:hover svg circle[fill="none"] {
+    fill: none;
+}
+
+/* Icon labels modulated state (brightness pulsing) */
+.raembl-app .fader-label-icon.modulated svg path,
+.raembl-app .fader-label-icon.modulated svg circle,
+.raembl-app .fader-label-icon.modulated svg polygon,
+.raembl-app .fader-label-icon.modulated svg rect {
+    fill: rgb(
+        calc(var(--theme-color-r) * var(--led-opacity, 0.6) + var(--bg-module-r) * (1 - var(--led-opacity, 0.6))),
+        calc(var(--theme-color-g) * var(--led-opacity, 0.6) + var(--bg-module-g) * (1 - var(--led-opacity, 0.6))),
+        calc(var(--theme-color-b) * var(--led-opacity, 0.6) + var(--bg-module-b) * (1 - var(--led-opacity, 0.6)))
+    );
+}
+
+.raembl-app .fader {
+    position: relative;
+}
+
+.raembl-app .fader-track {
+    width: var(--raembl-fader-width);
+    height: var(--raembl-fader-height);
+    background-color: var(--bg-button);
+    position: relative;
+    border: 1px solid var(--theme-color);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    touch-action: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.raembl-app .fader-fill {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: var(--theme-color);
+}
+
+/* Hide solid fill when modulation is active */
+.raembl-app .fader-fill.modulation-active {
+    display: none;
+}
+
+/* Reference line showing base value when modulation is active */
+.raembl-app .fader-base-line {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--theme-color);
+    pointer-events: none;
+    transition: bottom 0.033s linear;
+    z-index: 3;
+    display: none;
+}
+
+.raembl-app .fader-base-line.active {
+    display: block;
+}
+
+.raembl-app .center-zero .zero-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: var(--theme-color);
+    top: 50%;
+}
+
+.raembl-app .fader-value {
+    font-size: 9px;
+    margin-top: 3px;
+    height: 18px;
+    min-height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* --- Per-Parameter Modulation Styles --- */
+
+/* Modulatable parameter labels */
+.raembl-app .fader-label.modulatable {
+    cursor: pointer;
+    position: relative;
+    padding: 2px 4px;
+    border-radius: 2px;
+}
+
+.raembl-app .fader-label.modulatable:hover {
+    background-color: var(--theme-color);
+    color: var(--bg-module);
+    border-radius: 2px;
+    padding: 2px 4px;
+}
+
+/* Make waveform icons black when hovered (on yellow background) */
+/* Waveform icon base colors */
+.fader-label.waveform-icon svg path,
+.raembl-app .fader-value.waveform-icon svg path {
+    stroke: var(--theme-color) !important;
+}
+
+.fader-label.waveform-icon svg circle,
+.fader-label.waveform-icon svg rect,
+.fader-value.waveform-icon svg circle,
+.raembl-app .fader-value.waveform-icon svg rect {
+    fill: var(--theme-color);
+}
+
+.raembl-app .fader-label.modulatable.waveform-icon:hover svg path {
+    stroke: var(--bg-module) !important;
+}
+
+.fader-label.modulatable.waveform-icon:hover svg circle,
+.raembl-app .fader-label.modulatable.waveform-icon:hover svg rect {
+    fill: var(--bg-module) !important;
+}
+
+/* Brightness modulation for parameter labels - theme color to bg-module with automation */
+.raembl-app .fader-label.modulated {
+    color: rgb(
+        calc(var(--theme-color-r) * var(--led-opacity, 0.6) + var(--bg-module-r) * (1 - var(--led-opacity, 0.6))),
+        calc(var(--theme-color-g) * var(--led-opacity, 0.6) + var(--bg-module-g) * (1 - var(--led-opacity, 0.6))),
+        calc(var(--theme-color-b) * var(--led-opacity, 0.6) + var(--bg-module-b) * (1 - var(--led-opacity, 0.6)))
+    );
+    transition: color 0.05s linear;
+}
+
+/* Brightness modulation for SVG icon labels - theme color to bg-module */
+.fader-label.modulated.waveform-icon svg path,
+.raembl-app .fader-value.modulated.waveform-icon svg path {
+    stroke: rgb(
+        calc(var(--theme-color-r) * var(--led-opacity, 0.6) + var(--bg-module-r) * (1 - var(--led-opacity, 0.6))),
+        calc(var(--theme-color-g) * var(--led-opacity, 0.6) + var(--bg-module-g) * (1 - var(--led-opacity, 0.6))),
+        calc(var(--theme-color-b) * var(--led-opacity, 0.6) + var(--bg-module-b) * (1 - var(--led-opacity, 0.6)))
+    ) !important;
+    transition: stroke 0.05s linear;
+}
+
+/* Brightness modulation for noise waveform dots (uses fill) */
+.fader-label.modulated.waveform-icon svg circle,
+.fader-label.modulated.waveform-icon svg rect,
+.fader-value.modulated.waveform-icon svg circle,
+.raembl-app .fader-value.modulated.waveform-icon svg rect {
+    fill: rgb(
+        calc(var(--theme-color-r) * var(--led-opacity, 0.6) + var(--bg-module-r) * (1 - var(--led-opacity, 0.6))),
+        calc(var(--theme-color-g) * var(--led-opacity, 0.6) + var(--bg-module-g) * (1 - var(--led-opacity, 0.6))),
+        calc(var(--theme-color-b) * var(--led-opacity, 0.6) + var(--bg-module-b) * (1 - var(--led-opacity, 0.6)))
+    );
+    transition: fill 0.05s linear;
+}
+
+/* Modulation overlay showing modulated value */
+.raembl-app .fader-fill-modulated {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    background: rgba(var(--theme-color-r), var(--theme-color-g), var(--theme-color-b), 0.35);
+    pointer-events: none;
+    transition: height 0.033s linear, bottom 0.033s linear;
+    z-index: 2;
+}
+
+/* Vertical modulation text inside fader - container for layered approach */
+.raembl-app .fader-modulation-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-90deg);
+    font-size: 9px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    pointer-events: none;
+    z-index: 3;
+    white-space: nowrap;
+    width: 150px; /* Match fader height */
+    height: 16px;
+    text-align: center;
+}
+
+/* Yellow text layer (visible above fill) */
+.raembl-app .fader-modulation-text::before {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    color: var(--theme-color);
+    clip-path: var(--yellow-clip, inset(0 0 0 50%));
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Black text layer (visible in fill) */
+.raembl-app .fader-modulation-text::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    color: var(--bg-body);
+    clip-path: var(--black-clip, inset(0 50% 0 0));
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Muted modulation - grayed out appearance */
+.fader-label.muted,
+.raembl-app .fader-value.muted {
+    color: var(--text-grey-5);
+    opacity: 0.5;
+}
+
+.fader-label.muted.waveform-icon svg path,
+.raembl-app .fader-value.muted.waveform-icon svg path {
+    stroke: var(--text-grey-5);
+    opacity: 0.5;
+}
+
+.fader-label.muted.waveform-icon svg circle,
+.fader-label.muted.waveform-icon svg rect,
+.fader-value.muted.waveform-icon svg circle,
+.raembl-app .fader-value.muted.waveform-icon svg rect {
+    fill: var(--text-grey-5);
+    opacity: 0.5;
+}
+
+.fader-label.muted:hover,
+.raembl-app .fader-value.muted:hover {
+    background-color: transparent;
+    color: var(--text-grey-4);
+    opacity: 0.7;
+}
+
+.fader-label.muted.waveform-icon:hover svg path,
+.raembl-app .fader-value.muted.waveform-icon:hover svg path {
+    stroke: var(--text-grey-4);
+    opacity: 0.7;
+}
+
+.fader-label.muted.waveform-icon:hover svg circle,
+.fader-label.muted.waveform-icon:hover svg rect,
+.fader-value.muted.waveform-icon:hover svg circle,
+.raembl-app .fader-value.muted.waveform-icon:hover svg rect {
+    fill: var(--text-grey-4);
+    opacity: 0.7;
+}
+
+/* --- End Per-Parameter Modulation Styles --- */
+
+.raembl-app .stepped .step-notch {
+    position: absolute;
+    left: -3px;
+    width: 22px;
+    height: 1px;
+    background-color: var(--grid-3);
+}
+
+.raembl-app #raembl-mod .stepped .fader-track {
+    position: relative;
+}
+
+.raembl-app #raembl-mod .stepped .step-notch {
+    content: "";
+    position: absolute;
+    left: -3px;
+    width: 22px;
+    height: 1px;
+    background-color: var(--grid-3);
+}
+
+.raembl-app #raembl-mod .stepped .fader-track .step-notch-1 {
+    top: 25%;
+}
+
+.raembl-app #raembl-mod .stepped .fader-track .step-notch-2 {
+    top: 50%;
+}
+
+.raembl-app #raembl-mod .stepped .fader-track .step-notch-3 {
+    top: 75%;
+}
+
+.raembl-app .waveform-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.raembl-app .fader-label.waveform-icon {
+    height: 25px;
+}
+
+.raembl-app .fader-value.waveform-icon {
+    height: 18px;
+}
+
+.raembl-app .waveform-icon svg {
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+}
+
+.raembl-app .settings-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 500px;
+    min-height: 300px;
+    background-color: var(--bg-settings);
+    border: 2px solid var(--theme-color);
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(var(--theme-color-r), var(--theme-color-g), var(--theme-color-b), 0.3);
+    z-index: 1000;
+    color: var(--theme-color);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.raembl-app .settings-panel.hidden {
+    display: none;
+}
+
+.raembl-app #raembl-manual-modal {
+    max-width: 900px;
+    height: 80vh;
+    max-height: 80vh;
+}
+
+.raembl-app .manual-layout {
+    display: flex;
+    gap: 20px;
+    position: relative;
+    flex: 1;
+    min-height: 0; /* Critical for flex children to scroll */
+    overflow: hidden;
+}
+
+.raembl-app .sidebar-toggle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    background: var(--bg-button);
+    border: 1px solid var(--theme-color);
+    color: var(--theme-color);
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.raembl-app .sidebar-toggle:hover {
+    background: var(--bg-button-hover);
+    color: var(--text-white);
+}
+
+.raembl-app .manual-sidebar {
+    width: 200px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--border-grey-1);
+    padding-right: 15px;
+    padding-top: 35px;
+    font-size: 11px;
+    overflow-y: auto;
+    max-height: 100%;
+}
+
+.raembl-app .manual-sidebar.hidden {
+    display: none;
+}
+
+.raembl-app .manual-sidebar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.raembl-app .manual-sidebar > ul > li {
+    margin-bottom: 8px;
+}
+
+.raembl-app .manual-sidebar ul ul {
+    margin-left: 12px;
+    margin-top: 4px;
+}
+
+.raembl-app .manual-sidebar ul ul li {
+    margin-bottom: 4px;
+}
+
+.raembl-app .manual-sidebar a {
+    color: var(--theme-color);
+    text-decoration: none;
+    display: block;
+    padding: 2px 0;
+    transition: all 0.2s;
+    font-size: 11px;
+}
+
+.raembl-app .manual-sidebar a:hover {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.raembl-app .manual-sidebar a.active {
+    font-weight: bold;
+}
+
+.raembl-app .manual-main-content {
+    flex: 1;
+    min-height: 0; /* Critical for flex children to scroll */
+    padding-top: 35px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--theme-color);
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.raembl-app .manual-main-content h5 {
+    font-size: 14px;
+    margin-top: 0;
+    margin-bottom: 8px;
+    color: var(--theme-color);
+}
+
+.raembl-app #manual-content {
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--theme-color);
+}
+
+.raembl-app .settings-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--theme-color);
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.raembl-app .settings-panel-header h2 {
+    font-size: 18px;
+    margin: 0;
+    color: var(--theme-color);
+}
+
+.raembl-app .close-button {
+    background: none;
+    border: none;
+    color: var(--theme-color);
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0 5px;
+    line-height: 1;
+    transition: all 0.2s;
+}
+.raembl-app .close-button:hover {
+    color: var(--bg-body);
+    background: var(--theme-color);
+    border-radius: 4px;
+    padding: 0 8px;
+}
+
+.raembl-app .settings-panel-content {
+    flex-grow: 1;
+    max-height: 90vh;
+    overflow-y: hidden;
+    padding-right: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--theme-color) var(--bg-settings-content);
+}
+
+.raembl-app #raembl-manual-modal .settings-panel-content {
+    overflow-y: hidden;
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 50px); /* Account for header */
+}
+
+.raembl-app .settings-panel-content::-webkit-scrollbar {
+    width: 8px;
+}
+.raembl-app .settings-panel-content::-webkit-scrollbar-track {
+    background: var(--bg-settings-content);
+    border-radius: 4px;
+}
+.raembl-app .settings-panel-content::-webkit-scrollbar-thumb {
+    background: var(--theme-color);
+    border-radius: 4px;
+}
+.raembl-app .settings-panel-content::-webkit-scrollbar-thumb:hover {
+    background: var(--theme-color);
+}
+
+
+.raembl-app .settings-section {
+    margin-bottom: 8px;
+    padding-bottom: 0px;
+}
+.raembl-app .settings-section:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.raembl-app .settings-section h3 {
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: var(--theme-color);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.raembl-app .settings-section p {
+    font-size: 12px;
+    color: var(--theme-color);
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+.settings-section select,
+.raembl-app .settings-section .settings-button {
+    background-color: var(--bg-input);
+    color: var(--theme-color);
+    border: 1px solid var(--theme-color);
+    padding: 8px 12px;
+    border-radius: 4px;
+    width: 100%;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+    margin-bottom: 0px;
+}
+
+.raembl-app .button-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 0px;
+}
+
+.raembl-app .button-row .settings-button {
+    flex: 1;
+    width: auto;
+}
+.raembl-app .settings-section .settings-button {
+    text-align: center;
+}
+
+.settings-section select:hover,
+.raembl-app .settings-section .settings-button:hover {
+    background-color: var(--bg-input-hover);
+    border-color: var(--theme-color);
+}
+.settings-section select:focus,
+.raembl-app .settings-section .settings-button:focus {
+    outline: none;
+    box-shadow: 0 0 5px rgba(var(--theme-color-r), var(--theme-color-g), var(--theme-color-b), 0.5);
+}
+
+.raembl-app .settings-section .settings-button:disabled {
+    background-color: var(--bg-button);
+    border-color: var(--border-grey-2);
+    color: var(--text-grey-3);
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.raembl-app .settings-feedback {
+    font-size: 11px;
+    margin-top: 5px;
+}
+
+.raembl-app .midi-mapping-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: flex-end;
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid var(--border-grey-2);
+    border-radius: 4px;
+    background-color: var(--bg-settings-content);
+}
+
+.raembl-app .midi-mapping-form-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px; 
+}
+
+.raembl-app .midi-mapping-form-item label {
+    font-size: 10px;
+    color: var(--theme-color);
+}
+
+.midi-mapping-form-item select,
+.raembl-app .midi-mapping-form-item input[type="number"] {
+    background-color: var(--bg-input);
+    color: var(--theme-color);
+    border: 1px solid var(--border-grey-1);
+    padding: 6px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    width: 100%;
+}
+
+.raembl-app .midi-mapping-form-item input[type="number"]::placeholder {
+    color: var(--theme-color);
+    opacity: 0.6;
+}
+.raembl-app .midi-mapping-form-item select {
+    min-width: 150px; 
+}
+.raembl-app .midi-mapping-form-item input[type="number"] {
+    width: 70px; 
+    text-align: center;
+}
+
+.midi-mapping-form-item input[type=number]::-webkit-inner-spin-button,
+.raembl-app .midi-mapping-form-item input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.raembl-app .midi-mapping-form-item input[type=number] {
+  -moz-appearance: textfield; 
+}
+
+
+.raembl-app .settings-button-small {
+    background-color: var(--bg-input);
+    color: var(--theme-color);
+    border: 1px solid var(--theme-color);
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+    height: 31px;
+}
+.raembl-app .settings-button-small:hover {
+    background-color: var(--bg-input-hover);
+    border-color: var(--theme-color);
+}
+.raembl-app .settings-button-small:disabled {
+    background-color: var(--bg-button);
+    border-color: var(--border-grey-2);
+    color: var(--text-grey-3);
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+
+.raembl-app #midi-mappings-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 10px;
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1px solid var(--border-grey-2);
+    border-radius: 4px;
+    padding: 8px;
+    background-color: var(--bg-settings-content);
+}
+
+.raembl-app #midi-mappings-list li {
+    font-size: 11px;
+    color: var(--text-grey-1);
+    padding: 6px 0;
+    border-bottom: 1px dotted var(--border-grey-1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.raembl-app #midi-mappings-list li:last-child {
+    border-bottom: none;
+}
+.raembl-app #midi-mappings-list li.no-mappings {
+    color: var(--theme-color);
+    font-style: italic;
+    text-align: center;
+}
+.raembl-app #midi-mappings-list .mapping-details {
+    flex-grow: 1;
+}
+.raembl-app #midi-mappings-list .mapping-param {
+    font-weight: bold;
+    color: var(--theme-color);
+}
+.raembl-app #midi-mappings-list .mapping-arrow {
+    color: var(--theme-color);
+}
+.raembl-app #midi-mappings-list .mapping-cc {
+    color: var(--theme-color);
+}
+#midi-mappings-list .mapping-channel,
+.raembl-app #midi-mappings-list .mapping-port {
+    color: var(--theme-color);
+    font-size: 10px;
+    margin-left: 5px;
+}
+
+.raembl-app #midi-mappings-list .delete-mapping-btn {
+    background: none;
+    border: 1px solid #FF6B6B; 
+    color: #FF6B6B;
+    font-size: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 3px 6px;
+    border-radius: 3px;
+    margin-left: 10px;
+}
+.raembl-app #midi-mappings-list .delete-mapping-btn:hover {
+    background-color: #FF6B6B;
+    color: #1e1e1e;
+}
+
+/* Theme Color Hue Fader */
+.raembl-app .theme-hue-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 0px;
+}
+
+.raembl-app .theme-hue-fader {
+    flex: 1;
+    height: 30px;
+    display: flex;
+    align-items: center;
+}
+
+.raembl-app .theme-hue-track {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right,
+        hsl(0, 100%, 60%),
+        hsl(30, 100%, 60%),
+        hsl(60, 100%, 60%),
+        hsl(90, 100%, 60%),
+        hsl(120, 100%, 60%),
+        hsl(150, 100%, 60%),
+        hsl(180, 100%, 60%),
+        hsl(210, 100%, 60%),
+        hsl(240, 100%, 60%),
+        hsl(270, 100%, 60%),
+        hsl(300, 100%, 60%),
+        hsl(330, 100%, 60%),
+        hsl(360, 100%, 60%)
+    );
+    border: 1px solid var(--border-grey-1);
+    border-radius: 4px;
+    position: relative;
+    cursor: pointer;
+}
+
+.raembl-app .theme-hue-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 3px 0 0 3px;
+    pointer-events: none;
+}
+
+.raembl-app .theme-hue-value {
+    font-size: 12px;
+    color: var(--theme-color);
+    min-width: 35px;
+    text-align: center;
+}
+
+/* ============================================
+   Clouds Mode Dropdown
+   ============================================ */
+
+.raembl-app .clouds-mode-dropdown-container {
+    position: relative;
+    width: 100%;
+}
+
+.raembl-app .clouds-mode-dropdown-button {
+    background: none;
+    border: none;
+    color: currentColor;
+    font: inherit;
+    font-weight: bold;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    padding: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: transform 0.1s ease;
+}
+
+.raembl-app .clouds-mode-dropdown-button:hover {
+    transform: scale(1.05);
+}
+
+.raembl-app .clouds-mode-dropdown-button:active {
+    transform: scale(0.95);
+}
+
+.raembl-app .clouds-mode-dropdown-button:focus {
+    outline: none;
+}
+
+.raembl-app .dropdown-arrow {
+    width: 10px;
+    height: 6px;
+    transition: transform 0.2s ease;
+}
+
+.raembl-app .clouds-mode-dropdown-button[aria-expanded="true"] .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.raembl-app .clouds-mode-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    background: var(--bg-module);
+    border: 1px solid var(--theme-color);
+    border-radius: 4px;
+    padding: 4px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.raembl-app .clouds-mode-dropdown-menu.hidden {
+    display: none;
+}
+
+.raembl-app .dropdown-option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: transparent;
+    border: none;
+    color: var(--theme-color);
+    font-size: 11px;
+    font-weight: normal;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.15s ease;
+}
+
+.raembl-app .dropdown-option:hover {
+    background-color: var(--theme-color);
+    color: var(--bg-module);
+}
+
+.raembl-app .dropdown-option:focus-visible {
+    outline: 2px solid var(--theme-color);
+    outline-offset: -2px;
+}
+
+.raembl-app .dropdown-option[aria-selected="true"] {
+    font-weight: bold;
+}
+
+.raembl-app .dropdown-option-text {
+    flex: 1;
+}
+
+/* Scrollbar styling for dropdown */
+.raembl-app .clouds-mode-dropdown-menu::-webkit-scrollbar {
+    width: 8px;
+}
+
+.raembl-app .clouds-mode-dropdown-menu::-webkit-scrollbar-track {
+    background: var(--bg-body);
+    border-radius: 4px;
+}
+
+.raembl-app .clouds-mode-dropdown-menu::-webkit-scrollbar-thumb {
+    background: var(--theme-color);
+    border-radius: 4px;
+}
+
+/* ============================================
+   Clouds Module
+   ============================================ */
+
+/* Clouds module width and alignment */
+.raembl-app #raembl-clouds {
+    width: auto;
+    --fader-count: 10;
+}
+
+/* Clouds header - constrain height to match other modules */
+.raembl-app #raembl-clouds .module-header-container {
+    min-height: var(--header-min-height);
+    height: auto;
+    flex-wrap: nowrap;
+}
+
+/* Clouds header buttons - prevent shrinking in flex layout */
+.raembl-app #raembl-clouds .freeze-button,
+.raembl-app #raembl-clouds .clock-sync-button,
+.raembl-app #raembl-clouds .duck-btn {
+    flex-shrink: 0;
+}
+
+.raembl-app #raembl-clouds-canvas {
+    background-color: var(--bg-canvas);
+    border: 1px solid var(--border-grey-1);
+    border-radius: var(--radius-sm);
+    display: block;
+    margin: var(--raembl-canvas-margin) auto;
+    width: calc(var(--fader-count) * var(--slide-pot-body-width) - var(--raembl-canvas-edge-inset) * 2);
+    height: var(--raembl-canvas-height);
+}
+
+/* Zero line for bipolar faders (pitch) */
+.raembl-app .zero-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: var(--theme-color);
+    opacity: 0.5;
+    top: 50%;
+    pointer-events: none;
+}
+
+/* ============================================
+   Fader Label Hover Enhancement
+   ============================================ */
+
+.raembl-app .fader-label.waveform-icon {
+    position: relative;
+    cursor: help;
+}
+
+.raembl-app .fader-label.waveform-icon:hover svg {
+    transform: scale(1.2);
+    filter: brightness(1.3);
+}
+
+.raembl-app .fader-label.waveform-icon::after {
+    content: attr(data-param-label);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-module);
+    border: 1px solid var(--theme-color);
+    color: var(--theme-color);
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: bold;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 100;
+    margin-bottom: 4px;
+}
+
+.raembl-app .fader-label.waveform-icon:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-2px);
+}
+
+/* ============================================
+   FX Mode Toggle Buttons
+   ============================================ */
+
+.fx-mode-toggle {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.fx-mode-button {
+    flex: 1;
+    padding: 10px 16px;
+    background: var(--bg-button);
+    border: 2px solid var(--border-grey-1);
+    color: var(--text-grey-2);
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.fx-mode-button:hover {
+    background: var(--bg-button-hover);
+    border-color: var(--theme-color);
+    color: var(--text-white);
+    transform: scale(1.02);
+}
+
+.fx-mode-button.active {
+    background: var(--theme-color);
+    border-color: var(--theme-color);
+    color: var(--bg-module);
+    font-weight: 700;
+}
+
+.fx-mode-button:focus {
+    outline: 2px solid var(--theme-color);
+    outline-offset: 2px;
+}
+
+
+@media (max-width: 1200px) {
+    .raembl-app .top-row, .raembl-app .bottom-row {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 768px) {
+    .raembl-app #app {
+        padding: 10px;
+    }
+
+    .raembl-app .module {
+        margin-bottom: 10px;
+    }
+
+    .raembl-app .settings-panel {
+        width: 95%;
+        padding: 15px;
+    }
+    .raembl-app .settings-panel-header h2 {
+        font-size: 16px;
+    }
+    .raembl-app .settings-section h3 {
+        font-size: 13px;
+    }
+    .settings-section p,
+    .settings-section select,
+    .raembl-app .settings-section .settings-button {
+        font-size: 11px;
+    }
+}
+
+/* ============================================
+   SLIDE POT OVERRIDES FOR RÆMBL
+   Ultra-tight spacing
+   ============================================ */
+.raembl-app .slide-pot-container {
+    /* Minimal body width */
+    --slide-pot-body-width: 16px;
+    /* No gap between elements */
+    gap: 1px;
+}
+
+.raembl-app .slide-pot-label {
+    font-size: 9px;
+    height: 12px;
+}
+
+.raembl-app .slide-pot-value {
+    font-size: 8px;
+    height: 10px;
+}
+
+/* ============================================
+   Gradient Mode Styles
+   Note: .gradient-mode is on document.documentElement (html),
+   so selectors must be .gradient-mode .raembl-app (not reversed)
+   ============================================ */
+
+/* Module borders with gradient */
+.gradient-mode .raembl-app .module {
+    position: relative;
+    border-color: transparent;
+}
+
+.gradient-mode .raembl-app .module::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: var(--theme-gradient-h);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+/* Module headers with gradient text */
+.gradient-mode .raembl-app .module-header {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Labels with gradient text */
+.gradient-mode .raembl-app .slide-pot-label,
+.gradient-mode .raembl-app .knob-label,
+.gradient-mode .raembl-app .fader-label {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Label SVG icons with gradient - comprehensive element targeting */
+/* Waveform icons - stroke-based paths get stroke gradient */
+.gradient-mode .raembl-app .waveform-icon svg path {
+    stroke: url(#raembl-gradient-stroke) !important;
+}
+
+/* Waveform icons - ONLY paths with explicit fill="currentColor" get fill gradient */
+/* Paths in stroke-only SVGs (fill="none" on parent) should NOT get fill */
+.gradient-mode .raembl-app .waveform-icon svg path[fill="currentColor"] {
+    fill: url(#raembl-gradient-fill) !important;
+}
+
+/* Circles in waveform icons (e.g. noise dots) get fill gradient */
+.gradient-mode .raembl-app .waveform-icon svg circle {
+    fill: url(#raembl-gradient-fill) !important;
+}
+
+/* Rects with explicit fill get gradient */
+.gradient-mode .raembl-app .waveform-icon svg rect[fill="currentColor"] {
+    fill: url(#raembl-gradient-fill) !important;
+}
+
+.gradient-mode .raembl-app .waveform-icon svg polygon {
+    fill: url(#raembl-gradient-fill) !important;
+}
+
+.gradient-mode .raembl-app .waveform-icon svg polyline {
+    stroke: url(#raembl-gradient-stroke) !important;
+}
+
+/* Non-waveform label SVGs (icons with fills) */
+.gradient-mode .raembl-app .slide-pot-label:not(.waveform-icon) svg path {
+    stroke: url(#raembl-gradient-stroke) !important;
+}
+
+/* Only paths with explicit fill="currentColor" get gradient fill */
+.gradient-mode .raembl-app .slide-pot-label:not(.waveform-icon) svg path[fill="currentColor"] {
+    fill: url(#raembl-gradient-fill) !important;
+}
+
+.gradient-mode .raembl-app .slide-pot-label:not(.waveform-icon) svg circle {
+    fill: url(#raembl-gradient-fill) !important;
+}
+
+/* Only rects with explicit fill get gradient */
+.gradient-mode .raembl-app .slide-pot-label:not(.waveform-icon) svg rect[fill="currentColor"] {
+    fill: url(#raembl-gradient-fill) !important;
+}
+
+.gradient-mode .raembl-app .slide-pot-label:not(.waveform-icon) svg polygon {
+    fill: url(#raembl-gradient-fill) !important;
+}
+
+.gradient-mode .raembl-app .slide-pot-label:not(.waveform-icon) svg polyline {
+    stroke: url(#raembl-gradient-stroke) !important;
+}
+
+/* Values with gradient text */
+.gradient-mode .raembl-app .slide-pot-value,
+.gradient-mode .raembl-app .knob-value,
+.gradient-mode .raembl-app .fader-value {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Toggle buttons with gradient border */
+.gradient-mode .raembl-app .toggle-button.active,
+.gradient-mode .raembl-app .delay-sync-toggle.active,
+.gradient-mode .raembl-app .viz-toggle-button.active {
+    position: relative;
+    border-color: transparent;
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.gradient-mode .raembl-app .toggle-button.active::before,
+.gradient-mode .raembl-app .delay-sync-toggle.active::before,
+.gradient-mode .raembl-app .viz-toggle-button.active::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: var(--theme-gradient-h);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+/* Random button SVG with gradient */
+.gradient-mode .raembl-app .random-button svg rect {
+    stroke: url(#raembl-gradient-stroke) !important;
+}
+
+.gradient-mode .raembl-app .random-button svg circle {
+    fill: url(#raembl-gradient-fill) !important;
+}
+
+/* Clouds quality button - gradient text */
+.gradient-mode .raembl-app .quality-button {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Clouds clock sync button SVG */
+.gradient-mode .raembl-app #clouds-clock-sync-button svg path {
+    stroke: url(#raembl-gradient-stroke);
+}
+
+/* LFO/SEQ reset buttons - gradient text when inactive */
+.gradient-mode .raembl-app .toggle-button.lfo-reset:not(.active),
+.gradient-mode .raembl-app .toggle-button.seq-reset:not(.active) {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Mode toggle (MONO/POLY) with gradient border */
+.gradient-mode .raembl-app .mode-toggle {
+    position: relative;
+    border-color: transparent;
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.gradient-mode .raembl-app .mode-toggle::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: var(--theme-gradient-h);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+.gradient-mode .raembl-app .mode-toggle.active {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: padding-box;
+    -webkit-text-fill-color: var(--bg-module);
+    background-clip: padding-box;
+}
+
+/* Mode switch (ENV/LFO) with gradient border */
+.gradient-mode .raembl-app .mode-switch {
+    position: relative;
+    border-color: transparent;
+}
+
+.gradient-mode .raembl-app .mode-switch::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: var(--theme-gradient-h);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+.gradient-mode .raembl-app .mode-switch .switch-option {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.gradient-mode .raembl-app .mode-switch .switch-option.active {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: padding-box;
+    -webkit-text-fill-color: var(--bg-module);
+    background-clip: padding-box;
+}
+
+/* Vertical switch (fader switches) with gradient border */
+.gradient-mode .raembl-app .switch {
+    position: relative;
+    border-color: transparent;
+}
+
+.gradient-mode .raembl-app .switch::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: var(--theme-gradient-h);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+/* Switch toggle labels (LFO/ENV) with gradient text */
+.gradient-mode .raembl-app .switch-label {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Switch icon SVG with gradient fill */
+.gradient-mode .raembl-app .switch-icon svg {
+    fill: url(#raembl-gradient-fill);
+}
+
+/* Freeze button with gradient - target polyline elements */
+.gradient-mode .raembl-app .freeze-button svg polyline,
+.gradient-mode .raembl-app #clouds-freeze-button svg polyline {
+    stroke: url(#raembl-gradient-stroke) !important;
+}
+
+.gradient-mode .raembl-app .freeze-button.active svg polyline,
+.gradient-mode .raembl-app #clouds-freeze-button.active svg polyline {
+    stroke: url(#raembl-gradient-stroke) !important;
+}
+
+/* Sequencer steps with gradient */
+.gradient-mode .raembl-app .step.active {
+    background: var(--theme-gradient-h);
+}
+
+.gradient-mode .raembl-app .step.gate.active {
+    background: var(--theme-gradient-h);
+}
+
+/* Canvas gradient borders (LFO, PATH, DELAY) */
+.gradient-mode .raembl-app #raembl-lfo-canvas,
+.gradient-mode .raembl-app #raembl-path-canvas,
+.gradient-mode .raembl-app #raembl-delay-canvas {
+    position: relative;
+    border-color: transparent;
+}
+
+.gradient-mode .raembl-app #raembl-lfo-canvas::before,
+.gradient-mode .raembl-app #raembl-path-canvas::before,
+.gradient-mode .raembl-app #raembl-delay-canvas::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 4px;
+    padding: 1px;
+    background: var(--theme-gradient-h);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Display boxes with gradient border */
+.gradient-mode .raembl-app .display-box {
+    position: relative;
+    border-color: transparent;
+}
+
+.gradient-mode .raembl-app .display-box::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: var(--theme-gradient-h);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+/* Clouds mode dropdown - gradient mode styling */
+/* The dropdown container needs explicit background:none to avoid inheriting module-header's gradient */
+.gradient-mode .raembl-app .clouds-mode-dropdown-container {
+    background: none;
+}
+
+/* The dropdown button needs its own gradient text since module-header uses text-fill: transparent */
+.gradient-mode .raembl-app .clouds-mode-dropdown-button {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    border: none;
+    outline: none;
+}
+
+/* Arrow SVG in dropdown button - use solid colour since SVG strokes don't support background-clip */
+.gradient-mode .raembl-app .clouds-mode-dropdown-button .dropdown-arrow {
+    color: var(--theme-color-1);
+    -webkit-text-fill-color: var(--theme-color-1);
+}
+
+/* Clouds mode dropdown menu - gradient border */
+.gradient-mode .raembl-app .clouds-mode-dropdown-menu {
+    border-color: var(--theme-color-1);
+    border-image: var(--theme-gradient-h) 1;
+}
+
+/* Clouds dropdown options - gradient text on the text span (not the button) */
+.gradient-mode .raembl-app .dropdown-option .dropdown-option-text {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.gradient-mode .raembl-app .dropdown-option:hover {
+    background: var(--bg-button);
+}
+
+.gradient-mode .raembl-app .dropdown-option:hover .dropdown-option-text {
+    background: none;
+    -webkit-background-clip: padding-box;
+    -webkit-text-fill-color: var(--theme-color-1);
+    background-clip: padding-box;
+}
+
+/* Fader fills with gradient */
+.gradient-mode .raembl-app .fader-fill {
+    background: var(--theme-gradient-v);
+}
+
+/* Settings panel with gradient border */
+/* NOTE: Do NOT set position here - it overrides position:fixed and breaks the modal */
+.gradient-mode .raembl-app .settings-panel {
+    border-color: transparent;
+}
+
+.gradient-mode .raembl-app .settings-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: var(--theme-gradient-h);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+/* Settings section headers with gradient */
+.gradient-mode .raembl-app .settings-section-header {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* App title with gradient */
+.gradient-mode .raembl-app h1 {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Engine selector dropdown - gradient mode */
+/* The dropdown container needs explicit background:none to avoid inheriting module-header's gradient */
+.gradient-mode .raembl-app .raembl-engine-dropdown-container {
+    background: none;
+}
+
+/* Dropdown button text gradient */
+.gradient-mode .raembl-app .raembl-engine-dropdown-button {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Dropdown arrow stroke gradient - use SVG gradient reference */
+.gradient-mode .raembl-app .raembl-engine-dropdown-button .dropdown-arrow path {
+    stroke: url(#raembl-gradient-stroke);
+}
+
+/* Dropdown menu border gradient - double background technique */
+.gradient-mode .raembl-app .raembl-engine-dropdown-menu {
+    border-color: transparent;
+    background:
+        linear-gradient(var(--bg-module), var(--bg-module)) padding-box,
+        var(--theme-gradient-h) border-box;
+}
+
+/* Dropdown options gradient text */
+.gradient-mode .raembl-app .raembl-engine-dropdown-menu .dropdown-option {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Hover state - inverted gradient background */
+.gradient-mode .raembl-app .raembl-engine-dropdown-menu .dropdown-option:hover {
+    background: var(--theme-gradient-h) !important;
+    -webkit-background-clip: border-box !important;
+    background-clip: border-box !important;
+    -webkit-text-fill-color: var(--bg-module) !important;
+    color: var(--bg-module);
+}
+
+/* Engine selector - solid colour mode (non-gradient) */
+:root:not(.gradient-mode) .raembl-app .raembl-engine-dropdown-button {
+    color: var(--theme-color, var(--accent, #f0a000));
+}
+
+:root:not(.gradient-mode) .raembl-app .raembl-engine-dropdown-button .dropdown-arrow {
+    stroke: var(--theme-color, var(--accent, #f0a000));
+}
+
+:root:not(.gradient-mode) .raembl-app .raembl-engine-dropdown-menu .dropdown-option.selected {
+    color: var(--theme-color, var(--accent, #f0a000));
+}
+
+/* Rings header controls - gradient mode */
+.gradient-mode .raembl-app .rings-header-btn {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Rings header controls - solid colour mode (non-gradient) */
+:root:not(.gradient-mode) .raembl-app .rings-header-btn {
+    color: var(--theme-color, var(--accent, #f0a000));
+}
+
+/* ============================================
+   PLAITS MODE SPACERS
+   ============================================ */
+
+/* All Plaits spacers - equal width, fill available space */
+.raembl-app .plaits-spacer {
+    flex: 1 1 0;
+}

@@ -1,0 +1,439 @@
+/**
+ * Slice Editor Module
+ *
+ * Provides a modal interface for slicing audio samples with waveform visualization,
+ * transient detection, manual marker editing, and slice configuration export.
+ *
+ * Features:
+ * - Waveform rendering with zoom and scroll
+ * - Automatic transient detection
+ * - Manual slice marker editing (drag, add, delete)
+ * - Grid-based slicing (2-64 slices)
+ * - Sample trimming and rotation
+ * - JSON export/import of slice configurations
+ * - Slice preview playback
+ * - Keyboard shortcuts
+ *
+ * @module slice-editor
+ */
+
+export class SliceEditor {
+    /**
+     * Create a new SliceEditor instance
+     * @param {HTMLElement} modalElement - The modal container element
+     * @param {AudioContext} audioContext - Web Audio API context
+     */
+    constructor(modalElement, audioContext) {
+        this.modal = modalElement;
+        this.audioContext = audioContext;
+
+        // State
+        this.audioBuffer = null;
+        this.sampleRate = 0;
+        this.fileName = '';
+        this.sliceMarkers = [];  // Array of sample positions
+        this.zoom = 1;
+        this.scrollOffset = 0;
+        this.selectedMarker = null;
+        this.isDragging = false;
+        this.dragStartX = 0;
+        this.modalOffset = { x: 0, y: 0 };
+        this.hoveredSlice = -1;
+        this.currentPlayingSource = null;
+        this.currentSliceIndex = 0;
+        this.currentPlayingSliceIndex = -1;
+
+        // Sample editing
+        this.trimStart = 0;
+        this.trimEnd = null;
+        this.rotationOffset = 0;
+        this.isDraggingTrimStart = false;
+        this.isDraggingTrimEnd = false;
+
+        // DOM elements
+        this.waveformCanvas = null;
+        this.waveformCtx = null;
+        this.scrollbarThumb = null;
+        this.scrollbarTrack = null;
+
+        // Callbacks
+        this.onDone = null;  // Called when user clicks Done
+        this.onCancel = null;  // Called when user closes modal
+
+        this._initializeDOM();
+        this._attachEventListeners();
+    }
+
+    /**
+     * Initialize DOM element references
+     * @private
+     */
+    _initializeDOM() {
+        // Canvas
+        this.waveformCanvas = this.modal.querySelector('#slice-waveform');
+        this.waveformCtx = this.waveformCanvas.getContext('2d');
+
+        // Scrollbar
+        this.scrollbarThumb = this.modal.querySelector('#slice-scrollbar-thumb');
+        this.scrollbarTrack = this.modal.querySelector('#slice-scrollbar-track');
+
+        // Controls
+        this.gridSlider = this.modal.querySelector('#slice-grid-slider');
+        this.thresholdSlider = this.modal.querySelector('#slice-threshold-slider');
+        this.rotationSlider = this.modal.querySelector('#slice-rotation-slider');
+
+        // Buttons
+        this.detectBtn = this.modal.querySelector('#slice-detect-btn');
+        this.clearBtn = this.modal.querySelector('#slice-clear-all-btn');
+        this.exportBtn = this.modal.querySelector('#slice-export-json-btn');
+        this.doneBtn = this.modal.querySelector('#slice-done-btn');
+        this.closeBtn = this.modal.querySelector('#slice-close-btn');
+
+        // Info displays
+        this.waveformDuration = this.modal.querySelector('#slice-waveform-duration');
+        this.waveformZoom = this.modal.querySelector('#slice-waveform-zoom');
+        this.waveformSlices = this.modal.querySelector('#slice-waveform-slices');
+        this.gridValue = this.modal.querySelector('#slice-grid-value');
+        this.thresholdValue = this.modal.querySelector('#slice-threshold-value');
+        this.rotationValue = this.modal.querySelector('#slice-rotation-value');
+    }
+
+    /**
+     * Attach all event listeners
+     * @private
+     */
+    _attachEventListeners() {
+        // Modal dragging
+        const modalHeader = this.modal.querySelector('.modal-header');
+        this._setupModalDragging(modalHeader);
+
+        // Canvas interactions
+        this.waveformCanvas.addEventListener('mousedown', this._handleCanvasMouseDown.bind(this));
+        this.waveformCanvas.addEventListener('mousemove', this._handleCanvasMouseMove.bind(this));
+        this.waveformCanvas.addEventListener('mouseup', this._handleCanvasMouseUp.bind(this));
+        this.waveformCanvas.addEventListener('mouseleave', this._handleCanvasMouseLeave.bind(this));
+        this.waveformCanvas.addEventListener('dblclick', this._handleCanvasDoubleClick.bind(this));
+        this.waveformCanvas.addEventListener('wheel', this._handleCanvasWheel.bind(this));
+
+        // Scrollbar
+        this.scrollbarThumb.addEventListener('mousedown', this._handleScrollbarMouseDown.bind(this));
+
+        // Control sliders
+        this.gridSlider.addEventListener('input', this._handleGridSliderChange.bind(this));
+        this.thresholdSlider.addEventListener('input', this._handleThresholdSliderChange.bind(this));
+        this.rotationSlider.addEventListener('input', this._handleRotationSliderChange.bind(this));
+
+        // Buttons
+        this.detectBtn.addEventListener('click', this._handleDetectTransients.bind(this));
+        this.clearBtn.addEventListener('click', this._handleClearAll.bind(this));
+        this.exportBtn.addEventListener('click', this._handleExportJSON.bind(this));
+        this.doneBtn.addEventListener('click', this._handleDone.bind(this));
+        this.closeBtn.addEventListener('click', this._handleClose.bind(this));
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', this._handleKeyDown.bind(this));
+    }
+
+    /**
+     * Open the slice editor with an audio buffer
+     * @param {AudioBuffer} buffer - The audio buffer to edit
+     * @param {Object} existingSliceConfig - Optional existing slice configuration
+     * @param {string} fileName - Optional file name
+     */
+    open(buffer, existingSliceConfig = null, fileName = 'sample.wav') {
+        this.audioBuffer = buffer;
+        this.fileName = fileName;
+        this.sampleRate = buffer.sampleRate;
+        this.sliceMarkers = [];
+        this.trimStart = 0;
+        this.trimEnd = buffer.length;
+        this.rotationOffset = 0;
+        this.zoom = 1;
+        this.scrollOffset = 0;
+
+        // Load existing slice config if provided
+        if (existingSliceConfig && existingSliceConfig.slices) {
+            this.sliceMarkers = existingSliceConfig.slices
+                .slice(0, -1)  // Exclude last marker (end of buffer)
+                .map(slice => slice.start);
+        }
+
+        // Update UI
+        this._updateInfoDisplay();
+        this._renderWaveform();
+
+        // Show modal
+        this.modal.classList.add('active');
+
+        console.log(`[SliceEditor] Opened with ${buffer.length} samples at ${buffer.sampleRate}Hz`);
+    }
+
+    /**
+     * Close the slice editor
+     */
+    close() {
+        // Stop any playing audio
+        if (this.currentPlayingSource) {
+            this.currentPlayingSource.stop();
+            this.currentPlayingSource = null;
+        }
+
+        // Hide modal
+        this.modal.classList.remove('active');
+
+        if (this.onCancel) {
+            this.onCancel();
+        }
+
+        console.log('[SliceEditor] Closed');
+    }
+
+    /**
+     * Get the current slice configuration
+     * @returns {Object} Slice configuration object
+     */
+    getSliceConfig() {
+        if (!this.audioBuffer) {
+            return null;
+        }
+
+        // Sort markers
+        const sortedMarkers = [...this.sliceMarkers].sort((a, b) => a - b);
+
+        // Create slices array
+        const slices = [];
+        let start = Math.floor(this.trimStart + this.rotationOffset);
+
+        for (let i = 0; i <= sortedMarkers.length; i++) {
+            const end = i < sortedMarkers.length
+                ? sortedMarkers[i]
+                : Math.floor(this.trimEnd + this.rotationOffset);
+
+            slices.push({
+                id: i,
+                start: start,
+                end: end,
+                method: sortedMarkers[i] ? 'manual' : 'manual'
+            });
+
+            start = end;
+        }
+
+        return {
+            version: '1.0',
+            sampleName: this.fileName,
+            sampleRate: this.sampleRate,
+            bufferLength: this.audioBuffer.length,
+            slices: slices,
+            metadata: {
+                created: new Date().toISOString(),
+                creator: 'Bæng Slice Editor v1.0'
+            }
+        };
+    }
+
+    /**
+     * Update info display
+     * @private
+     */
+    _updateInfoDisplay() {
+        if (!this.audioBuffer) return;
+
+        const duration = this.audioBuffer.duration.toFixed(2);
+        const sliceCount = this.sliceMarkers.length + 1;
+
+        this.waveformDuration.textContent = `Duration: ${duration}s`;
+        this.waveformZoom.textContent = `Zoom: ${this.zoom}x`;
+        this.waveformSlices.textContent = `Slices: ${sliceCount}`;
+    }
+
+    /**
+     * Render the waveform
+     * @private
+     */
+    _renderWaveform() {
+        if (!this.audioBuffer) {
+            console.warn('[SliceEditor] No audio buffer to render');
+            return;
+        }
+
+        const canvas = this.waveformCanvas;
+        const ctx = this.waveformCtx;
+        const width = canvas.width;
+        const height = canvas.height;
+
+        console.log(`[SliceEditor] Rendering waveform: ${width}x${height}, buffer length: ${this.audioBuffer.length}`);
+
+        // Clear canvas with dark background
+        ctx.fillStyle = '#1a1a1a';
+        ctx.fillRect(0, 0, width, height);
+
+        // Get audio data (mix to mono if stereo)
+        let channelData;
+        if (this.audioBuffer.numberOfChannels === 1) {
+            channelData = this.audioBuffer.getChannelData(0);
+        } else {
+            // Mix stereo to mono
+            const left = this.audioBuffer.getChannelData(0);
+            const right = this.audioBuffer.getChannelData(1);
+            channelData = new Float32Array(left.length);
+            for (let i = 0; i < left.length; i++) {
+                channelData[i] = (left[i] + right[i]) * 0.5;
+            }
+        }
+
+        const bufferLength = channelData.length;
+
+        // Calculate visible range based on zoom and scroll
+        const visibleSamples = Math.floor(bufferLength / this.zoom);
+        const startSample = Math.floor(this.scrollOffset * (bufferLength - visibleSamples));
+
+        // Draw waveform
+        const styles = getComputedStyle(document.documentElement);
+        const themeColor = styles.getPropertyValue('--theme-color').trim() || '#ffdc32';
+
+        ctx.strokeStyle = themeColor;
+        ctx.fillStyle = themeColor + '40'; // Semi-transparent fill
+        ctx.lineWidth = 1;
+
+        const samplesPerPixel = Math.max(1, Math.floor(visibleSamples / width));
+
+        // Draw filled waveform
+        ctx.beginPath();
+        ctx.moveTo(0, height / 2);
+
+        for (let x = 0; x < width; x++) {
+            const sampleIndex = startSample + Math.floor((x / width) * visibleSamples);
+
+            if (sampleIndex >= bufferLength) break;
+
+            // Find min/max in this pixel's sample range
+            let min = 0, max = 0;
+            for (let i = 0; i < samplesPerPixel && sampleIndex + i < bufferLength; i++) {
+                const sample = channelData[sampleIndex + i];
+                if (sample < min) min = sample;
+                if (sample > max) max = sample;
+            }
+
+            // Convert to canvas coordinates (center line is height/2)
+            const yMax = (height / 2) - (max * height / 2);
+            const yMin = (height / 2) - (min * height / 2);
+
+            // Draw line from min to max
+            ctx.lineTo(x, yMax);
+        }
+
+        // Draw bottom half
+        for (let x = width - 1; x >= 0; x--) {
+            const sampleIndex = startSample + Math.floor((x / width) * visibleSamples);
+
+            if (sampleIndex >= bufferLength) continue;
+
+            let min = 0;
+            for (let i = 0; i < samplesPerPixel && sampleIndex + i < bufferLength; i++) {
+                const sample = channelData[sampleIndex + i];
+                if (sample < min) min = sample;
+            }
+
+            const yMin = (height / 2) - (min * height / 2);
+            ctx.lineTo(x, yMin);
+        }
+
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // Draw center line
+        ctx.strokeStyle = '#444';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, height / 2);
+        ctx.lineTo(width, height / 2);
+        ctx.stroke();
+
+        // Draw slice markers
+        this._drawSliceMarkers();
+
+        // Update scrollbar
+        this._updateScrollbar();
+    }
+
+    /**
+     * Draw slice markers
+     * @private
+     */
+    _drawSliceMarkers() {
+        if (!this.audioBuffer) return;
+
+        const ctx = this.waveformCtx;
+        const width = this.waveformCanvas.width;
+        const height = this.waveformCanvas.height;
+        const bufferLength = this.audioBuffer.length;
+        const visibleSamples = Math.floor(bufferLength / this.zoom);
+        const startSample = Math.floor(this.scrollOffset * (bufferLength - visibleSamples));
+
+        // Draw slice markers (red vertical lines)
+        ctx.strokeStyle = '#ff3333';
+        ctx.lineWidth = 2;
+
+        for (let i = 0; i < this.sliceMarkers.length; i++) {
+            const marker = this.sliceMarkers[i];
+            const relativePos = marker - startSample;
+            const x = (relativePos / visibleSamples) * width;
+
+            if (x >= 0 && x <= width) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, height);
+                ctx.stroke();
+
+                // Draw marker number at top
+                ctx.fillStyle = '#ff3333';
+                ctx.font = '10px monospace';
+                ctx.fillText(i.toString(), x + 3, 12);
+            }
+        }
+    }
+
+    /**
+     * Draw trim handles
+     * @private
+     */
+    _drawTrimHandles() {
+        // TODO: Implement trim handle rendering
+    }
+
+    /**
+     * Update scrollbar thumb position
+     * @private
+     */
+    _updateScrollbar() {
+        if (!this.scrollbarThumb || !this.scrollbarTrack) return;
+
+        const trackWidth = this.scrollbarTrack.offsetWidth;
+        const thumbWidth = Math.max(20, trackWidth / this.zoom);
+        const thumbLeft = this.scrollOffset * (trackWidth - thumbWidth);
+
+        this.scrollbarThumb.style.width = `${thumbWidth}px`;
+        this.scrollbarThumb.style.left = `${thumbLeft}px`;
+    }
+
+    // Placeholder methods - to be implemented
+    _setupModalDragging(header) { /* TODO */ }
+    _handleCanvasMouseDown(e) { /* TODO */ }
+    _handleCanvasMouseMove(e) { /* TODO */ }
+    _handleCanvasMouseUp(e) { /* TODO */ }
+    _handleCanvasMouseLeave(e) { /* TODO */ }
+    _handleCanvasDoubleClick(e) { /* TODO */ }
+    _handleCanvasWheel(e) { /* TODO */ }
+    _handleScrollbarMouseDown(e) { /* TODO */ }
+    _handleGridSliderChange(e) { /* TODO */ }
+    _handleThresholdSliderChange(e) { /* TODO */ }
+    _handleRotationSliderChange(e) { /* TODO */ }
+    _handleDetectTransients() { /* TODO */ }
+    _handleClearAll() { /* TODO */ }
+    _handleExportJSON() { /* TODO */ }
+    _handleDone() { if (this.onDone) this.onDone(this.getSliceConfig()); this.close(); }
+    _handleClose() { this.close(); }
+    _handleKeyDown(e) { /* TODO */ }
+}

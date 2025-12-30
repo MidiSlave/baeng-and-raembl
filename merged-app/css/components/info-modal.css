@@ -1,0 +1,112 @@
+/* File: merged-app/css/components/info-modal.css
+ * Draggable info modal styles
+ */
+
+.info-modal {
+    position: fixed;
+    width: 240px;
+    background: var(--bg-module);
+    border: 1px solid var(--theme-color);
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+    /* Default position - can be overridden by JS from localStorage */
+    top: 100px;
+    right: 20px;
+    /* Smooth transitions for show/hide (but not position during drag) */
+    opacity: 1;
+    transition: opacity 0.15s ease;
+}
+
+.info-modal.hidden {
+    display: none;
+}
+
+/* Header - draggable area */
+.info-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: var(--bg-button);
+    border-bottom: 1px solid var(--theme-color);
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    cursor: move;
+    user-select: none;
+}
+
+.info-modal-title {
+    font-size: 10px;
+    text-transform: uppercase;
+    color: var(--theme-color);
+    letter-spacing: 0.5px;
+    font-weight: bold;
+}
+
+.info-modal-close {
+    background: none;
+    border: none;
+    color: var(--theme-color);
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    transition: background-color 0.15s;
+}
+
+.info-modal-close:hover {
+    background: var(--bg-module);
+}
+
+/* Content area */
+.info-modal-content {
+    padding: 12px;
+}
+
+.info-param-name {
+    font-size: 13px;
+    font-weight: bold;
+    color: var(--theme-color);
+    margin-bottom: 8px;
+    line-height: 1.2;
+}
+
+.info-param-desc {
+    font-size: 11px;
+    color: var(--theme-color);
+    line-height: 1.5;
+}
+
+/* Dragging state */
+.info-modal.dragging {
+    cursor: move;
+    opacity: 0.9;
+    /* Disable transitions during drag for snappy feel */
+    transition: none;
+}
+
+.info-modal.dragging .info-modal-header {
+    background: var(--theme-color);
+}
+
+.info-modal.dragging .info-modal-title {
+    color: var(--bg-module);
+}
+
+.info-modal.dragging .info-modal-close {
+    color: var(--bg-module);
+}
+
+/* Responsive - keep modal on screen */
+@media (max-width: 600px) {
+    .info-modal {
+        width: 200px;
+        right: 10px;
+    }
+}

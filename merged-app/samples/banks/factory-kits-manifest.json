@@ -1,0 +1,158 @@
+{
+  "version": "1.0.0",
+  "generated": "2025-12-01T06:15:51.554Z",
+  "kits": [
+    {
+      "id": "casio-rz1",
+      "name": "Casio RZ-1",
+      "description": "Casio RZ-1 sampling drum machine samples",
+      "type": "factory",
+      "sampleCount": 12,
+      "manifestPath": "samples/banks/factory/casio-rz1-manifest.json"
+    },
+    {
+      "id": "cr-78",
+      "name": "CR-78",
+      "description": "Roland CR-78 CompuRhythm samples",
+      "type": "factory",
+      "sampleCount": 9,
+      "manifestPath": "samples/banks/factory/cr-78-manifest.json"
+    },
+    {
+      "id": "dmx",
+      "name": "DMX",
+      "description": "Oberheim DMX drum machine samples",
+      "type": "factory",
+      "sampleCount": 12,
+      "manifestPath": "samples/banks/factory/dmx-manifest.json"
+    },
+    {
+      "id": "hr16b",
+      "name": "HR-16B",
+      "description": "Alesis HR-16B drum machine samples",
+      "type": "factory",
+      "sampleCount": 13,
+      "manifestPath": "samples/banks/factory/hr16b-manifest.json"
+    },
+    {
+      "id": "linndrum",
+      "name": "LinnDrum",
+      "description": "Linn LinnDrum drum machine samples",
+      "type": "factory",
+      "sampleCount": 13,
+      "manifestPath": "samples/banks/factory/linndrum-manifest.json"
+    },
+    {
+      "id": "minipops",
+      "name": "MiniPops",
+      "description": "Korg MiniPops vintage rhythm machine samples",
+      "type": "factory",
+      "sampleCount": 12,
+      "manifestPath": "samples/banks/factory/minipops-manifest.json"
+    },
+    {
+      "id": "ms20-broken",
+      "name": "MS-20 Broken",
+      "description": "MS-20 synthesiser broken and distorted drum samples",
+      "type": "factory",
+      "sampleCount": 12,
+      "manifestPath": "samples/banks/factory/ms20-broken-manifest.json"
+    },
+    {
+      "id": "ms20-deep",
+      "name": "MS-20 Deep",
+      "description": "MS-20 synthesiser deep bass and harmonic drum samples",
+      "type": "factory",
+      "sampleCount": 14,
+      "manifestPath": "samples/banks/factory/ms20-deep-manifest.json"
+    },
+    {
+      "id": "ms20-discord",
+      "name": "MS-20 Discord",
+      "description": "MS-20 synthesiser discordant and detuned drum samples",
+      "type": "factory",
+      "sampleCount": 13,
+      "manifestPath": "samples/banks/factory/ms20-discord-manifest.json"
+    },
+    {
+      "id": "ms20-grain",
+      "name": "MS-20 Grain",
+      "description": "MS-20 synthesiser grainy and punchy drum samples",
+      "type": "factory",
+      "sampleCount": 11,
+      "manifestPath": "samples/banks/factory/ms20-grain-manifest.json"
+    },
+    {
+      "id": "ms20",
+      "name": "MS20",
+      "description": "MS-20 drum synthesis samples",
+      "type": "factory",
+      "sampleCount": 11,
+      "manifestPath": "samples/banks/factory/ms20-manifest.json"
+    },
+    {
+      "id": "ms20-metals",
+      "name": "MS-20 Metals",
+      "description": "MS-20 synthesiser metallic and harmonic cymbal samples",
+      "type": "factory",
+      "sampleCount": 13,
+      "manifestPath": "samples/banks/factory/ms20-metals-manifest.json"
+    },
+    {
+      "id": "sr-16",
+      "name": "SR-16",
+      "description": "Alesis SR-16 drum machine samples",
+      "type": "factory",
+      "sampleCount": 13,
+      "manifestPath": "samples/banks/factory/sr-16-manifest.json"
+    },
+    {
+      "id": "sr-18",
+      "name": "SR-18",
+      "description": "Alesis SR-18 drum machine samples (curated selection)",
+      "type": "factory",
+      "sampleCount": 15,
+      "manifestPath": "samples/banks/factory/sr-18-manifest.json"
+    },
+    {
+      "id": "tr-606",
+      "name": "TR-606",
+      "description": "Roland TR-606 Drumatix drum machine samples",
+      "type": "factory",
+      "sampleCount": 12,
+      "manifestPath": "samples/banks/factory/tr-606-manifest.json"
+    },
+    {
+      "id": "tr-707",
+      "name": "TR-707",
+      "description": "Roland TR-707 drum machine samples",
+      "type": "factory",
+      "sampleCount": 13,
+      "manifestPath": "samples/banks/factory/tr-707-manifest.json"
+    },
+    {
+      "id": "tr-727",
+      "name": "TR-727",
+      "description": "Roland TR-727 Latin percussion machine samples",
+      "type": "factory",
+      "sampleCount": 14,
+      "manifestPath": "samples/banks/factory/tr-727-manifest.json"
+    },
+    {
+      "id": "tr-808",
+      "name": "TR-808",
+      "description": "Roland TR-808 drum machine samples",
+      "type": "factory",
+      "sampleCount": 13,
+      "manifestPath": "samples/banks/factory/tr-808-manifest.json"
+    },
+    {
+      "id": "tr-909",
+      "name": "TR-909",
+      "description": "Roland TR-909 drum machine samples",
+      "type": "factory",
+      "sampleCount": 11,
+      "manifestPath": "samples/banks/factory/tr-909-manifest.json"
+    }
+  ]
+}

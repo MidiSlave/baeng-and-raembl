@@ -1,0 +1,37 @@
+{
+  "name": "MS-20 Deep",
+  "description": "MS-20 synthesiser deep bass and harmonic drum samples",
+  "type": "factory",
+  "samples": {
+    "36": "samples/banks/factory/ms20-deep/kick1.wav",
+    "37": "samples/banks/factory/ms20-deep/kick2.wav",
+    "38": "samples/banks/factory/ms20-deep/snare1.wav",
+    "39": "samples/banks/factory/ms20-deep/snare2.wav",
+    "40": "samples/banks/factory/ms20-deep/rim.wav",
+    "41": "samples/banks/factory/ms20-deep/snare3.wav",
+    "47": "samples/banks/factory/ms20-deep/lotom.wav",
+    "48": "samples/banks/factory/ms20-deep/midtom.wav",
+    "50": "samples/banks/factory/ms20-deep/hitom.wav",
+    "51": "samples/banks/factory/ms20-deep/crash.wav",
+    "53": "samples/banks/factory/ms20-deep/ride.wav",
+    "54": "samples/banks/factory/ms20-deep/perc1.wav",
+    "55": "samples/banks/factory/ms20-deep/perc2.wav",
+    "56": "samples/banks/factory/ms20-deep/perc3.wav"
+  },
+  "mapping": {
+    "36": "Deep Kick 1",
+    "37": "Deep Kick 2",
+    "38": "Deep Snare 1",
+    "39": "Deep Snare 2",
+    "40": "Deep Chunk",
+    "41": "Deep Snare 3",
+    "47": "Deep Bass Tom 1",
+    "48": "Deep Bass Tom 2",
+    "50": "Synth Drop 1",
+    "51": "Synth Drop 2",
+    "53": "Synth Drop 3",
+    "54": "Dark Harmony 1",
+    "55": "Dark Harmony 2",
+    "56": "Fat Tail"
+  }
+}

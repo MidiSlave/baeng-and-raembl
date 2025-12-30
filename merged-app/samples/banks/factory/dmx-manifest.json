@@ -1,0 +1,33 @@
+{
+  "name": "DMX",
+  "description": "Oberheim DMX drum machine samples",
+  "type": "factory",
+  "samples": {
+    "36": "samples/banks/factory/dmx/kick.wav",
+    "38": "samples/banks/factory/dmx/snare.wav",
+    "40": "samples/banks/factory/dmx/rim.wav",
+    "42": "samples/banks/factory/dmx/clhat.wav",
+    "44": "samples/banks/factory/dmx/clap.wav",
+    "46": "samples/banks/factory/dmx/ophat.wav",
+    "47": "samples/banks/factory/dmx/lotom.wav",
+    "48": "samples/banks/factory/dmx/midtom.wav",
+    "50": "samples/banks/factory/dmx/hitom.wav",
+    "53": "samples/banks/factory/dmx/ride.wav",
+    "54": "samples/banks/factory/dmx/tamb.wav",
+    "56": "samples/banks/factory/dmx/shaker.wav"
+  },
+  "mapping": {
+    "36": "Bass Drum",
+    "38": "Snare Drum",
+    "40": "Stick/Rim",
+    "42": "Closed Hi-Hat",
+    "44": "Clap",
+    "46": "Open Hi-Hat",
+    "47": "Low Tom",
+    "48": "Mid Tom",
+    "50": "High Tom",
+    "53": "Ride Cymbal",
+    "54": "Tambourine",
+    "56": "Shaker"
+  }
+}

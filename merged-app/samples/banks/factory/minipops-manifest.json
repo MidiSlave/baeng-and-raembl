@@ -1,0 +1,33 @@
+{
+  "name": "MiniPops",
+  "description": "Korg MiniPops vintage rhythm machine samples",
+  "type": "factory",
+  "samples": {
+    "36": "samples/banks/factory/minipops/kick.wav",
+    "38": "samples/banks/factory/minipops/snare.wav",
+    "40": "samples/banks/factory/minipops/rim.wav",
+    "42": "samples/banks/factory/minipops/clhat.wav",
+    "44": "samples/banks/factory/minipops/clap.wav",
+    "46": "samples/banks/factory/minipops/ophat.wav",
+    "47": "samples/banks/factory/minipops/lotom.wav",
+    "48": "samples/banks/factory/minipops/midtom.wav",
+    "50": "samples/banks/factory/minipops/hitom.wav",
+    "51": "samples/banks/factory/minipops/crash.wav",
+    "53": "samples/banks/factory/minipops/ride.wav",
+    "54": "samples/banks/factory/minipops/cowbell.wav"
+  },
+  "mapping": {
+    "36": "Bass Drum",
+    "38": "Snare Drum",
+    "40": "Rim Shot",
+    "42": "Closed Hi-Hat",
+    "44": "Clap",
+    "46": "Open Hi-Hat",
+    "47": "Low Tom",
+    "48": "Mid Tom",
+    "50": "High Tom",
+    "51": "Crash Cymbal",
+    "53": "Ride Cymbal",
+    "54": "Woodblock"
+  }
+}

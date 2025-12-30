@@ -1,0 +1,39 @@
+{
+  "name": "SR-18",
+  "description": "Alesis SR-18 drum machine samples (curated selection)",
+  "type": "factory",
+  "samples": {
+    "36": "samples/banks/factory/sr-18/kick.wav",
+    "38": "samples/banks/factory/sr-18/snare.wav",
+    "40": "samples/banks/factory/sr-18/rim.wav",
+    "42": "samples/banks/factory/sr-18/clhat.wav",
+    "44": "samples/banks/factory/sr-18/clap.wav",
+    "46": "samples/banks/factory/sr-18/ophat.wav",
+    "47": "samples/banks/factory/sr-18/lotom.wav",
+    "48": "samples/banks/factory/sr-18/midtom.wav",
+    "50": "samples/banks/factory/sr-18/hitom.wav",
+    "51": "samples/banks/factory/sr-18/crash.wav",
+    "53": "samples/banks/factory/sr-18/ride.wav",
+    "54": "samples/banks/factory/sr-18/cowbell.wav",
+    "55": "samples/banks/factory/sr-18/tamb.wav",
+    "56": "samples/banks/factory/sr-18/shaker.wav",
+    "57": "samples/banks/factory/sr-18/conga.wav"
+  },
+  "mapping": {
+    "36": "Bass Drum",
+    "38": "Snare Drum",
+    "40": "Rim Shot",
+    "42": "Closed Hi-Hat",
+    "44": "Clap",
+    "46": "Open Hi-Hat",
+    "47": "Low Tom",
+    "48": "Mid Tom",
+    "50": "High Tom",
+    "51": "Crash Cymbal",
+    "53": "Ride Cymbal",
+    "54": "Cowbell",
+    "55": "Tambourine",
+    "56": "Shaker",
+    "57": "Conga"
+  }
+}

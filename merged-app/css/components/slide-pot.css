@@ -1,0 +1,356 @@
+/* File: merged-app/css/components/slide-pot.css
+ * Slide Potentiometer Component Styles
+ * Based on Alpha RA2045F-20R-15LC-B10K-C hardware specification
+ */
+
+/* ============================================
+   HARDWARE-ACCURATE DIMENSIONS
+   ============================================ */
+:root {
+    /* Base dimensions (at 1x scale, ~96dpi) */
+    --slide-pot-travel: 75px;        /* 20mm travel distance */
+    --slide-pot-slot-width: 4px;     /* Narrow slot channel */
+    --slide-pot-body-width: 35px;    /* Body width */
+    --slide-pot-body-depth: 26px;    /* Body depth (height in vertical mode) */
+    --slide-pot-knob-width: 16px;    /* Knob cap width */
+    --slide-pot-knob-height: 22px;   /* Knob lever height */
+    --slide-pot-led-size: 5px;       /* LED diameter */
+
+    /* Scale factor - default 1x */
+    --slide-pot-scale: 1;
+
+    /* Computed dimensions */
+    --sp-travel: calc(var(--slide-pot-travel) * var(--slide-pot-scale));
+    --sp-slot-width: calc(var(--slide-pot-slot-width) * var(--slide-pot-scale));
+    --sp-body-width: calc(var(--slide-pot-body-width) * var(--slide-pot-scale));
+    --sp-body-depth: calc(var(--slide-pot-body-depth) * var(--slide-pot-scale));
+    --sp-knob-width: calc(var(--slide-pot-knob-width) * var(--slide-pot-scale));
+    --sp-knob-height: calc(var(--slide-pot-knob-height) * var(--slide-pot-scale));
+    --sp-led-size: calc(var(--slide-pot-led-size) * var(--slide-pot-scale));
+}
+
+/* ============================================
+   SLIDE POT CONTAINER
+   ============================================ */
+.slide-pot-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.slide-pot-label {
+    font-size: 10px;
+    color: var(--theme-color);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    height: 14px;
+}
+
+.slide-pot-value {
+    font-size: 9px;
+    color: var(--theme-color);
+    height: 12px;
+    min-width: 30px;
+    text-align: center;
+    margin-top: 12px;  /* Extra spacing below fader */
+}
+
+/* ============================================
+   SLIDE POT BODY (Vertical - Default)
+   ============================================ */
+.slide-pot-body {
+    position: relative;
+    width: var(--sp-body-width);
+    /* Total height = travel + knob overhang at top and bottom */
+    height: calc(var(--sp-travel) + var(--sp-knob-height));
+    background: transparent;
+    border: none;
+    cursor: ns-resize;
+}
+
+/* ============================================
+   SLOT / TRACK
+   ============================================ */
+.slide-pot-slot {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: var(--sp-slot-width);
+    height: var(--sp-travel);
+    /* Centre vertically within body */
+    top: calc(var(--sp-knob-height) / 2);
+
+    background: var(--bg-display);
+    border-radius: 2px;
+
+    /* Recessed appearance */
+    box-shadow:
+        inset 0 1px 3px rgba(0,0,0,0.6),
+        inset 0 -1px 1px rgba(255,255,255,0.05);
+}
+
+/* ============================================
+   KNOB / SLIDER CAP
+   ============================================ */
+.slide-pot-knob {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: var(--sp-knob-width);
+    height: var(--sp-knob-height);
+
+    /* Subtle gradient for depth - uses CSS variables for theme support */
+    background: linear-gradient(
+        to bottom,
+        var(--knob-gradient-1, #3a3a3a) 0%,
+        var(--knob-gradient-2, #252525) 40%,
+        var(--knob-gradient-3, #1a1a1a) 60%,
+        var(--knob-gradient-2, #252525) 100%
+    );
+    border: 1px solid var(--border-grey-1);
+    border-radius: 3px;
+
+    /* Position via custom property (0% = bottom, 100% = top) */
+    /* bottom = knob-height/2 + position * travel */
+    bottom: calc(
+        (var(--sp-knob-height) / 2) - (var(--sp-knob-height) / 2) +
+        (var(--pot-position, 0) / 100 * var(--sp-travel))
+    );
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+
+    cursor: ns-resize;
+    user-select: none;
+    touch-action: none;
+
+    /* Subtle 3D */
+    box-shadow:
+        0 2px 4px rgba(0,0,0,0.3),
+        inset 0 1px 0 rgba(255,255,255,0.1);
+
+    transition: box-shadow 0.1s ease;
+}
+
+.slide-pot-knob:hover {
+    box-shadow:
+        0 2px 6px rgba(0,0,0,0.4),
+        inset 0 1px 0 rgba(255,255,255,0.15);
+}
+
+.slide-pot-container.dragging .slide-pot-knob {
+    box-shadow:
+        0 1px 2px rgba(0,0,0,0.4),
+        inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+/* ============================================
+   LED INDICATOR
+   ============================================ */
+.slide-pot-led {
+    width: var(--sp-led-size);
+    height: var(--sp-led-size);
+    border-radius: 50%;
+    background: var(--theme-color);
+
+    /* LED brightness controlled by custom property */
+    opacity: var(--led-brightness, 0.3);
+
+    /* Glow effect - uses theme colour for consistent theming */
+    box-shadow:
+        0 0 calc(var(--sp-led-size) * 0.8) var(--theme-color),
+        0 0 calc(var(--sp-led-size) * 1.5) var(--theme-color-glow, rgba(255, 220, 50, 0.3));
+
+    transition: opacity 0.05s linear, box-shadow 0.05s linear;
+}
+
+/* LED brightness scales with value (value mode) */
+.slide-pot-knob[data-led-mode="value"] .slide-pot-led {
+    /* Brightness: 0.2 at 0%, 1.0 at 100% */
+    opacity: calc(0.2 + (var(--pot-position, 0) / 100) * 0.8);
+}
+
+/* Fixed brightness mode */
+.slide-pot-knob[data-led-mode="fixed"] .slide-pot-led {
+    opacity: 0.8;
+}
+
+/* ============================================
+   GRIP TEXTURE
+   ============================================ */
+.slide-pot-grip {
+    width: 80%;
+    height: 6px;
+    background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 1px,
+        var(--border-grey-2) 1px,
+        var(--border-grey-2) 2px
+    );
+    border-radius: 1px;
+    opacity: 0.7;
+}
+
+/* ============================================
+   HORIZONTAL ORIENTATION
+   ============================================ */
+.slide-pot-container[data-orientation="horizontal"] {
+    flex-direction: row;
+}
+
+.slide-pot-container[data-orientation="horizontal"] .slide-pot-label {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    height: auto;
+    width: 14px;
+}
+
+.slide-pot-container[data-orientation="horizontal"] .slide-pot-value {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    width: 12px;
+    height: auto;
+    min-width: auto;
+    min-height: 30px;
+}
+
+.slide-pot-container[data-orientation="horizontal"] .slide-pot-body {
+    width: calc(var(--sp-travel) + var(--sp-knob-height));
+    height: var(--sp-body-width);
+    background: transparent;
+    border: none;
+    cursor: ew-resize;
+}
+
+.slide-pot-container[data-orientation="horizontal"] .slide-pot-slot {
+    width: var(--sp-travel);
+    height: var(--sp-slot-width);
+    top: 50%;
+    left: calc(var(--sp-knob-height) / 2);
+    transform: translateY(-50%);
+}
+
+.slide-pot-container[data-orientation="horizontal"] .slide-pot-knob {
+    width: var(--sp-knob-height);
+    height: var(--sp-knob-width);
+    top: 50%;
+    left: calc(
+        (var(--sp-knob-height) / 2) - (var(--sp-knob-height) / 2) +
+        (var(--pot-position, 0) / 100 * var(--sp-travel))
+    );
+    bottom: auto;
+    transform: translateY(-50%);
+    cursor: ew-resize;
+    flex-direction: row;
+}
+
+.slide-pot-container[data-orientation="horizontal"] .slide-pot-grip {
+    width: 6px;
+    height: 80%;
+    background: repeating-linear-gradient(
+        to right,
+        transparent 0px,
+        transparent 1px,
+        var(--border-grey-2) 1px,
+        var(--border-grey-2) 2px
+    );
+}
+
+/* ============================================
+   SCALE VARIANTS
+   ============================================ */
+.slide-pot-container[data-scale="0.5"] {
+    --slide-pot-scale: 0.5;
+}
+
+.slide-pot-container[data-scale="0.75"] {
+    --slide-pot-scale: 0.75;
+}
+
+.slide-pot-container[data-scale="1"] {
+    --slide-pot-scale: 1;
+}
+
+.slide-pot-container[data-scale="1.5"] {
+    --slide-pot-scale: 1.5;
+}
+
+.slide-pot-container[data-scale="2"] {
+    --slide-pot-scale: 2;
+}
+
+/* ============================================
+   STEPPED MODE (discrete values)
+   ============================================ */
+.slide-pot-container[data-stepped="true"] .slide-pot-knob {
+    transition: bottom 0.08s ease-out;
+}
+
+.slide-pot-container[data-orientation="horizontal"][data-stepped="true"] .slide-pot-knob {
+    transition: left 0.08s ease-out;
+}
+
+/* ============================================
+   MODULATING STATE (PPMod active)
+   ============================================ */
+.slide-pot-container.modulating .slide-pot-led {
+    /* Override value-mode calc - use JS-controlled brightness */
+    opacity: var(--led-brightness, 0.5) !important;
+    /* Enhanced glow when modulating */
+    box-shadow:
+        0 0 calc(var(--sp-led-size) * 1.2) var(--theme-color),
+        0 0 calc(var(--sp-led-size) * 2.5) rgba(255, 220, 50, 0.5);
+}
+
+/* ============================================
+   MODULATABLE LABEL (clickable for PPMod)
+   ============================================ */
+.slide-pot-label.modulatable {
+    cursor: pointer;
+}
+
+.slide-pot-label.modulatable:hover {
+    text-decoration: underline;
+}
+
+.slide-pot-label.muted {
+    opacity: 0.5;
+}
+
+/* ============================================
+   CANVAS-BASED KNOB
+   ============================================ */
+/* When using canvas knob, hide default LED and grip */
+.slide-pot-knob:has(.slide-pot-knob-canvas) .slide-pot-led,
+.slide-pot-knob:has(.slide-pot-knob-canvas) .slide-pot-grip {
+    display: none;
+}
+
+/* Canvas knob - landscape orientation (wider than tall) */
+.slide-pot-knob-canvas {
+    display: block;
+    /* Canvas dimensions set in HTML: width="48" height="24" */
+    /* Rendered at 2x for retina, displayed at half size */
+    width: 24px;
+    height: 12px;
+}
+
+/* When using canvas knob, adjust knob container */
+.slide-pot-knob:has(.slide-pot-knob-canvas) {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    /* Make container just fit the canvas */
+    width: auto;
+    height: auto;
+    min-width: 24px;
+    min-height: 12px;
+    padding: 0;
+}

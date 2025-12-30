@@ -1,0 +1,246 @@
+/**
+ * Random Font Selector for App Title
+ * Applies a random font to the app title on each page load
+ */
+
+// Extensive list of web-safe and interesting fonts
+const FONT_LIST = [
+    // Sans-serif fonts
+    'Impact, fantasy',
+    'Helvetica, sans-serif',
+    'Helvetica Neue, sans-serif',
+    'Arial, sans-serif',
+    'Arial Black, sans-serif',
+    'Arial Narrow, sans-serif',
+    'Verdana, sans-serif',
+    'Trebuchet MS, sans-serif',
+    'Lucida Grande, sans-serif',
+    'Lucida Sans Unicode, sans-serif',
+    'Gill Sans, sans-serif',
+    'Tahoma, sans-serif',
+    'Geneva, sans-serif',
+    'Avenir, sans-serif',
+    'Avenir Next, sans-serif',
+    'Optima, sans-serif',
+    'Futura, sans-serif',
+    'Century Gothic, sans-serif',
+    'Calibri, sans-serif',
+    'Franklin Gothic Medium, sans-serif',
+    'Segoe UI, sans-serif',
+    'Candara, sans-serif',
+    'Corbel, sans-serif',
+    'Myriad Pro, sans-serif',
+    'PT Sans, sans-serif',
+    'Lato, sans-serif',
+    'Roboto, sans-serif',
+    'Open Sans, sans-serif',
+    'Montserrat, sans-serif',
+    'Raleway, sans-serif',
+    'Proxima Nova, sans-serif',
+    'Nunito, sans-serif',
+    'Source Sans Pro, sans-serif',
+    'Ubuntu, sans-serif',
+    'Oswald, sans-serif',
+    'Poppins, sans-serif',
+    'Work Sans, sans-serif',
+    'Rubik, sans-serif',
+    'Barlow, sans-serif',
+    'Karla, sans-serif',
+
+    // Serif fonts
+    'Georgia, serif',
+    'Times New Roman, serif',
+    'Times, serif',
+    'Palatino, serif',
+    'Palatino Linotype, serif',
+    'Garamond, serif',
+    'Baskerville, serif',
+    'Hoefler Text, serif',
+    'Didot, serif',
+    'Bodoni MT, serif',
+    'Book Antiqua, serif',
+    'Bookman, serif',
+    'Cambria, serif',
+    'Constantia, serif',
+    'Goudy Old Style, serif',
+    'Rockwell, serif',
+    'Century, serif',
+    'Big Caslon, serif',
+    'Cochin, serif',
+    'Iowan Old Style, serif',
+    'Charter, serif',
+    'New York, serif',
+    'Caslon, serif',
+    'Minion Pro, serif',
+    'Adobe Caslon Pro, serif',
+    'Adobe Garamond Pro, serif',
+    'Mrs Eaves, serif',
+    'Merriweather, serif',
+    'Playfair Display, serif',
+    'Lora, serif',
+    'Crimson Text, serif',
+    'Source Serif Pro, serif',
+    'Spectral, serif',
+    'Bitter, serif',
+    'Libre Baskerville, serif',
+    'PT Serif, serif',
+    'Arvo, serif',
+    'Cardo, serif',
+    'Cormorant, serif',
+    'EB Garamond, serif',
+    'Vollkorn, serif',
+    'Neuton, serif',
+
+    // Monospace fonts
+    'Courier New, monospace',
+    'Courier, monospace',
+    'Monaco, monospace',
+    'Menlo, monospace',
+    'Consolas, monospace',
+    'Andale Mono, monospace',
+    'Lucida Console, monospace',
+    'DejaVu Sans Mono, monospace',
+    'Liberation Mono, monospace',
+    'Inconsolata, monospace',
+    'SF Mono, monospace',
+    'Source Code Pro, monospace',
+    'Fira Code, monospace',
+    'Fira Mono, monospace',
+    'JetBrains Mono, monospace',
+    'IBM Plex Mono, monospace',
+    'Roboto Mono, monospace',
+    'Space Mono, monospace',
+    'PT Mono, monospace',
+    'Noto Mono, monospace',
+    'Ubuntu Mono, monospace',
+    'Oxygen Mono, monospace',
+    'Anonymous Pro, monospace',
+    'Overpass Mono, monospace',
+    'Cutive Mono, monospace',
+    'VT323, monospace',
+    'Major Mono Display, monospace',
+
+    // Cursive/Script fonts
+    'Comic Sans MS, cursive',
+    'Brush Script MT, cursive',
+    'Bradley Hand, cursive',
+    'Snell Roundhand, cursive',
+    'Zapfino, cursive',
+    'Lucida Handwriting, cursive',
+    'Apple Chancery, cursive',
+    'Edwardian Script ITC, cursive',
+    'Lucida Calligraphy, cursive',
+    'Mistral, cursive',
+    'Monotype Corsiva, cursive',
+    'Freestyle Script, cursive',
+    'French Script MT, cursive',
+    'Vivaldi, cursive',
+    'Vladimir Script, cursive',
+    'Segoe Script, cursive',
+    'Brush Script Std, cursive',
+    'Rage Italic, cursive',
+    'Kunstler Script, cursive',
+    'Pacifico, cursive',
+    'Dancing Script, cursive',
+    'Great Vibes, cursive',
+    'Lobster, cursive',
+    'Satisfy, cursive',
+    'Sacramento, cursive',
+    'Allura, cursive',
+    'Kaushan Script, cursive',
+    'Courgette, cursive',
+    'Cookie, cursive',
+    'Petit Formal Script, cursive',
+    'Bad Script, cursive',
+    'Caveat, cursive',
+    'Amatic SC, cursive',
+    'Patrick Hand, cursive',
+    'Indie Flower, cursive',
+    'Shadows Into Light, cursive',
+
+    // Fantasy/Display fonts
+    'Papyrus, fantasy',
+    'Luminari, fantasy',
+    'Copperplate, fantasy',
+    'Chalkboard, fantasy',
+    'Marker Felt, fantasy',
+    'Herculanum, fantasy',
+    'Trattatello, fantasy',
+    'American Typewriter, serif',
+    'Stencil, fantasy',
+    'Curlz MT, fantasy',
+    'Jokerman, fantasy',
+    'Algerian, fantasy',
+    'Broadway, fantasy',
+    'Castellar, fantasy',
+    'Showcard Gothic, fantasy',
+    'Snap ITC, fantasy',
+    'Playbill, fantasy',
+    'Rockwell Extra Bold, fantasy',
+    'Haettenschweiler, fantasy',
+    'Blackadder ITC, fantasy',
+    'Chiller, fantasy',
+    'Ravie, fantasy',
+    'Old English Text MT, fantasy',
+    'Elephant, fantasy',
+    'Engravers MT, fantasy',
+    'Felix Titling, fantasy',
+    'Forte, fantasy',
+    'Gloucester MT Extra Condensed, fantasy',
+    'Harlow Solid Italic, fantasy',
+    'Imprint MT Shadow, fantasy',
+    'Magneto, fantasy',
+    'Niagara Solid, fantasy',
+    'Palace Script MT, fantasy',
+    'Perpetua Titling MT, fantasy',
+    'Wide Latin, fantasy',
+    'Bangers, fantasy',
+    'Creepster, fantasy',
+    'Fredoka One, fantasy',
+    'Righteous, fantasy',
+    'Black Ops One, fantasy',
+    'Bungee, fantasy',
+    'Monoton, fantasy',
+    'Shrikhand, fantasy',
+    'Fascinate, fantasy',
+    'Rammetto One, fantasy',
+    'Geostar Fill, fantasy',
+    'Sancreek, fantasy',
+    'Orbitron, fantasy',
+    'Press Start 2P, fantasy',
+    'Audiowide, fantasy',
+    'Iceland, fantasy',
+    'Wallpoet, fantasy',
+    'Iceberg, fantasy',
+    'Faster One, fantasy'
+];
+
+/**
+ * Apply a random font to the app title element
+ * @param {string} selector - CSS selector for the title element (default: 'h1')
+ */
+export function applyRandomFont(selector = 'h1') {
+    const titleElement = document.querySelector(selector);
+
+    if (!titleElement) {
+        console.warn(`Random font: Element with selector "${selector}" not found`);
+        return;
+    }
+
+    // Pick a random font from the list
+    const randomIndex = Math.floor(Math.random() * FONT_LIST.length);
+    const selectedFont = FONT_LIST[randomIndex];
+
+    // Apply the font
+    titleElement.style.fontFamily = selectedFont;
+
+    // Log the selected font for debugging
+}
+
+/**
+ * Get the current font list (useful for debugging)
+ * @returns {string[]} Array of font family strings
+ */
+export function getFontList() {
+    return [...FONT_LIST];
+}

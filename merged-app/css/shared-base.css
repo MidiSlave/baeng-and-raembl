@@ -1,0 +1,319 @@
+/* File: merged-app/css/shared-base.css
+ * Shared CSS variables and base styles for Bæng & Ræmbl merged application
+ */
+
+:root {
+    /* Default (Dark) Theme */
+    --bg-body: #222222;
+    --bg-module: #111111;
+    --bg-canvas: #0A0A0A;
+    --bg-canvas-alt: #0A0A0A;
+    --bg-settings: #181818;
+    --bg-settings-content: #2a2a2a;
+    --bg-input: #2c2c2c;
+    --bg-input-hover: #383838;
+    --bg-button: #222222;
+    --bg-button-hover: #333333;
+    --bg-display: #0A0A0A;
+
+    --border-grey-1: #444444;
+    --border-grey-2: #333333;
+    --border-grey-3: #555555;
+    --border-grey-4: #666666;
+
+    --text-white: #ffffff;
+    --text-grey-1: #cccccc;
+    --text-grey-2: #aaa;
+    --text-grey-3: #888;
+
+    /* Theme color (unified for both apps) */
+    --theme-color: #FFDC32;
+    --theme-color-r: 255;
+    --theme-color-g: 220;
+    --theme-color-b: 50;
+    --theme-color-dim: #CC9900;
+    --theme-color-hover: #FFFFAF;
+
+    /* Gradient theme colours (used when .gradient-mode is active) */
+    --theme-color-1: #FFDC32;
+    --theme-color-1-r: 255;
+    --theme-color-1-g: 220;
+    --theme-color-1-b: 50;
+    --theme-color-2: #32DCFF;
+    --theme-color-2-r: 50;
+    --theme-color-2-g: 220;
+    --theme-color-2-b: 255;
+    --theme-gradient-h: linear-gradient(to right, var(--theme-color-1), var(--theme-color-2));
+    --theme-gradient-v: linear-gradient(to bottom, var(--theme-color-1), var(--theme-color-2));
+
+    /* RGB components for bg-module (for colour blending) */
+    --bg-module-r: 17;
+    --bg-module-g: 17;
+    --bg-module-b: 17;
+
+    /* Additional theme variables */
+    --bg-darker: #1A1A1A;
+    --step-active-bg: #404040;
+    --accent-color: #FF8C00;
+
+    /* Grid colours (for visualisations) */
+    --grid-1: #333333;
+    --grid-2: #444444;
+    --grid-3: #555555;
+
+    /* ===== LAYOUT FOUNDATION ===== */
+
+    /* Spacing scale */
+    --space-2xs: 2px;
+    --space-xs: 4px;
+    --space-sm: 6px;
+    --space-md: 10px;
+    --space-lg: 15px;
+    --space-xl: 20px;
+
+    /* Border radius scale */
+    --radius-sm: 3px;
+    --radius-md: 5px;
+    --radius-lg: 6px;
+    --radius-round: 50%;
+
+    /* Typography scale */
+    --font-2xs: 7px;
+    --font-xs: 8px;
+    --font-sm: 9px;
+    --font-md: 10px;
+    --font-lg: 12px;
+    --font-xl: 14px;
+
+    /* Module consistency */
+    --module-padding: var(--space-md);
+    --module-radius: var(--radius-lg);
+    --module-gap: var(--space-md);
+    --header-margin-bottom: var(--space-md);
+    --header-padding-bottom: var(--space-xs);
+    --header-min-height: 26px;
+    --header-font-size: var(--font-xl);
+
+    /* Row/body layout */
+    --body-padding: var(--space-lg);
+    --body-gap: var(--space-md);
+    --app-gap: 40px;
+
+    /* Dynamic module gap (JS-controlled) */
+    --dynamic-module-gap: 10px;
+}
+
+/* Light Theme */
+[data-theme="light"] {
+    --bg-body: #dddddd;
+    --bg-module: #eeeeee;
+    --bg-canvas: #f5f5f5;
+    --bg-canvas-alt: #f0f0f0;
+    --bg-settings: #e8e8e8;
+    --bg-settings-content: #f2f2f2;
+    --bg-input: #ffffff;
+    --bg-input-hover: #f8f8f8;
+    --bg-button: #e0e0e0;
+    --bg-button-hover: #d0d0d0;
+    --bg-display: #fafafa;
+
+    --border-grey-1: #cccccc;
+    --border-grey-2: #bbbbbb;
+    --border-grey-3: #aaaaaa;
+    --border-grey-4: #999999;
+
+    --text-white: #000000;
+    --text-grey-1: #333333;
+    --text-grey-2: #555555;
+    --text-grey-3: #777777;
+
+    --theme-color: #CC9900;
+    --theme-color-r: 204;
+    --theme-color-g: 153;
+    --theme-color-b: 0;
+    --theme-color-dim: #996600;
+    --theme-color-hover: #FFCC00;
+
+    /* Gradient mode colours for light theme (darker/more saturated for visibility) */
+    --theme-color-1: #CC9900;
+    --theme-color-1-r: 204;
+    --theme-color-1-g: 153;
+    --theme-color-1-b: 0;
+    --theme-color-2: #0099CC;
+    --theme-color-2-r: 0;
+    --theme-color-2-g: 153;
+    --theme-color-2-b: 204;
+    --theme-gradient-h: linear-gradient(to right, var(--theme-color-1), var(--theme-color-2));
+    --theme-gradient-v: linear-gradient(to bottom, var(--theme-color-1), var(--theme-color-2));
+
+    /* RGB components for bg-module (for colour blending) */
+    --bg-module-r: 238;
+    --bg-module-g: 238;
+    --bg-module-b: 238;
+
+    /* Additional theme variables */
+    --bg-darker: #e5e5e5;
+    --step-active-bg: #bfbfbf;
+
+    /* Grid colours (for visualisations) */
+    --grid-1: #cccccc;
+    --grid-2: #bbbbbb;
+    --grid-3: #aaaaaa;
+}
+
+/* Global resets */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Menlo', 'Monaco', 'Consolas', 'Courier New', monospace;
+}
+
+body {
+    background-color: var(--bg-body);
+    color: var(--theme-color);
+    overflow-x: hidden;
+    font-size: var(--font-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--body-padding) var(--body-padding) var(--app-gap) var(--body-padding);
+    gap: var(--body-gap);
+}
+
+/* Individual app containers */
+.baeng-app, .raembl-app {
+    width: 100%;
+    max-width: 1400px;
+    display: flex;
+    justify-content: center;
+    /* Prevent text selection on double-click/shift-click */
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
+
+/* Re-enable text selection for actual input fields */
+.baeng-app input,
+.baeng-app textarea,
+.baeng-app select,
+.raembl-app input,
+.raembl-app textarea,
+.raembl-app select {
+    user-select: text;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+}
+
+/* Shared utilities */
+.hidden {
+    display: none !important;
+}
+
+.close-button {
+    background: transparent;
+    border: none;
+    color: var(--theme-color);
+    font-size: 24px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.close-button:hover {
+    color: var(--theme-color-hover);
+}
+
+/* App container - vertical stack layout */
+#app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: var(--space-xl);
+    gap: var(--app-gap);
+}
+
+/* Scrollbar styling (webkit browsers) */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-module);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-grey-1);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--border-grey-3);
+}
+
+/* Common button styles */
+button {
+    background-color: var(--bg-button);
+    border: 1px solid var(--border-grey-1);
+    color: var(--text-white);
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+button:hover {
+    background-color: var(--bg-button-hover);
+    border-color: var(--border-grey-3);
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+button:focus {
+    outline: none;
+}
+
+button:focus-visible {
+    outline: 1px solid var(--theme-color);
+    outline-offset: 1px;
+}
+
+/* Common input styles */
+input[type="text"],
+input[type="number"],
+select {
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-grey-1);
+    color: var(--text-white);
+    padding: 4px 8px;
+    font-size: 11px;
+}
+
+input[type="text"]:hover,
+input[type="number"]:hover,
+select:hover {
+    background-color: var(--bg-input-hover);
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus {
+    outline: 1px solid var(--theme-color);
+    border-color: var(--theme-color);
+}
+
+/* Canvas common styles */
+canvas {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+/* Spacer panels - empty bordered boxes to fill gaps between modules */
+.spacer-panel {
+    background: var(--bg-module);
+    border: 1px solid var(--theme-color);
+    border-radius: var(--module-radius);
+    flex-grow: 1;
+    min-height: 100px;
+}

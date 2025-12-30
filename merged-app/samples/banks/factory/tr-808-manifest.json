@@ -1,0 +1,35 @@
+{
+  "name": "TR-808",
+  "description": "Roland TR-808 drum machine samples",
+  "type": "factory",
+  "samples": {
+    "36": "samples/banks/factory/tr-808/kick.wav",
+    "38": "samples/banks/factory/tr-808/snare.wav",
+    "40": "samples/banks/factory/tr-808/rim.wav",
+    "42": "samples/banks/factory/tr-808/clhat.wav",
+    "44": "samples/banks/factory/tr-808/clap.wav",
+    "46": "samples/banks/factory/tr-808/ophat.wav",
+    "47": "samples/banks/factory/tr-808/lotom.wav",
+    "48": "samples/banks/factory/tr-808/midtom.wav",
+    "50": "samples/banks/factory/tr-808/hitom.wav",
+    "51": "samples/banks/factory/tr-808/crash.wav",
+    "53": "samples/banks/factory/tr-808/ride.wav",
+    "54": "samples/banks/factory/tr-808/cowbell.wav",
+    "56": "samples/banks/factory/tr-808/maracas.wav"
+  },
+  "mapping": {
+    "36": "Bass Drum",
+    "38": "Snare Drum",
+    "40": "Rim Shot",
+    "42": "Closed Hi-Hat",
+    "44": "Clap",
+    "46": "Open Hi-Hat",
+    "47": "Low Tom/Conga",
+    "48": "Mid Tom/Conga",
+    "50": "High Tom/Conga",
+    "51": "Crash Cymbal",
+    "53": "Ride Cymbal",
+    "54": "Cowbell",
+    "56": "Maracas"
+  }
+}

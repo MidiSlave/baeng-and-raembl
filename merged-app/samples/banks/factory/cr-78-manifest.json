@@ -1,0 +1,27 @@
+{
+  "name": "CR-78",
+  "description": "Roland CR-78 CompuRhythm samples",
+  "type": "factory",
+  "samples": {
+    "36": "samples/banks/factory/cr-78/kick.wav",
+    "38": "samples/banks/factory/cr-78/snare.wav",
+    "40": "samples/banks/factory/cr-78/rim.wav",
+    "42": "samples/banks/factory/cr-78/clhat.wav",
+    "46": "samples/banks/factory/cr-78/ophat.wav",
+    "51": "samples/banks/factory/cr-78/cymbal.wav",
+    "54": "samples/banks/factory/cr-78/tamb.wav",
+    "56": "samples/banks/factory/cr-78/cowbell.wav",
+    "58": "samples/banks/factory/cr-78/guiro.wav"
+  },
+  "mapping": {
+    "36": "Bass Drum",
+    "38": "Snare Drum",
+    "40": "Rim Shot",
+    "42": "Closed Hi-Hat",
+    "46": "Open Hi-Hat",
+    "51": "Cymbal",
+    "54": "Tambourine",
+    "56": "Cowbell",
+    "58": "Guiro"
+  }
+}

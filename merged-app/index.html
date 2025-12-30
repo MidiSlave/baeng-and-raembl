@@ -1,0 +1,1892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bæng & Ræmbl - Unified Synthesiser Suite</title>
+    <link rel="icon" type="image/png" href="icon.png">
+
+    <!-- Shared CSS first -->
+    <link rel="stylesheet" href="css/shared-base.css">
+    <!-- Component CSS -->
+    <link rel="stylesheet" href="css/components/slide-pot.css">
+    <link rel="stylesheet" href="css/components/led-ring-knob.css">
+    <link rel="stylesheet" href="css/components/mini-fader.css">
+    <link rel="stylesheet" href="css/components/time-strip.css">
+    <link rel="stylesheet" href="css/components/info-modal.css">
+    <link rel="stylesheet" href="css/ppmod-modal.css">
+    <link rel="stylesheet" href="css/settings-tabs.css">
+    <link rel="stylesheet" href="css/circuit-pattern.css">
+    <!-- Then app-specific CSS -->
+    <link rel="stylesheet" href="css/baeng.css">
+    <link rel="stylesheet" href="css/raembl.css">
+    <!-- iPad landscape optimisation (last to override) -->
+    <link rel="stylesheet" href="css/ipad-landscape.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
+
+    <script type="importmap">
+    {
+      "imports": {
+        "config": "./js/config.js",
+        "utils": "./js/utils.js",
+        "time": "./js/modules/time.js",
+        "sequence": "./js/modules/sequence.js",
+        "engine": "./js/modules/engine.js",
+        "ui": "./js/ui.js",
+        "components": "./js/components/index.js",
+        "state": "./js/state.js",
+        "audio": "./js/audio.js",
+        "main": "./js/main.js",
+        "clock": "./js/modules/clock.js",
+        "factors": "./js/modules/factors.js",
+        "lfo": "./js/modules/lfo.js",
+        "path": "./js/modules/path.js",
+        "reverb": "./js/modules/reverb.js",
+        "delay": "./js/modules/delay.js"
+      }
+    }
+    </script>
+</head>
+<body>
+    <!-- Bæng Section (Top) -->
+    <div id="baeng-app" class="baeng-app">
+        <!-- SVG Gradient Definitions for Gradient Mode -->
+        <svg width="0" height="0" style="position: absolute;">
+            <defs>
+                <linearGradient id="gradient-stroke" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="hsl(45, 100%, 50%)" stop-opacity="1" />
+                    <stop offset="100%" stop-color="hsl(180, 100%, 50%)" stop-opacity="1" />
+                </linearGradient>
+                <linearGradient id="gradient-fill" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="hsl(45, 100%, 50%)" stop-opacity="1" />
+                    <stop offset="100%" stop-color="hsl(180, 100%, 50%)" stop-opacity="1" />
+                </linearGradient>
+            </defs>
+        </svg>
+
+        <div id="baeng-inner-app">
+            <!-- Persistent file input for engine loading (never destroyed by re-renders) -->
+            <input type="file" id="baeng-persistent-engine-file-input" style="position: absolute; left: -9999px; opacity: 0; pointer-events: none;">
+
+            <div class="main-row" id="baeng-main-row">
+                <!-- Modules will be dynamically inserted here by JavaScript (js/components/index.js) -->
+            </div>
+
+            <!-- SETTINGS PANEL START -->
+            <div id="baeng-settings-panel" class="settings-panel hidden">
+                <div class="settings-panel-header">
+                    <h2>Settings</h2>
+                    <button id="baeng-close-settings-btn" class="close-button" title="Close Settings">×</button>
+                </div>
+                <!-- Tab bar (6 tabs) -->
+                <div class="settings-tabs" data-settings-for="baeng">
+                    <button class="settings-tab active" data-tab="patch">PATCH</button>
+                    <button class="settings-tab" data-tab="fx">FX</button>
+                    <button class="settings-tab" data-tab="midi">MIDI</button>
+                    <button class="settings-tab" data-tab="theme">THEME</button>
+                    <button class="settings-tab" data-tab="scale">SCALE</button>
+                    <button class="settings-tab" data-tab="help">HELP</button>
+                </div>
+                <div class="settings-panel-content">
+                    <!-- PATCH Tab -->
+                    <div class="settings-tab-panel active" data-tab-panel="patch">
+                    <div class="settings-section" id="baeng-save-load-section">
+                        <h3>Save / Load Global Patch</h3>
+                        <p>Store and recall your entire Bæng configuration (all voices, sequences, and global settings).</p>
+                        <div class="settings-button-row">
+                            <button id="baeng-save-patch-button" class="settings-button">Save</button>
+                            <!-- Hidden file input for global patch loading, triggered by the button below -->
+                            <input type="file" id="baeng-load-patch-input" accept=".json" style="display: none;">
+                            <button id="baeng-load-patch-button" class="settings-button">Load</button>
+                        </div>
+                        <p class="settings-feedback" id="baeng-patch-feedback"></p>
+                    </div>
+                    </div>
+
+                    <!-- FX Tab -->
+                    <div class="settings-tab-panel" data-tab-panel="fx">
+                    <div class="settings-section" id="baeng-fx-mode-section">
+                        <h3>FX Mode</h3>
+                        <p>Choose between classic effects or Clouds granular processor.</p>
+                        <div class="settings-button-row">
+                            <button id="baeng-fx-mode-classic" class="settings-button fx-mode-btn active" data-mode="classic">
+                                Classic (Reverb + Delay)
+                            </button>
+                            <button id="baeng-fx-mode-clouds" class="settings-button fx-mode-btn" data-mode="clouds">
+                                Clouds
+                            </button>
+                        </div>
+                    </div>
+                    </div>
+
+                    <!-- MIDI Tab -->
+                    <div class="settings-tab-panel" data-tab-panel="midi">
+                    <div class="settings-section" id="baeng-midi-input-section">
+                        <h3>MIDI Input Device</h3>
+                        <p>Select your MIDI controller. (Note: MIDI functionality is planned for future updates).</p>
+                        <select id="baeng-midi-input-select" disabled><option value="">No Devices Available</option></select>
+                    </div>
+
+                    <div class="settings-section" id="baeng-midi-map-section">
+                        <h3>MIDI CC Mapping</h3>
+                        <p>Assign MIDI Control Change messages to synth parameters. (Note: MIDI functionality is planned for future updates).</p>
+
+                        <div class="midi-mapping-controls">
+                            <div class="midi-mapping-form-item">
+                                <label for="baeng-midi-parameter-select">Parameter:</label>
+                                <select id="baeng-midi-parameter-select" disabled>
+                                    <option value="">-- Select Parameter --</option>
+                                </select>
+                            </div>
+                            <div class="midi-mapping-form-item">
+                                <label for="baeng-midi-cc-input">CC #:</label>
+                                <input type="number" id="baeng-midi-cc-input" min="0" max="127" placeholder="0-127" disabled>
+                            </div>
+                            <div class="midi-mapping-form-item">
+                                <label for="baeng-midi-channel-input">Channel (Opt.):</label>
+                                <input type="number" id="baeng-midi-channel-input" min="1" max="16" placeholder="1-16" disabled>
+                            </div>
+                            <div class="midi-mapping-form-item">
+                                 <button id="baeng-midi-learn-btn" class="settings-button-small" disabled>Learn</button>
+                            </div>
+                            <div class="midi-mapping-form-item">
+                                <button id="baeng-add-midi-mapping-btn" class="settings-button-small" disabled>Add</button>
+                            </div>
+                        </div>
+                        <div id="baeng-midi-learn-status" class="settings-feedback"></div>
+
+                        <h4>Current Mappings:</h4>
+                        <ul id="baeng-midi-mappings-list">
+                            <li class="no-mappings">No CC mappings defined.</li>
+                        </ul>
+                    </div>
+                    </div>
+
+                    <!-- THEME Tab -->
+                    <div class="settings-tab-panel" data-tab-panel="theme">
+                    <div class="settings-section" id="baeng-theme-section">
+                        <h3>Theme & Appearance</h3>
+                        <p>Customise the visual appearance of Bæng.</p>
+
+                        <div class="button-row">
+                            <button id="baeng-invert-display-button" class="settings-button">Switch to Light Mode</button>
+                        </div>
+
+                        <h4 style="font-size: 13px; margin-top: 15px; margin-bottom: 8px;">Theme Colour</h4>
+
+                        <!-- Gradient Mode Toggle -->
+                        <label class="settings-checkbox" style="margin-bottom: 12px;">
+                            <input type="checkbox" id="baeng-gradient-mode-toggle">
+                            <span>Enable Gradient Mode</span>
+                        </label>
+
+                        <!-- Single Color Mode (default) -->
+                        <div id="baeng-single-color-controls">
+                            <p style="margin-bottom: 8px;">Adjust the hue of the theme colour (0-360°).</p>
+                            <div class="theme-hue-container">
+                                <div class="theme-hue-fader" id="baeng-single-hue-fader">
+                                    <div class="theme-hue-track">
+                                        <div class="theme-hue-fill" id="baeng-single-hue-fill"></div>
+                                    </div>
+                                </div>
+                                <div class="theme-hue-value" id="baeng-single-hue-value">45°</div>
+                            </div>
+                        </div>
+
+                        <!-- Gradient Mode Controls (hidden by default) -->
+                        <div id="baeng-gradient-color-controls" style="display: none;">
+                            <p style="margin-bottom: 8px;">Select two colours to create your gradient theme.</p>
+
+                            <!-- Colour 1 Selector -->
+                            <div class="theme-color-row">
+                                <label class="theme-color-label">Colour 1:</label>
+                                <div class="theme-hue-container">
+                                    <div class="theme-hue-fader" id="baeng-gradient-hue-fader-1">
+                                        <div class="theme-hue-track">
+                                            <div class="theme-hue-fill" id="baeng-gradient-hue-fill-1"></div>
+                                        </div>
+                                    </div>
+                                    <div class="theme-hue-value" id="baeng-gradient-hue-value-1">45°</div>
+                                </div>
+                            </div>
+
+                            <!-- Colour 2 Selector -->
+                            <div class="theme-color-row">
+                                <label class="theme-color-label">Colour 2:</label>
+                                <div class="theme-hue-container">
+                                    <div class="theme-hue-fader" id="baeng-gradient-hue-fader-2">
+                                        <div class="theme-hue-track">
+                                            <div class="theme-hue-fill" id="baeng-gradient-hue-fill-2"></div>
+                                        </div>
+                                    </div>
+                                    <div class="theme-hue-value" id="baeng-gradient-hue-value-2">180°</div>
+                                </div>
+                            </div>
+
+                            <!-- Gradient Rotation -->
+                            <div class="theme-color-row" style="margin-top: 15px;">
+                                <label class="theme-color-label">Rotation:</label>
+                                <div class="theme-hue-container">
+                                    <div class="theme-hue-fader" id="baeng-gradient-rotation-fader">
+                                        <div class="theme-hue-track" style="background: linear-gradient(to right, #333, #666);">
+                                            <div class="theme-hue-fill" id="baeng-gradient-rotation-fill"></div>
+                                        </div>
+                                    </div>
+                                    <div class="theme-hue-value" id="baeng-gradient-rotation-value">90°</div>
+                                </div>
+                            </div>
+
+                            <!-- Gradient Preview -->
+                            <div class="gradient-preview-container">
+                                <label class="theme-color-label">Preview:</label>
+                                <div class="gradient-preview"></div>
+                            </div>
+
+                            <!-- Preset Gradients -->
+                            <div class="gradient-presets">
+                                <button class="gradient-preset-btn" data-hue1="45" data-hue2="180">Yellow-Cyan</button>
+                                <button class="gradient-preset-btn" data-hue1="300" data-hue2="200">Pink-Blue</button>
+                                <button class="gradient-preset-btn" data-hue1="0" data-hue2="60">Red-Yellow</button>
+                                <button class="gradient-preset-btn" data-hue1="270" data-hue2="330">Purple-Magenta</button>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+
+                    <!-- SCALE Tab -->
+                    <div class="settings-tab-panel" data-tab-panel="scale">
+                    <div class="settings-section" id="baeng-scale-quantization-section">
+                        <h3>Scale Quantisation</h3>
+                        <p>Snap pitch modulation to musical scales for melodic patterns.</p>
+
+                        <label class="settings-checkbox">
+                            <input type="checkbox" id="baeng-scale-quantize-enabled">
+                            <span>Enable Scale Quantisation</span>
+                        </label>
+
+                        <div class="scale-select-row">
+                            <div class="scale-select-column">
+                                <h4 style="font-size: 13px; margin-bottom: 6px;">Musical Scale</h4>
+                                <select id="baeng-scale-select" class="settings-select">
+                                    <option value="0">Chromatic</option>
+                                </select>
+                            </div>
+                            <div class="scale-select-column">
+                                <h4 style="font-size: 13px; margin-bottom: 6px;">Root Note</h4>
+                                <select id="baeng-root-select" class="settings-select">
+                                    <option value="0">C</option>
+                                    <option value="1">C#</option>
+                                    <option value="2">D</option>
+                                    <option value="3">D#</option>
+                                    <option value="4">E</option>
+                                    <option value="5">F</option>
+                                    <option value="6">F#</option>
+                                    <option value="7">G</option>
+                                    <option value="8">G#</option>
+                                    <option value="9">A</option>
+                                    <option value="10">A#</option>
+                                    <option value="11">B</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+
+                    <!-- HELP Tab -->
+                    <div class="settings-tab-panel" data-tab-panel="help">
+                    <div class="settings-section">
+                        <h3>User Manual</h3>
+                        <p>Learn how to use Bæng with the comprehensive user manual.</p>
+                        <div class="button-row">
+                            <button id="baeng-rtfm-button" class="settings-button">Open Manual (RTFM)</button>
+                        </div>
+                    </div>
+                    <div class="settings-section">
+                        <h3>About Bæng</h3>
+                        <p>Bæng is a polyrhythmic FM drum synthesiser inspired by classic hardware.</p>
+                        <p>Version: 1.0.0 (Alpha)</p>
+                    </div>
+                    </div>
+                </div>
+            </div>
+            <!-- SETTINGS PANEL END -->
+
+            <!-- MANUAL MODAL START -->
+            <div id="baeng-manual-modal" class="settings-panel hidden">
+                <div class="settings-panel-header">
+                    <h2>User Manual</h2>
+                    <button id="baeng-close-manual-btn" class="close-button" title="Close Manual">×</button>
+                </div>
+                <div class="settings-panel-content">
+                    <div class="manual-layout">
+                        <button id="baeng-toggle-manual-sidebar" class="sidebar-toggle" title="Toggle Sidebar">☰</button>
+                        <nav id="baeng-manual-sidebar" class="manual-sidebar">
+                            <ul>
+                                <li><a href="#baeng-getting-started">Getting Started</a></li>
+                                <li><a href="#baeng-signal-flow">Signal Flow</a></li>
+                                <li><a href="#baeng-modules">Modules</a>
+                                    <ul>
+                                        <li><a href="#baeng-time-strip">TIME STRIP</a></li>
+                                        <li><a href="#baeng-voices">VOICES</a></li>
+                                        <li><a href="#baeng-engine">ENGINE</a></li>
+                                        <li><a href="#baeng-engines-list">Synthesis Engines</a></li>
+                                        <li><a href="#baeng-reverb">REVERB</a></li>
+                                        <li><a href="#baeng-delay">DELAY</a></li>
+                                        <li><a href="#baeng-clouds">CLOUDS FX</a></li>
+                                        <li><a href="#baeng-drum-bus">DRUM BUS</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#baeng-ppmod">Per-Parameter Modulation</a></li>
+                                <li><a href="#baeng-sidechain">Sidechain Ducking</a></li>
+                                <li><a href="#baeng-patch-mgmt">Patch Management</a></li>
+                                <li><a href="#baeng-midi">Input Methods</a></li>
+                                <li><a href="#baeng-customization">Customization</a></li>
+                            </ul>
+                        </nav>
+                        <div id="baeng-manual-content" class="manual-main-content">
+                        <h3>BÆNG User Manual</h3>
+
+                        <p>&nbsp;</p>
+
+                        <h4 id="baeng-getting-started">Getting Started</h4>
+
+                        <p>&nbsp;</p>
+
+                        <p>Click anywhere on the interface to enable audio, then press <strong>Play</strong> in the shared TIME strip to start the sequencer. Bæng is a 6-voice polyrhythmic drum synthesiser with per-voice Euclidean pattern generation.</p>
+
+                        <p>&nbsp;</p>
+
+                        <h4 id="baeng-signal-flow">Signal Flow</h4>
+
+                        <p>&nbsp;</p>
+
+                        <p>Each voice follows this signal path:</p>
+                        <p><strong>Pattern</strong> (VOICES module) triggers → <strong>Synthesis</strong> (ENGINE module) → <strong>Drum Bus</strong> (master processing) → <strong>Output</strong></p>
+                        <p>Parallel sends to: <strong>Reverb</strong>, <strong>Delay</strong>, <strong>Clouds</strong> → mixed via <strong>Sidechain Ducking</strong></p>
+
+                        <p>&nbsp;</p>
+
+                        <h4 id="baeng-modules">Modules</h4>
+
+                        <p>&nbsp;</p>
+
+                        <h5 id="baeng-time-strip">TIME STRIP</h5>
+
+                        <p>Shared timing controls for both Bæng and Ræmbl. Located between the two apps.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p>
+                        <strong>BPM:</strong> Master tempo (20-300 BPM)<br>
+                        <strong>SWING:</strong> Timing offset for off-beat steps (0-100%)<br>
+                        <strong>LENGTH:</strong> Pattern length in bars (1-128) - <em>independent per app</em>
+                        </p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Creating Repeated Musical Phrases:</strong><br>
+                        The LENGTH parameter controls how many bars play before the pattern loops. Setting a shorter LENGTH (e.g., 1-4 bars) creates tight, repeating phrases. When combined with different STEPS values in VOICES, you can create evolving polymetric patterns where elements cycle at different rates.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>RST (Reset) Button:</strong><br>
+                        When active, resets all voice sequencers to step 1 at the start of each bar. This keeps patterns locked to bar boundaries - essential for tight, rhythmically aligned grooves. Disable RST for free-running polyrhythms where patterns drift against each other.</p>
+
+                        <p>&nbsp;</p>
+
+                        <h5 id="baeng-voices">VOICES</h5>
+
+                        <p>6-voice step sequencer with Euclidean rhythm generation. Each voice has its own pattern and can trigger different synthesis engines.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Euclidean Parameters:</strong><br>
+                        <strong>STEPS:</strong> Pattern length (1-32 steps)<br>
+                        <strong>FILLS:</strong> Number of triggers distributed across steps<br>
+                        <strong>SHIFT:</strong> Rotates the pattern<br>
+                        <strong>ACCENT (>):</strong> Probability of accented hits (louder, punchier)</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Articulation:</strong><br>
+                        <strong>FLAM:</strong> Double-hit effect with configurable timing<br>
+                        <strong>RATCHET:</strong> Rapid repeated triggers per step<br>
+                        <strong>R-SPD:</strong> Ratchet speed/timing</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Voice Controls:</strong><br>
+                        <strong>GATE:</strong> Prevents overlapping triggers (monophonic per voice)<br>
+                        <strong>CHOKE:</strong> Links voices so one cuts off another<br>
+                        <strong>PROB:</strong> Trigger probability (0-100%)</p>
+
+                        <p>&nbsp;</p>
+
+                        <h5 id="baeng-engine">ENGINE</h5>
+
+                        <p>Per-voice synthesis engine selection and parameter control. Each voice can use a different engine.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Macro Controls (vary by engine):</strong><br>
+                        <strong>PATCH/TONE:</strong> Timbre/character control<br>
+                        <strong>PITCH:</strong> Base pitch/tuning<br>
+                        <strong>DEPTH/DECAY:</strong> Envelope/modulation depth<br>
+                        <strong>RATE/SWEEP:</strong> Modulation rate or pitch sweep</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Voice Processing:</strong><br>
+                        <strong>LEVEL:</strong> Voice output level<br>
+                        <strong>PAN:</strong> Stereo position<br>
+                        <strong>RVB:</strong> Reverb send amount<br>
+                        <strong>DLY:</strong> Delay send amount<br>
+                        <strong>CLOUD:</strong> Clouds send amount</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Effects:</strong><br>
+                        <strong>BIT:</strong> Bit crusher effect<br>
+                        <strong>DRIVE:</strong> Saturation/distortion</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Modes:</strong><br>
+                        <strong>OUT/AUX:</strong> Output routing (main or auxiliary)<br>
+                        <strong>POLY:</strong> Polyphony mode for multi-note engines</p>
+
+                        <p>&nbsp;</p>
+
+                        <h5 id="baeng-engines-list">Synthesis Engines</h5>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>aKICK - Analog Kick:</strong><br>
+                        Classic analog kick drum synthesis with pitch envelope.<br>
+                        - TONE: Lowpass filter cutoff (brightness)<br>
+                        - DECAY: Resonance and decay time<br>
+                        - SWEEP: Pitch sweep amount (10-30 semitones)</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>aSNARE - Analog Snare:</strong><br>
+                        Modal resonator snare synthesis (808-style to extended modes).<br>
+                        - TONE: Modal character<br>
+                        - DECAY: Resonance decay time<br>
+                        - SNAP: Noise amount and attack sharpness</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>aHIHAT - Analog Hi-Hat:</strong><br>
+                        Multi-oscillator metallic synthesis.<br>
+                        - METAL: Oscillator spread (tight to washy)<br>
+                        - DECAY: Decay time (closed to open)<br>
+                        - BRIGHT: Highpass filter cutoff</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>DX7 - FM Synthesis:</strong><br>
+                        6-operator FM synthesis. Load patches via browser button.<br>
+                        - DEPTH: Modulator intensity (FM depth)<br>
+                        - RATE: Envelope speed (attack/decay/release)<br>
+                        - PITCH: Master tuning offset</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>SAMPLE - Sample Player:</strong><br>
+                        One-shot sample playback from loaded banks.<br>
+                        - SAMPLE: Sample selection within bank<br>
+                        - DECAY: Envelope decay time<br>
+                        - FILTER: Lowpass filter cutoff<br>
+                        - PITCH: Pitch shift in semitones</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>SLICE - Slice Chopper:</strong><br>
+                        Sample slicing with transient detection.<br>
+                        - SLICE: Slice selection within bank<br>
+                        - DECAY: As percentage of slice length<br>
+                        - FILTER: Lowpass filter cutoff<br>
+                        - PITCH: Pitch shift in semitones</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>PLT - Plaits:</strong><br>
+                        24 Mutable Instruments Plaits engines. See Plaits section in Ræmbl manual for full engine list.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>RNG - Rings:</strong><br>
+                        6 Mutable Instruments Rings resonator models. See Rings section in Ræmbl manual for full model list.</p>
+
+                        <p>&nbsp;</p>
+
+                        <h5 id="baeng-reverb">REVERB</h5>
+
+                        <p>Algorithmic reverb with per-voice send routing.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p>
+                        <strong>PRE-DELAY:</strong> Time before reflections begin<br>
+                        <strong>DECAY:</strong> Reverb tail length<br>
+                        <strong>DIFFUSION:</strong> Smoothness of reflections<br>
+                        <strong>DAMPING:</strong> High-frequency absorption
+                        </p>
+
+                        <p>&nbsp;</p>
+
+                        <h5 id="baeng-delay">DELAY</h5>
+
+                        <p>Tempo-synced or free-running delay with tape-style modulation.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p>
+                        <strong>SYNC/FREE:</strong> Toggle tempo sync or milliseconds<br>
+                        <strong>TIME:</strong> Delay time (synced divisions or 1-4000ms)<br>
+                        <strong>FEEDBACK:</strong> Number of repeats<br>
+                        <strong>WOW:</strong> Slow pitch modulation<br>
+                        <strong>FLUTTER:</strong> Fast pitch modulation<br>
+                        <strong>SAT:</strong> Feedback saturation
+                        </p>
+
+                        <p>&nbsp;</p>
+
+                        <h5 id="baeng-clouds">CLOUDS FX</h5>
+
+                        <p>Mutable Instruments Clouds granular processor with clock sync and quality presets. Toggle between Classic FX and Clouds mode in Settings.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Playback Modes:</strong><br>
+                        Granular, WSOLA, Looping Delay, Spectral, Oliverb, Resonestor</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Bæng-specific features:</strong><br>
+                        - Per-voice send routing<br>
+                        - Clock sync option<br>
+                        - Quality presets: HI, MED, LO, XLO</p>
+
+                        <p>See Clouds FX section in Ræmbl manual for full parameter reference.</p>
+
+                        <p>&nbsp;</p>
+
+                        <h5 id="baeng-drum-bus">DRUM BUS</h5>
+
+                        <p>Ableton Drum Buss-inspired master bus processor. Applies to all voices before output.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Signal Chain:</strong> Input → Drive → Crunch → Transients → Boom → Compressor → Dampen → Dry/Wet → Output</p>
+
+                        <p>&nbsp;</p>
+
+                        <p>
+                        <strong>DRIVE:</strong> Waveshaper saturation (SOFT/MED/HARD modes)<br>
+                        <strong>CRUNCH:</strong> Mid-high frequency saturation<br>
+                        <strong>TRANSIENTS:</strong> Bipolar transient shaper (-100 to +100, less ↔ more)<br>
+                        <strong>BOOM:</strong> Sub-bass sine triggered by transients<br>
+                        - Amount: How much sub to add<br>
+                        - Freq: Sub frequency (30-90Hz)<br>
+                        - Decay: Sub decay time<br>
+                        <strong>COMP:</strong> Toggle compression on/off<br>
+                        <strong>DAMPEN:</strong> Lowpass filter (500Hz-30kHz)<br>
+                        <strong>TRIM:</strong> Input gain<br>
+                        <strong>OUTPUT:</strong> Output gain<br>
+                        <strong>DRY/WET:</strong> Parallel processing blend
+                        </p>
+
+                        <p>&nbsp;</p>
+
+                        <h4 id="baeng-ppmod">Per-Parameter Modulation</h4>
+
+                        <p>&nbsp;</p>
+
+                        <p>Click highlighted parameter labels to open the modulation modal. Both per-voice and global parameters support modulation.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>6 Modulation Modes:</strong><br>
+                        <strong>LFO:</strong> Low-frequency oscillator (0.1-20 Hz)<br>
+                        <strong>RND:</strong> LFSR-based random modulation<br>
+                        <strong>ENV:</strong> AD/ADSR envelope (triggered per voice)<br>
+                        <strong>EF:</strong> Envelope follower (audio amplitude tracking)<br>
+                        <strong>TM:</strong> Probabilistic step sequencer<br>
+                        <strong>SEQ:</strong> CV sequencer (clock-synced)</p>
+
+                        <p>See Per-Parameter Modulation section in Ræmbl manual for detailed mode descriptions.</p>
+
+                        <p>&nbsp;</p>
+
+                        <h4 id="baeng-sidechain">Sidechain Ducking</h4>
+
+                        <p>&nbsp;</p>
+
+                        <p>Compressor-based ducking that allows specific voices to duck the effects returns (Reverb, Delay, Clouds).</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Configuration:</strong><br>
+                        - Select which voices trigger ducking<br>
+                        - Configure per-effect (each effect has independent ducking)<br>
+                        - Threshold, Ratio, Attack, Release, Range controls</p>
+
+                        <p>&nbsp;</p>
+
+                        <h4 id="baeng-patch-mgmt">Patch Management</h4>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Per-Voice Patches:</strong><br>
+                        Save/Load individual voice configurations including engine, parameters, and sequence.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Global Patches:</strong><br>
+                        Save/Load entire kit configurations (all 6 voices + global settings) via Settings panel.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Undo/Redo:</strong><br>
+                        Cmd/Ctrl+Z (undo), Cmd/Ctrl+X (redo)<br>
+                        Up to 100 state snapshots</p>
+
+                        <p>&nbsp;</p>
+
+                        <h4 id="baeng-midi">Input Methods</h4>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Computer Keyboard:</strong><br>
+                        Number keys <strong>1-6</strong> trigger voices 1-6<br>
+                        Hold <strong>Shift</strong> while pressing 1-6 for accented hits</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>MIDI:</strong><br>
+                        Connect MIDI devices for triggering voices and controlling parameters.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Note Mapping:</strong><br>
+                        Default drum mapping or configurable per-voice pitch</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>CC Learn:</strong><br>
+                        Map MIDI CC to any parameter via Settings panel</p>
+
+                        <p>&nbsp;</p>
+
+                        <h4 id="baeng-customization">Customization</h4>
+
+                        <p>&nbsp;</p>
+
+                        <p>Access theme settings via the <strong>THEME</strong> tab in Settings (gear icon in TIME STRIP).</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Light/Dark Mode:</strong><br>
+                        Toggle between light and dark interface themes. All visualisations and UI elements update in real-time.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Theme Colour:</strong><br>
+                        Adjust the hue of the theme colour using the fader (0-360°). This affects all accent colours, borders, and highlighted elements throughout the interface.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Gradient Mode:</strong><br>
+                        Enable gradient mode for a two-colour theme that flows across the interface.<br>
+                        - <strong>Colour 1 &amp; 2:</strong> Set the two hue values for the gradient<br>
+                        - <strong>Rotation:</strong> Adjust the gradient angle (0-360°)<br>
+                        - <strong>Presets:</strong> Quick-select colour combinations (Yellow-Cyan, Pink-Blue, Red-Yellow, Purple-Magenta)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- MANUAL MODAL END -->
+
+            <!-- Hidden file input for individual voice patch loading will be created by main.js -->
+        </div>
+
+        <!-- SLICE EDITOR MODAL -->
+        <div class="slice-modal" id="baeng-slice-modal">
+            <div class="modal-header" id="baeng-slice-modal-header">
+                <h2>SLICE EDITOR</h2>
+                <button class="close-button" id="baeng-slice-close-btn">×</button>
+            </div>
+
+            <div class="modal-content">
+                <!-- Waveform Display -->
+                <div class="waveform-container">
+                    <canvas id="baeng-slice-waveform" width="800" height="200"></canvas>
+                    <div class="waveform-info">
+                        <span id="baeng-slice-waveform-duration">Duration: 0.00s</span>
+                        <span id="baeng-slice-waveform-zoom">Zoom: 1x</span>
+                        <span id="baeng-slice-waveform-slices">Slices: 0</span>
+                    </div>
+
+                    <!-- Custom Scrollbar -->
+                    <div class="waveform-scrollbar-container">
+                        <div class="scrollbar-track" id="baeng-slice-scrollbar-track">
+                            <div class="scrollbar-thumb" id="baeng-slice-scrollbar-thumb"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slice Editor Controls -->
+                <div class="control-section">
+                    <div class="control-group">
+                        <span class="control-label">Slice Count:</span>
+                        <input type="range" id="baeng-slice-grid-slider" min="2" max="64" value="8" step="1">
+                        <span class="slider-value" id="baeng-slice-grid-value">8</span>
+                    </div>
+                    <div class="control-group">
+                        <span class="control-label">Threshold:</span>
+                        <input type="range" id="baeng-slice-threshold-slider" min="0" max="100" value="50" step="1">
+                        <span class="slider-value" id="baeng-slice-threshold-value">50%</span>
+                    </div>
+                    <div class="control-group">
+                        <button id="baeng-slice-detect-btn">Detect Slices</button>
+                    </div>
+                    <div class="control-group">
+                        <span class="control-label">Rotation:</span>
+                        <input type="range" id="baeng-slice-rotation-slider" min="-100" max="100" value="0" step="1">
+                        <span class="slider-value" id="baeng-slice-rotation-value">0%</span>
+                        <button id="baeng-slice-reset-rotation-btn" style="padding: 6px 12px; font-size: 12px;">Reset</button>
+                    </div>
+                    <div class="control-group">
+                        <button id="baeng-slice-reset-trim-btn" style="padding: 6px 12px; font-size: 12px;">Reset Trim</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="baeng-slice-clear-all-btn">Clear All</button>
+                <div style="flex: 1;"></div>
+                <button id="baeng-slice-export-json-btn">Export JSON</button>
+                <button id="baeng-slice-done-btn">Done</button>
+            </div>
+        </div>
+        <!-- SLICE EDITOR MODAL END -->
+
+        <!-- SAMPLE BROWSER MODAL -->
+        <div class="browser-modal" id="baeng-sample-browser-modal">
+            <div class="modal-header">
+                <button class="favorites-filter-btn" id="baeng-sample-favorites-filter-btn" title="Show favorites only">☆</button>
+                <h2>SAMPLE BROWSER</h2>
+                <button class="close-button" id="baeng-sample-browser-close-btn">×</button>
+            </div>
+
+            <div class="modal-content browser-modal-content">
+                <!-- Search Bar -->
+                <div class="browser-search-container">
+                    <input type="search" id="baeng-sample-browser-search" class="browser-search" placeholder="Search samples..." autocomplete="off">
+                    <span class="browser-search-icon">🔍</span>
+                </div>
+
+                <!-- Sample List -->
+                <div class="browser-list" id="baeng-sample-browser-list">
+                    <div class="browser-loading">Loading samples...</div>
+                </div>
+
+                <!-- Info Bar -->
+                <div class="browser-info" id="baeng-sample-browser-info">
+                    Showing 0 samples · <span id="baeng-sample-favorites-count">0 favorites</span>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="baeng-sample-preview-btn" disabled>Preview</button>
+                <button id="baeng-sample-stop-btn" style="display: none;">Stop</button>
+                <div style="flex: 1;"></div>
+                <button id="baeng-sample-load-btn" disabled>Load</button>
+            </div>
+        </div>
+        <!-- SAMPLE BROWSER MODAL END -->
+
+        <!-- DX7 BANK BROWSER MODAL -->
+        <div class="browser-modal" id="baeng-dx7-browser-modal">
+            <div class="modal-header">
+                <button class="favorites-filter-btn" id="baeng-dx7-favorites-filter-btn" title="Show favorites only">☆</button>
+                <h2>DX7 BANK BROWSER</h2>
+                <button class="close-button" id="baeng-dx7-browser-close-btn">×</button>
+            </div>
+
+            <div class="modal-content browser-modal-content">
+                <!-- Breadcrumb Navigation -->
+                <div class="browser-breadcrumb" id="baeng-dx7-breadcrumb">
+                    <span class="crumb active" data-path="">Root</span>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="browser-search-container">
+                    <input type="search" id="baeng-dx7-browser-search" class="browser-search" placeholder="Search banks..." autocomplete="off">
+                    <span class="browser-search-icon">🔍</span>
+                </div>
+
+                <!-- Bank/File List -->
+                <div class="browser-list" id="baeng-dx7-browser-list">
+                    <div class="browser-loading">Loading banks...</div>
+                </div>
+
+                <!-- Patch Preview (when bank is selected) -->
+                <div class="patch-preview" id="baeng-dx7-patch-preview" style="display: none;">
+                    <h3>Patches in Bank:</h3>
+                    <div class="patch-list" id="baeng-dx7-patch-list"></div>
+                </div>
+
+                <!-- Info Bar -->
+                <div class="browser-info" id="baeng-dx7-browser-info">
+                    35 folders, 12,530+ banks · <span id="baeng-dx7-favorites-count">0 favorites</span>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="baeng-dx7-back-btn" style="display: none;">Back</button>
+                <div style="flex: 1;"></div>
+                <button id="baeng-dx7-load-btn" disabled>Load Bank</button>
+            </div>
+        </div>
+        <!-- DX7 BANK BROWSER MODAL END -->
+
+        <!-- KIT BROWSER MODAL -->
+        <div class="browser-modal" id="baeng-kit-browser-modal">
+            <div class="modal-header">
+                <button class="favorites-filter-btn" id="baeng-kit-favorites-filter-btn" title="Show favourites only">☆</button>
+                <h2>KIT BROWSER</h2>
+                <button class="close-button" id="baeng-kit-browser-close-btn">×</button>
+            </div>
+
+            <div class="modal-content browser-modal-content">
+                <!-- Search Bar -->
+                <div class="browser-search-container">
+                    <input type="search" id="baeng-kit-browser-search" class="browser-search" placeholder="Search kits..." autocomplete="off">
+                    <span class="browser-search-icon">🔍</span>
+                </div>
+
+                <!-- Main Content: Split View -->
+                <div class="kit-browser-split">
+                    <!-- Left: Kit List -->
+                    <div class="kit-list-container">
+                        <div class="browser-list" id="baeng-kit-browser-list">
+                            <div class="browser-loading">Loading kits...</div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Sample Preview Panel -->
+                    <div class="kit-preview-panel" id="baeng-kit-preview-panel" style="display: none;">
+                        <h3 id="baeng-kit-preview-title">Kit Name</h3>
+                        <div class="kit-sample-list" id="baeng-kit-sample-list">
+                            <!-- Populated by JS: sample rows with preview buttons -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Bar -->
+                <div class="browser-info" id="baeng-kit-browser-info">
+                    Showing 0 kits · <span id="baeng-kit-favorites-count">0 favourites</span>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="baeng-kit-load-btn" disabled>Load Kit</button>
+                <div style="flex: 1;"></div>
+                <button id="baeng-kit-close-modal-btn">Cancel</button>
+            </div>
+        </div>
+        <!-- KIT BROWSER MODAL END -->
+
+        <!-- SIDECHAIN DUCKING MODAL -->
+        <div id="sidechain-modal" class="hidden">
+            <div class="modal-header" id="sidechain-modal-header">
+                <svg class="duck-icon" width="20" height="20" viewBox="0 0 64 64" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17.406,25.591c0,0 2.059,0.83 1.986,2.891c-0.072,2.062 -6.66,2.957 -6.66,11.094c0,8.137 9.096,14.532 19.217,14.532c10.12,0 23.872,-5.932 23.872,-17.83c0,-19.976 -1.513,-6.134 -17.276,-6.134c-5.235,0 -6.169,-1.787 -5.342,-2.806c3.91,-4.811 5.342,-17.446 -7.42,-17.446c-8.327,0.173 -10.338,6.946 -10.325,8.587c0.008,1.153 -1.204,1.543 -7.308,1.308c-1.536,5.619 9.256,5.804 9.256,5.804Zm3.77,-10.366c1.104,0 2,0.897 2,2c0,1.104 -0.896,2 -2,2c-1.103,0 -2,-0.896 -2,-2c0,-1.103 0.897,-2 2,-2Z"/>
+                </svg>
+                <span id="duck-modal-title">DUCKING: Effect</span>
+                <button class="close-btn" id="sidechain-modal-close-btn">×</button>
+            </div>
+            <div class="modal-content">
+                <!-- Waveform visualiser showing ducked output -->
+                <div class="duck-visualiser">
+                    <canvas id="duck-waveform-canvas" width="248" height="60"></canvas>
+                </div>
+
+                <label class="duck-enable-row">
+                    <input type="checkbox" id="duck-enabled">
+                    <span>Enable Ducking</span>
+                </label>
+
+                <div class="voice-checkboxes">
+                    <label><input type="checkbox" data-voice="0" checked> V1</label>
+                    <label><input type="checkbox" data-voice="1"> V2</label>
+                    <label><input type="checkbox" data-voice="2"> V3</label>
+                    <label><input type="checkbox" data-voice="3"> V4</label>
+                    <label><input type="checkbox" data-voice="4"> V5</label>
+                    <label><input type="checkbox" data-voice="5"> V6</label>
+                </div>
+
+                <div class="duck-params">
+                    <div class="duck-param">
+                        <label>THRESH</label>
+                        <input type="range" id="duck-threshold" min="0" max="100" value="30">
+                        <span class="param-value" id="duck-threshold-val">-42dB</span>
+                    </div>
+                    <div class="duck-param">
+                        <label>RATIO</label>
+                        <input type="range" id="duck-ratio" min="0" max="100" value="80">
+                        <span class="param-value" id="duck-ratio-val">16:1</span>
+                    </div>
+                    <div class="duck-param">
+                        <label>ATK</label>
+                        <input type="range" id="duck-attack" min="0" max="100" value="10">
+                        <span class="param-value" id="duck-attack-val">0.3ms</span>
+                    </div>
+                    <div class="duck-param">
+                        <label>REL</label>
+                        <input type="range" id="duck-release" min="0" max="100" value="40">
+                        <span class="param-value" id="duck-release-val">100ms</span>
+                    </div>
+                    <div class="duck-param">
+                        <label>RANGE</label>
+                        <input type="range" id="duck-range" min="0" max="100" value="60">
+                        <span class="param-value" id="duck-range-val">24dB</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- SIDECHAIN DUCKING MODAL END -->
+
+        <!-- PPMOD MODAL START -->
+        <div id="ppmod-modal" class="hidden">
+            <div class="ppmod-modal-header" id="ppmod-modal-header">
+                <svg class="ppmod-modal-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+                <span id="ppmod-modal-title">MOD: PARAM</span>
+                <button class="ppmod-close-btn" id="ppmod-modal-close-btn">×</button>
+            </div>
+
+            <!-- Mode Tabs -->
+            <div class="ppmod-tabs">
+                <button class="ppmod-tab active" data-mode="LFO">LFO</button>
+                <button class="ppmod-tab" data-mode="RND">RND</button>
+                <button class="ppmod-tab" data-mode="ENV">ENV</button>
+                <button class="ppmod-tab" data-mode="EF">EF</button>
+                <button class="ppmod-tab" data-mode="TM">TM</button>
+                <button class="ppmod-tab" data-mode="SEQ">SEQ</button>
+            </div>
+
+            <!-- Voice Selector (Bæng per-voice params only) -->
+            <div id="ppmod-voice-selector" class="ppmod-voice-selector hidden">
+                <span class="ppmod-voice-label">VOICE</span>
+                <button class="ppmod-voice-btn active">1</button>
+                <button class="ppmod-voice-btn">2</button>
+                <button class="ppmod-voice-btn">3</button>
+                <button class="ppmod-voice-btn">4</button>
+                <button class="ppmod-voice-btn">5</button>
+                <button class="ppmod-voice-btn">6</button>
+            </div>
+
+            <div class="ppmod-content">
+                <!-- Visualisation -->
+                <div class="ppmod-visualiser">
+                    <canvas id="ppmod-visualisation" width="356" height="60"></canvas>
+                </div>
+
+                <!-- Common Controls -->
+                <div class="ppmod-common-controls">
+                    <div class="ppmod-control">
+                        <label>DEPTH</label>
+                        <input type="range" id="ppmod-depth" min="0" max="100" value="50">
+                        <span class="ppmod-value" id="ppmod-depth-val">50%</span>
+                    </div>
+                    <div class="ppmod-control">
+                        <label>OFFSET</label>
+                        <input type="range" id="ppmod-offset" min="-100" max="100" value="0">
+                        <span class="ppmod-value" id="ppmod-offset-val">+0%</span>
+                    </div>
+                </div>
+
+                <!-- LFO Mode Panel -->
+                <div id="ppmod-panel-lfo" class="ppmod-mode-panel">
+                    <!-- LFO Waveform selector -->
+                    <div class="ppmod-selector ppmod-lfo-wave-row">
+                        <span class="ppmod-selector-label">WAVE</span>
+                        <div class="ppmod-selector-buttons" id="ppmod-lfo-wave-btns">
+                            <button class="ppmod-selector-btn active" data-value="0">SIN</button>
+                            <button class="ppmod-selector-btn" data-value="1">TRI</button>
+                            <button class="ppmod-selector-btn" data-value="2">SQR</button>
+                            <button class="ppmod-selector-btn" data-value="3">SAW</button>
+                            <button class="ppmod-selector-btn" data-value="4">RAMP</button>
+                            <button class="ppmod-selector-btn" data-value="5">S&H</button>
+                        </div>
+                    </div>
+                    <!-- LFO Rate control -->
+                    <div class="ppmod-mode-controls">
+                        <div class="ppmod-control">
+                            <label>RATE</label>
+                            <input type="range" id="ppmod-lfo-rate" min="0.05" max="30" step="0.05" value="1">
+                            <span class="ppmod-value" id="ppmod-lfo-rate-val">1.00Hz</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RND Mode Panel -->
+                <div id="ppmod-panel-rnd" class="ppmod-mode-panel hidden">
+                    <!-- Bit length selector -->
+                    <div class="ppmod-selector ppmod-rnd-bits-row">
+                        <span class="ppmod-selector-label">BIT LENGTH</span>
+                        <div class="ppmod-selector-buttons" id="ppmod-rnd-bits-btns">
+                            <button class="ppmod-selector-btn" data-value="4">4</button>
+                            <button class="ppmod-selector-btn" data-value="8">8</button>
+                            <button class="ppmod-selector-btn active" data-value="16">16</button>
+                            <button class="ppmod-selector-btn" data-value="32">32</button>
+                        </div>
+                    </div>
+                    <!-- Probability and Rate controls -->
+                    <div class="ppmod-mode-controls">
+                        <div class="ppmod-control">
+                            <label>PROB</label>
+                            <input type="range" id="ppmod-rnd-prob" min="0" max="100" value="100">
+                            <span class="ppmod-value" id="ppmod-rnd-prob-val">100%</span>
+                        </div>
+                        <div class="ppmod-control">
+                            <label>RATE</label>
+                            <input type="range" id="ppmod-rnd-rate" min="0" max="100" step="any" value="50">
+                            <span class="ppmod-value" id="ppmod-rnd-rate-val">1.0kHz</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ENV Mode Panel -->
+                <div id="ppmod-panel-env" class="ppmod-mode-panel hidden">
+                    <!-- Source selector row -->
+                    <div class="ppmod-selector ppmod-env-source-row">
+                        <span class="ppmod-selector-label">SOURCE</span>
+                        <div class="ppmod-selector-buttons" id="ppmod-env-source-btns">
+                            <button class="ppmod-selector-btn active" data-value="note-on">NOTE</button>
+                            <button class="ppmod-selector-btn" data-value="amp">AMP</button>
+                            <button class="ppmod-selector-btn" data-value="filter">FILT</button>
+                        </div>
+                    </div>
+                    <!-- Attack/Release/Curve row -->
+                    <div class="ppmod-mode-controls three-col">
+                        <div class="ppmod-control">
+                            <label>ATK</label>
+                            <input type="range" id="ppmod-env-attack" min="0" max="100" step="any" value="25">
+                            <span class="ppmod-value" id="ppmod-env-attack-val">10ms</span>
+                        </div>
+                        <div class="ppmod-control">
+                            <label>REL</label>
+                            <input type="range" id="ppmod-env-release" min="0" max="100" step="any" value="50">
+                            <span class="ppmod-value" id="ppmod-env-release-val">200ms</span>
+                        </div>
+                        <div class="ppmod-selector ppmod-env-curve-selector">
+                            <span class="ppmod-selector-label">CURVE</span>
+                            <div class="ppmod-selector-buttons" id="ppmod-env-curve-btns">
+                                <button class="ppmod-selector-btn" data-value="linear">LIN</button>
+                                <button class="ppmod-selector-btn active" data-value="exponential">EXP</button>
+                                <button class="ppmod-selector-btn" data-value="logarithmic">LOG</button>
+                                <button class="ppmod-selector-btn" data-value="sCurve">S</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EF Mode Panel -->
+                <div id="ppmod-panel-ef" class="ppmod-mode-panel hidden">
+                    <!-- Source selector -->
+                    <div class="ppmod-selector ppmod-ef-source-row">
+                        <span class="ppmod-selector-label">SOURCE</span>
+                        <div class="ppmod-selector-buttons" id="ppmod-ef-source-btns">
+                            <button class="ppmod-selector-btn active" data-value="raembl">RÆMBL</button>
+                            <button class="ppmod-selector-btn" data-value="baeng">BÆNG</button>
+                            <button class="ppmod-selector-btn" data-value="master">MASTER</button>
+                        </div>
+                    </div>
+                    <!-- Attack/Release/Sensitivity controls -->
+                    <div class="ppmod-mode-controls three-col">
+                        <div class="ppmod-control">
+                            <label>ATK</label>
+                            <input type="range" id="ppmod-ef-attack" min="0" max="100" step="any" value="25">
+                            <span class="ppmod-value" id="ppmod-ef-attack-val">10ms</span>
+                        </div>
+                        <div class="ppmod-control">
+                            <label>REL</label>
+                            <input type="range" id="ppmod-ef-release" min="0" max="100" step="any" value="50">
+                            <span class="ppmod-value" id="ppmod-ef-release-val">100ms</span>
+                        </div>
+                        <div class="ppmod-control">
+                            <label>SENS</label>
+                            <input type="range" id="ppmod-ef-sensitivity" min="0" max="200" value="100">
+                            <span class="ppmod-value" id="ppmod-ef-sensitivity-val">100%</span>
+                        </div>
+                    </div>
+                    <!-- Level meter -->
+                    <div class="ppmod-ef-meter-container">
+                        <span class="ppmod-ef-meter-label">LEVEL</span>
+                        <div class="ppmod-ef-meter">
+                            <div class="ppmod-ef-meter-fill" id="ppmod-ef-meter-fill"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TM Mode Panel -->
+                <div id="ppmod-panel-tm" class="ppmod-mode-panel hidden">
+                    <div class="ppmod-mode-controls">
+                        <div class="ppmod-control">
+                            <label>LENGTH</label>
+                            <input type="range" id="ppmod-tm-length" min="1" max="16" step="1" value="8">
+                            <span class="ppmod-value" id="ppmod-tm-length-val">8 steps</span>
+                        </div>
+                        <div class="ppmod-control">
+                            <label>PROB</label>
+                            <input type="range" id="ppmod-tm-prob" min="0" max="100" value="50">
+                            <span class="ppmod-value" id="ppmod-tm-prob-val">50%</span>
+                        </div>
+                    </div>
+                    <!-- TM Pattern Display (read-only visualisation) -->
+                    <div class="ppmod-tm-pattern" id="ppmod-tm-pattern"></div>
+                    <!-- Randomise button -->
+                    <div class="ppmod-tm-actions">
+                        <button class="ppmod-tm-randomise-btn" id="ppmod-tm-randomise">RANDOMISE</button>
+                    </div>
+                </div>
+
+                <!-- SEQ Mode Panel -->
+                <div id="ppmod-panel-seq" class="ppmod-mode-panel hidden">
+                    <div class="ppmod-mode-controls">
+                        <div class="ppmod-control">
+                            <label>LENGTH</label>
+                            <input type="range" id="ppmod-seq-length" min="1" max="16" step="1" value="4">
+                            <span class="ppmod-value" id="ppmod-seq-length-val">4 steps</span>
+                        </div>
+                    </div>
+                    <!-- Step editor will be populated by JS in Phase 2 -->
+                    <div class="ppmod-seq-editor" id="ppmod-seq-editor">
+                        <!-- Steps added dynamically -->
+                    </div>
+                    <div class="ppmod-hint">Drag steps up/down to set values</div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="ppmod-footer">
+                <button id="ppmod-reset-btn">RESET</button>
+            </div>
+        </div>
+        <!-- PPMOD MODAL END -->
+    </div>
+
+    <!-- Ræmbl Section (Bottom) -->
+    <div id="raembl-app" class="raembl-app">
+        <!-- SVG Gradient Definitions for Gradient Mode -->
+        <svg width="0" height="0" style="position: absolute;">
+            <defs>
+                <linearGradient id="raembl-gradient-stroke" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="hsl(45, 100%, 50%)" stop-opacity="1" />
+                    <stop offset="100%" stop-color="hsl(180, 100%, 50%)" stop-opacity="1" />
+                </linearGradient>
+                <linearGradient id="raembl-gradient-fill" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="hsl(45, 100%, 50%)" stop-opacity="1" />
+                    <stop offset="100%" stop-color="hsl(180, 100%, 50%)" stop-opacity="1" />
+                </linearGradient>
+            </defs>
+        </svg>
+        <div id="raembl-inner-app">
+            <div class="top-row" id="raembl-top-row"></div>
+            <div class="bottom-row" id="raembl-bottom-row"></div>
+
+            <!-- SETTINGS PANEL START -->
+            <div id="raembl-settings-panel" class="settings-panel hidden">
+                <div class="settings-panel-header">
+                    <h2>Settings</h2>
+                    <button id="raembl-close-settings-btn" class="close-button" title="Close Settings">×</button>
+                </div>
+                <!-- Tab bar (5 tabs - no SCALE) -->
+                <div class="settings-tabs" data-settings-for="raembl">
+                    <button class="settings-tab active" data-tab="patch">PATCH</button>
+                    <button class="settings-tab" data-tab="fx">FX</button>
+                    <button class="settings-tab" data-tab="midi">MIDI</button>
+                    <button class="settings-tab" data-tab="theme">THEME</button>
+                    <button class="settings-tab" data-tab="help">HELP</button>
+                </div>
+                <div class="settings-panel-content">
+                    <!-- PATCH Tab -->
+                    <div class="settings-tab-panel active" data-tab-panel="patch">
+                    <div class="settings-section" id="raembl-save-load-section">
+                        <h3>Save / Load Patch</h3>
+                        <p>Store and recall your Ræmbl synth configuration.</p>
+                        <div class="button-row">
+                            <button id="raembl-save-patch-button" class="settings-button">Save Patch</button>
+                            <input type="file" id="raembl-load-patch-input" accept=".json" style="display: none;">
+                            <button id="raembl-load-patch-button" class="settings-button" onclick="document.getElementById('raembl-load-patch-input').click();">Load Patch</button>
+                        </div>
+                        <p class="settings-feedback" id="raembl-patch-feedback"></p>
+                    </div>
+                    </div>
+
+                    <!-- FX Tab -->
+                    <div class="settings-tab-panel" data-tab-panel="fx">
+                    <div class="settings-section" id="raembl-fx-mode-section">
+                        <h3>FX Mode</h3>
+                        <p>Choose between classic effects or Clouds granular processor.</p>
+                        <div class="fx-mode-toggle">
+                            <button id="fx-mode-classic" class="fx-mode-button active" data-mode="classic">
+                                Classic (Reverb + Delay)
+                            </button>
+                            <button id="fx-mode-clouds" class="fx-mode-button" data-mode="clouds">
+                                Clouds
+                            </button>
+                        </div>
+                    </div>
+                    </div>
+
+                    <!-- MIDI Tab -->
+                    <div class="settings-tab-panel" data-tab-panel="midi">
+                    <div class="settings-section" id="raembl-midi-input-section">
+                        <h3>MIDI Input Device</h3>
+                        <p>Select your MIDI keyboard or controller. Notes/CCs are accepted from all connected devices by default.</p>
+                        <select id="raembl-midi-input-select"><option value="">All Devices (Notes/CC)</option></select>
+                    </div>
+
+                    <div class="settings-section" id="raembl-midi-map-section">
+                        <h3>MIDI CC Mapping</h3>
+                        <p>Assign MIDI Control Change messages to synth parameters.</p>
+
+                        <div class="midi-mapping-controls">
+                            <div class="midi-mapping-form-item">
+                                <label for="raembl-midi-parameter-select">Parameter:</label>
+                                <select id="raembl-midi-parameter-select">
+                                    <option value="">-- Select Parameter --</option>
+                                </select>
+                            </div>
+                            <div class="midi-mapping-form-item">
+                                <label for="raembl-midi-cc-input">CC #:</label>
+                                <input type="number" id="raembl-midi-cc-input" min="0" max="127" placeholder="0-127">
+                            </div>
+                            <div class="midi-mapping-form-item">
+                                <label for="raembl-midi-channel-input">Channel (Opt.):</label>
+                                <input type="number" id="raembl-midi-channel-input" min="1" max="16" placeholder="1-16">
+                            </div>
+                            <div class="midi-mapping-form-item">
+                                 <button id="raembl-midi-learn-btn" class="settings-button-small" title="MIDI Learn (Coming Soon)" disabled>Learn</button>
+                            </div>
+                            <div class="midi-mapping-form-item">
+                                <button id="raembl-add-midi-mapping-btn" class="settings-button-small">Add</button>
+                            </div>
+                        </div>
+                        <div id="raembl-midi-learn-status" class="settings-feedback"></div>
+
+                        <h4>Current Mappings:</h4>
+                        <ul id="raembl-midi-mappings-list">
+                            <li class="no-mappings">No CC mappings defined.</li>
+                        </ul>
+                    </div>
+                    </div>
+
+                    <!-- THEME Tab -->
+                    <div class="settings-tab-panel" data-tab-panel="theme">
+                    <div class="settings-section" id="raembl-theme-section">
+                        <h3>Theme & Appearance</h3>
+                        <p>Customise the visual appearance of Ræmbl.</p>
+
+                        <div class="button-row">
+                            <button id="raembl-invert-display-button" class="settings-button">Switch to Light Mode</button>
+                        </div>
+
+                        <h4 style="font-size: 13px; margin-top: 15px; margin-bottom: 8px;">Theme Colour</h4>
+                        <p style="margin-bottom: 8px;">Adjust the hue of the theme colour (0-360°).</p>
+                        <div class="theme-hue-container" id="raembl-theme-color-section">
+                            <div class="theme-hue-fader" id="raembl-single-hue-fader">
+                                <div class="theme-hue-track">
+                                    <div class="theme-hue-fill" id="raembl-single-hue-fill" style="width: 12.5%"></div>
+                                </div>
+                            </div>
+                            <div class="theme-hue-value" id="raembl-single-hue-value">45°</div>
+                        </div>
+                    </div>
+                    </div>
+
+                    <!-- HELP Tab -->
+                    <div class="settings-tab-panel" data-tab-panel="help">
+                    <div class="settings-section">
+                        <h3>User Manual</h3>
+                        <p>Learn how to use Ræmbl with the comprehensive user manual.</p>
+                        <div class="button-row">
+                            <button id="raembl-rtfm-button" class="settings-button">Open Manual (RTFM)</button>
+                        </div>
+                    </div>
+                    <div class="settings-section">
+                        <h3>About Ræmbl</h3>
+                        <p>Ræmbl is a monophonic/polyphonic synthesiser with subtractive synthesis and Euclidean pattern sequencing.</p>
+                        <p>Version: 1.0.0 (Alpha)</p>
+                    </div>
+                    </div>
+                </div>
+            </div>
+            <!-- SETTINGS PANEL END -->
+
+            <!-- MANUAL MODAL START -->
+            <div id="raembl-manual-modal" class="settings-panel hidden">
+                <div class="settings-panel-header">
+                    <h2>User Manual</h2>
+                    <button id="raembl-close-manual-btn" class="close-button" title="Close Manual">×</button>
+                </div>
+                <div class="settings-panel-content">
+                    <div class="manual-layout">
+                        <button id="raembl-toggle-manual-sidebar" class="sidebar-toggle" title="Toggle Sidebar">☰</button>
+                        <nav id="raembl-manual-sidebar" class="manual-sidebar">
+                            <ul>
+                                <li><a href="#getting-started">Getting Started</a></li>
+                                <li><a href="#signal-flow">Signal Flow</a></li>
+                                <li><a href="#modules">Modules</a>
+                                    <ul>
+                                        <li><a href="#time">TIME</a></li>
+                                        <li><a href="#factors">FACTORS</a></li>
+                                        <li><a href="#lfo">LFO</a></li>
+                                        <li><a href="#path">PATH</a></li>
+                                        <li><a href="#mod">MOD</a></li>
+                                        <li><a href="#oscillator">OSCILLATOR</a></li>
+                                        <li><a href="#plaits">PLAITS</a></li>
+                                        <li><a href="#rings">RINGS</a></li>
+                                        <li><a href="#mixer">MIXER</a></li>
+                                        <li><a href="#filter">FILTER</a></li>
+                                        <li><a href="#envelope">ENVELOPE</a></li>
+                                        <li><a href="#delay">DELAY</a></li>
+                                        <li><a href="#reverb">REVERB</a></li>
+                                        <li><a href="#clouds-fx">CLOUDS FX</a></li>
+                                        <li><a href="#output">OUTPUT</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#per-param-mod">Per-Parameter Modulation</a></li>
+                                <li><a href="#raembl-sidechain">Sidechain Ducking</a></li>
+                                <li><a href="#input-methods">Input Methods</a></li>
+                                <li><a href="#patch-mgmt">Patch Management</a></li>
+                                <li><a href="#customization">Customization</a></li>
+                            </ul>
+                        </nav>
+                        <div id="raembl-manual-content" class="manual-main-content">
+                        <h3>RÆMBL User Manual</h3>
+
+                        <p>&nbsp;</p>
+
+                        <h4 id="getting-started">Getting Started</h4>
+
+                        <p>&nbsp;</p>
+
+                        <p>Click anywhere on the interface to enable audio, then press <strong>Play</strong> in the TIME module to start the sequencer.</p>
+
+                        <p>&nbsp;</p>
+
+                        <h4 id="signal-flow">Signal Flow</h4>
+
+                        <p>&nbsp;</p>
+
+                        <p>The sequencer works as follows: <strong>TIME</strong> generates clock pulses at the set BPM. <strong>FACTORS</strong> creates euclidean rhythm patterns that determine when notes trigger. <strong>LFO</strong> generates continuous control values (a slow-moving waveform). <strong>PATH</strong> quantizes these LFO values to musical notes based on the selected scale and root. When a FACTORS gate occurs, PATH triggers a note from the current LFO position. The note then flows through: <strong>OSCILLATOR</strong> (sound generation) → <strong>MIXER</strong> (waveform blending) → <strong>FILTER</strong> (tone shaping) → <strong>ENVELOPE</strong> (amplitude) → <strong>DELAY</strong> &amp; <strong>REVERB</strong> (effects) → <strong>OUTPUT</strong> (master volume).</p>
+
+                        <p>&nbsp;</p>
+
+                        <h4 id="modules">Modules</h4>
+
+                        <p>&nbsp;</p>
+
+                        <h5 id="time">TIME</h5>
+
+                        <p>Shared timing controls located in the TIME STRIP between Bæng and Ræmbl.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p>
+                        <strong>BPM:</strong> Master tempo (20-300 BPM)<br>
+                        <strong>SWING:</strong> Timing offset for off-beat steps (0-100%)<br>
+                        <strong>LENGTH:</strong> Pattern length in bars (1-128) - <em>independent from Bæng</em>
+                        </p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Creating Repeated Musical Phrases:</strong><br>
+                        The LENGTH parameter controls how many bars play before the pattern loops. Setting a shorter LENGTH (e.g., 1-4 bars) creates tight, repeating melodic phrases. The LFO and FACTORS patterns will loop after this many bars, creating evolving sequences when LENGTH differs between Bæng and Ræmbl.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>RST Buttons:</strong><br>
+                        <strong>FACTORS RST:</strong> Resets the Euclidean pattern to step 1 at each bar start. Keeps rhythm locked to bar boundaries.<br>
+                        <strong>LFO RST:</strong> Resets LFO phase to 0 at each bar start. Keeps melodic modulation in sync with the beat.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p>Access Settings via the gear icon.</p>
+
+                        <p>&nbsp;</p>
+
+                        <h5 id="factors">FACTORS</h5>
+
+                        <p>Euclidean rhythm generator. Creates mathematically-distributed rhythmic patterns. Click-drag the 3D visualization to adjust camera angle; double-click to toggle animation.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p>
+                        <strong>STEPS:</strong> Sets pattern length (1-32)<br>
+                        <strong>FILLS:</strong> Sets number of triggers (0-STEPS)<br>
+                        <strong>SHIFT:</strong> Rotates the pattern<br>
+                        <strong>ACCENT (&gt;):</strong> Probability of accented notes (louder, brighter filter)<br>
+                        <strong>SLIDE:</strong> Probability of legato/glide between notes<br>
+                        <strong>TRILL (TR):</strong> Probability of rapid note alternation
+                        </p>
+
+                        <p>&nbsp;</p>
+
+                        <h5 id="lfo">LFO</h5>
+
+                        <p>Low-frequency oscillator for melodic sequencing. Generates continuous control values sent to PATH for pitch quantization.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p>
+                        <strong>AMP:</strong> Controls modulation depth<br>
+                        <strong>FREQ:</strong> Controls oscillation speed (0.05-30Hz)<br>
+                        <strong>WAVE:</strong> Morphs between sine/triangle/square/sawtooth waveforms<br>
+                        <strong>OFFSET:</strong> Shifts the waveform vertically
+                        </p>
+
+                        <p>&nbsp;</p>
+
+                        <h5 id="path">PATH</h5>
+
+                        <p>Receives LFO values and quantizes them to musical notes based on scale and root.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p>
+                        <strong>SCALE:</strong> Selects from 32 scales (Major, Minor, Pentatonic, Blues, Dorian, etc.)<br>
+                        <strong>ROOT:</strong> Sets the root note (C-B)<br>
+                        <strong>PROB:</strong> Sets probability of note triggering when gated
+                        </p>
+
+                        <p>&nbsp;</p>
+
+                        <h5 id="mod">MOD</h5>
+
+                        <p>Secondary LFO for modulating filter, pitch, and pulse width.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p>
+                        <strong>RATE:</strong> Controls modulation speed<br>
+                        <strong>WAVE:</strong> Selects waveform type (SIN/RAMP/SQR/NOISE/S&amp;H)
+                        </p>
+
+                        <p>&nbsp;</p>
+
+                        <h5 id="oscillator">OSCILLATOR</h5>
+
+                        <p>Sound generation with three synthesis engine options. Toggle MONO (single voice) or POLY (8-voice polyphony with voice stealing).</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Engine Selection:</strong><br>
+                        <strong>SUB:</strong> Classic subtractive synthesis (default)<br>
+                        <strong>PLT:</strong> Plaits - 24 engines across 3 banks<br>
+                        <strong>RNG:</strong> Rings - Physical modelling resonator</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Subtractive Parameters:</strong><br>
+                        <strong>OCT:</strong> Transposes main oscillators<br>
+                        <strong>SUB OCT:</strong> Transposes sub oscillator<br>
+                        <strong>DRIFT:</strong> Adds random pitch variation<br>
+                        <strong>GLIDE:</strong> Sets portamento time<br>
+                        <strong>WIDTH:</strong> Sets pulse wave duty cycle<br>
+                        <strong>PWM:</strong> Sets pulse width modulation amount<br>
+                        <strong>MOD:</strong> Sets pitch modulation amount
+                        </p>
+
+                        <p>&nbsp;</p>
+
+                        <h5 id="plaits">PLAITS</h5>
+
+                        <p>Mutable Instruments Plaits macro oscillator with 24 synthesis engines across 3 banks. Select bank via coloured buttons, then choose engine from dropdown.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>GREEN Bank (0-7) - Pitched/Harmonic:</strong><br>
+                        0: Virtual Analog - VA oscillators with detuning<br>
+                        1: Waveshaping - Wavefolder synthesis<br>
+                        2: FM - 2-operator frequency modulation<br>
+                        3: Granular - Grain cloud synthesis<br>
+                        4: Additive - Harmonic series synthesis<br>
+                        5: Wavetable - Wavetable morphing<br>
+                        6: Chord - 4-voice chord generator<br>
+                        7: Speech - Formant synthesis</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>RED Bank (8-15) - Noise/Physical:</strong><br>
+                        8: Swarm - Swarm of particles<br>
+                        9: Noise - Filtered noise generator<br>
+                        10: Particle - Particle noise<br>
+                        11: String - Karplus-Strong string model<br>
+                        12: Modal - Modal resonator<br>
+                        13: Bass Drum - Analog kick synthesis<br>
+                        14: Snare Drum - Analog snare synthesis<br>
+                        15: Hi-Hat - Analog hi-hat synthesis</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>ORANGE Bank (16-23) - Classic/FM:</strong><br>
+                        16: VA-VCF - Classic VA with filter<br>
+                        17: Phase Distortion - Casio CZ-style synthesis<br>
+                        18-20: Six-Op FM - DX7-style FM (3 variants)<br>
+                        21: Wave Terrain - 2D wavetable synthesis<br>
+                        22: String Machine - Ensemble string synthesis<br>
+                        23: Chiptune - 8-bit synthesis</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Parameters:</strong><br>
+                        <strong>HARMONICS:</strong> Harmonic content/brightness<br>
+                        <strong>TIMBRE:</strong> Timbral character<br>
+                        <strong>MORPH:</strong> Morphs between variations<br>
+                        <strong>LPG DECAY:</strong> Low-pass gate decay time<br>
+                        <strong>LPG COLOUR:</strong> Low-pass gate filter response</p>
+
+                        <p>&nbsp;</p>
+
+                        <h5 id="rings">RINGS</h5>
+
+                        <p>Mutable Instruments Rings physical modelling resonator with 6 resonator models plus an Easter Egg mode.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Resonator Models:</strong><br>
+                        0: Modal - 64-mode SVF bank resonator<br>
+                        1: Sympathetic String - 8 coupled strings<br>
+                        2: String - Karplus-Strong with dispersion<br>
+                        3: FM Voice - FM synthesis with envelope follower<br>
+                        4: Sympathetic String Quantised - Quantised sympathetic strings<br>
+                        5: String and Reverb - String model with built-in reverb</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Easter Egg - Disastrous Peace:</strong><br>
+                        A 12-voice polysynth hidden in Rings. Access via long-press on the model selector.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Parameters:</strong><br>
+                        <strong>FREQUENCY:</strong> Base pitch/frequency<br>
+                        <strong>STRUCTURE:</strong> Harmonic structure<br>
+                        <strong>BRIGHTNESS:</strong> High-frequency content<br>
+                        <strong>DAMPING:</strong> Decay/damping amount<br>
+                        <strong>POSITION:</strong> Exciter position on resonator<br>
+                        <strong>POLYPHONY:</strong> M (mono), P2 (2-voice), P4 (4-voice)</p>
+
+                        <p>&nbsp;</p>
+
+                        <h5 id="mixer">MIXER</h5>
+
+                        <p>Blends oscillator waveforms together.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p>
+                        <strong>SAW:</strong> Controls sawtooth level<br>
+                        <strong>SQUARE:</strong> Controls square wave level (affected by PWM)<br>
+                        <strong>TRI:</strong> Controls triangle wave level<br>
+                        <strong>SUB:</strong> Controls sub oscillator level<br>
+                        <strong>NOISE:</strong> Controls noise generator level
+                        </p>
+
+                        <p>&nbsp;</p>
+
+                        <h5 id="filter">FILTER</h5>
+
+                        <p>Tone shaping with highpass and lowpass filters.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p>
+                        <strong>HP:</strong> Sets highpass cutoff frequency (20Hz-10kHz)<br>
+                        <strong>LP:</strong> Sets lowpass cutoff frequency (20Hz-20kHz)<br>
+                        <strong>RES:</strong> Sets resonance/emphasis at cutoff<br>
+                        <strong>KEY:</strong> Makes filter track note pitch<br>
+                        <strong>ENV:</strong> Sets envelope modulation depth<br>
+                        <strong>MOD:</strong> Sets MOD LFO modulation amount
+                        </p>
+
+                        <p>&nbsp;</p>
+
+                        <h5 id="envelope">ENVELOPE</h5>
+
+                        <p>ADSR amplitude and filter envelope. Controls the volume and brightness contour of notes.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p>
+                        <strong>A:</strong> Sets attack time<br>
+                        <strong>D:</strong> Sets decay time (shortened by accent)<br>
+                        <strong>S:</strong> Sets sustain level<br>
+                        <strong>R:</strong> Sets release time
+                        </p>
+
+                        <p>&nbsp;</p>
+
+                        <h5 id="delay">DELAY</h5>
+
+                        <p>Echo effect with tape simulation. Toggle SYNC (tempo-locked) or FREE (milliseconds) modes.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p>
+                        <strong>SEND:</strong> Sets wet/dry mix<br>
+                        <strong>TIME:</strong> Sets delay time (SYNC: BPM divisions like 1/4, 1/8T; FREE: 1-4000ms)<br>
+                        <strong>FDBK:</strong> Sets feedback amount/repeats<br>
+                        <strong>WOW:</strong> Adds slow pitch modulation<br>
+                        <strong>FLUT:</strong> Adds fast pitch modulation<br>
+                        <strong>SAT:</strong> Adds saturation/distortion to feedback
+                        </p>
+
+                        <p>&nbsp;</p>
+
+                        <h5 id="reverb">REVERB</h5>
+
+                        <p>Space and ambience effect using convolution.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p>
+                        <strong>SEND:</strong> Sets wet/dry mix<br>
+                        <strong>PRED:</strong> Sets pre-delay time before reflections<br>
+                        <strong>DEC:</strong> Sets reverb decay/tail length<br>
+                        <strong>DIFF:</strong> Sets diffusion/smoothness of reflections<br>
+                        <strong>DAMP:</strong> Sets high-frequency damping
+                        </p>
+
+                        <p>&nbsp;</p>
+
+                        <h5 id="clouds-fx">CLOUDS FX</h5>
+
+                        <p>Mutable Instruments Clouds granular processor. Toggle between Classic FX (Reverb + Delay) and Clouds mode in Settings.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Playback Modes:</strong><br>
+                        <strong>Granular:</strong> 64-grain engine with window morphing - classic granular texture<br>
+                        <strong>WSOLA:</strong> Time-stretching without pitch change - smooth time manipulation<br>
+                        <strong>Looping Delay:</strong> Buffer-based delay with pitch shifting<br>
+                        <strong>Spectral:</strong> Phase vocoder FFT processing - frequency domain effects<br>
+                        <strong>Oliverb:</strong> Parasites reverb mode - lush algorithmic reverb<br>
+                        <strong>Resonestor:</strong> Parasites resonator mode - tuned resonances</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Parameters:</strong><br>
+                        <strong>PITCH:</strong> Pitch shift (-2 to +2 octaves)<br>
+                        <strong>POS:</strong> Playhead position in buffer<br>
+                        <strong>DENS:</strong> Grain density (granular) or other mode-specific<br>
+                        <strong>SIZE:</strong> Grain size or buffer length<br>
+                        <strong>TEX:</strong> Texture/window shape<br>
+                        <strong>D/W:</strong> Dry/wet mix<br>
+                        <strong>SPRD:</strong> Stereo spread<br>
+                        <strong>FB:</strong> Feedback amount (caution: high values can runaway)<br>
+                        <strong>VERB:</strong> Built-in reverb amount</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Controls:</strong><br>
+                        <strong>FREEZE:</strong> Freezes the buffer for infinite sustain<br>
+                        <strong>MODE:</strong> Selects playback mode<br>
+                        <strong>IN:</strong> Input level to Clouds</p>
+
+                        <p>&nbsp;</p>
+
+                        <h5 id="output">OUTPUT</h5>
+
+                        <p>Master volume control with limiter. The title displays a real-time stereo oscilloscope visualization.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p>
+                        <strong>VOL:</strong> Sets output level
+                        </p>
+
+                        <p>&nbsp;</p>
+
+                        <h4 id="per-param-mod">Per-Parameter Modulation</h4>
+
+                        <p>&nbsp;</p>
+
+                        <p>Click highlighted parameter labels to open the modulation modal. 37+ parameters are modulatable across all modules. Visual feedback includes pulsing LEDs and transparent overlays on faders showing real-time modulated values.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>6 Modulation Modes:</strong></p>
+
+                        <p>
+                        <strong>LFO:</strong> Low-frequency oscillator<br>
+                        - Waveforms: Sine, Triangle, Square, Saw<br>
+                        - Rate: 0.1-20 Hz<br>
+                        - Sync to clock optional<br>
+                        - Phase reset on trigger</p>
+
+                        <p>
+                        <strong>RND:</strong> LFSR-based random<br>
+                        - Bit length: 4-32 bits<br>
+                        - Probability: 0-100%<br>
+                        - Sample rate: 100Hz-10kHz</p>
+
+                        <p>
+                        <strong>ENV:</strong> AD/ADSR envelope<br>
+                        - Attack: 0.2ms-8s<br>
+                        - Release: 0.2ms-8s<br>
+                        - Curve shapes: Linear, Exponential, Logarithmic<br>
+                        - Sources: Note-on, Filter, Amplitude</p>
+
+                        <p>
+                        <strong>EF:</strong> Envelope follower<br>
+                        - Tracks audio amplitude in real-time<br>
+                        - Attack: 1ms-1s<br>
+                        - Release: 1ms-1s<br>
+                        - Peak detection with smoothing</p>
+
+                        <p>
+                        <strong>TM:</strong> Probabilistic step sequencer<br>
+                        - 1-16 steps<br>
+                        - Per-step probability (0-9 scale)<br>
+                        - Clock-synced or manual trigger</p>
+
+                        <p>
+                        <strong>SEQ:</strong> CV sequencer<br>
+                        - 4-16 step pattern<br>
+                        - Clock-synced to transport<br>
+                        - Editable step values</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Common Controls:</strong><br>
+                        <strong>DEPTH:</strong> Modulation amount (0-100%)<br>
+                        <strong>OFFSET:</strong> Shifts modulation centre point</p>
+
+                        <p>&nbsp;</p>
+
+                        <h4 id="raembl-sidechain">Sidechain Ducking</h4>
+
+                        <p>&nbsp;</p>
+
+                        <p>Compressor-based ducking that allows Bæng drum voices to duck Ræmbl's effects returns (Reverb, Delay, Clouds). This creates space for drum hits by momentarily reducing the effect levels.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Accessing Ducking:</strong><br>
+                        Click the duck icon (🦆) on any effect module header to open the ducking configuration modal.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Configuration:</strong><br>
+                        <strong>Enable:</strong> Toggle ducking on/off for this effect<br>
+                        <strong>Trigger Voices:</strong> Select which Bæng voices trigger the ducking (V1-V6 checkboxes)<br>
+                        <strong>Threshold:</strong> Level at which ducking begins<br>
+                        <strong>Ratio:</strong> Compression ratio when ducking<br>
+                        <strong>Attack:</strong> How quickly ducking engages<br>
+                        <strong>Release:</strong> How quickly ducking recovers<br>
+                        <strong>Range:</strong> Maximum amount of gain reduction</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Tip:</strong> Use ducking on Reverb and Delay to keep drums punchy and clear. A fast attack with medium release works well for most drum patterns.</p>
+
+                        <p>&nbsp;</p>
+
+                        <h4 id="input-methods">Input Methods</h4>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Computer Keyboard:</strong><br>
+                        Middle row (A-;) and top row (W-P) play notes<br>
+                        Z/X shift octaves<br>
+                        Hold Shift for accent</p>
+
+                        <p><strong>MIDI:</strong><br>
+                        Connect MIDI devices for note input and CC control<br>
+                        Use MIDI Learn in Settings: click Learn, move a controller, select parameter</p>
+
+                        <p>&nbsp;</p>
+
+                        <h4 id="patch-mgmt">Patch Management</h4>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Save/Load:</strong><br>
+                        Export and import synth states as JSON files via Settings Panel</p>
+
+                        <p><strong>Undo/Redo:</strong><br>
+                        Cmd/Ctrl+Z (undo), Cmd/Ctrl+X (redo)<br>
+                        Up to 100 state snapshots</p>
+
+                        <p>&nbsp;</p>
+
+                        <h4 id="customization">Customization</h4>
+
+                        <p>&nbsp;</p>
+
+                        <p>Access theme settings via the <strong>THEME</strong> tab in Settings (gear icon in TIME STRIP).</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Light/Dark Mode:</strong><br>
+                        Toggle between light and dark interface themes. All visualisations and UI elements update in real-time.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Theme Colour:</strong><br>
+                        Adjust the hue of the theme colour using the fader (0-360°). This affects all accent colours, borders, and highlighted elements throughout the interface.</p>
+
+                        <p>&nbsp;</p>
+
+                        <p><strong>Gradient Mode:</strong><br>
+                        Enable gradient mode for a two-colour theme that flows across the interface.<br>
+                        - <strong>Colour 1 &amp; 2:</strong> Set the two hue values for the gradient<br>
+                        - <strong>Rotation:</strong> Adjust the gradient angle (0-360°)<br>
+                        - <strong>Presets:</strong> Quick-select colour combinations (Yellow-Cyan, Pink-Blue, Red-Yellow, Purple-Magenta)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- MANUAL MODAL END -->
+        </div>
+    </div>
+
+    <!-- Shared Time Strip (Bottom) -->
+    <div id="time-strip-container" class="time-strip-container"></div>
+
+    <!-- Info Modal (positioned absolutely) -->
+    <div id="info-modal" class="info-modal hidden">
+        <div class="info-modal-header">
+            <span class="info-modal-title">Parameter Info</span>
+            <button class="info-modal-close">&times;</button>
+        </div>
+        <div class="info-modal-content">
+            <div class="info-param-name">--</div>
+            <div class="info-param-desc">Hover a parameter for info</div>
+        </div>
+    </div>
+
+    <!-- Shared modules first -->
+    <script type="module" src="js/shared/audio.js"></script>
+    <script type="module" src="js/shared/clock.js"></script>
+    <script src="js/shared/dynamic-spacing.js"></script>
+    <script src="js/shared/viewport-scale.js"></script>
+    <script type="module" src="js/state.js"></script>
+    <!-- Then app-specific -->
+    <script type="module" src="js/baeng/main.js"></script>
+    <script type="module" src="js/raembl/main.js"></script>
+</body>
+</html>

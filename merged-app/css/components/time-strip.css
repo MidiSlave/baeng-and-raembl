@@ -1,0 +1,345 @@
+/* File: merged-app/css/components/time-strip.css
+ * Time strip component styles + simple fader
+ */
+
+/* ===== TIME STRIP ===== */
+
+.time-strip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 40px;
+    background: var(--bg-module);
+    border: 1px solid var(--theme-color);
+    border-radius: var(--radius-md);
+    padding: 4px 12px;
+    overflow: hidden;
+}
+
+.strip-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.strip-section.left {
+    justify-content: flex-start;
+}
+
+.strip-section.centre {
+    justify-content: center;
+    gap: 10px;
+    flex-shrink: 1;
+}
+
+.strip-section.right {
+    justify-content: flex-end;
+}
+
+/* App labels */
+.strip-label {
+    font-size: 11px;
+    font-weight: bold;
+    color: var(--theme-color);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    min-width: 45px;
+}
+
+/* Step counter displays */
+.strip-display {
+    font-size: 10px;
+    font-family: 'Menlo', monospace;
+    color: var(--theme-color);
+    border: 1px solid var(--theme-color);
+    border-radius: 3px;
+    padding: 2px 5px;
+    background: var(--bg-display);
+    min-width: 54px;
+    text-align: center;
+}
+
+/* Generic strip button - all same size */
+.strip-btn {
+    width: 24px;
+    height: 24px;
+    background: var(--bg-button);
+    border: 1px solid var(--theme-color);
+    border-radius: 3px;
+    color: var(--theme-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    flex-shrink: 0;
+    transition: background-color 0.15s, color 0.15s;
+}
+
+.strip-btn:hover {
+    opacity: 0.85;
+}
+
+.strip-btn.active {
+    background: var(--theme-color);
+    color: var(--bg-module);
+}
+
+/* Info button */
+.strip-info-btn {
+    font-size: 14px;
+    font-weight: bold;
+    font-style: italic;
+    font-family: 'Georgia', serif;
+}
+
+/* Settings button - gear icon */
+.strip-settings-btn svg {
+    width: 14px;
+    height: 14px;
+    fill: var(--theme-color);
+}
+
+
+/* ===== SIMPLE FADER ===== */
+
+.simple-fader-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.simple-fader-label {
+    font-size: 8px;
+    color: var(--theme-color);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    min-width: 28px;
+}
+
+.simple-fader-track {
+    position: relative;
+    width: 90px;
+    height: 8px;
+    background: var(--bg-display);
+    border-radius: 4px;
+    cursor: ew-resize;
+    border: 1px solid var(--border-grey-2);
+}
+
+.simple-fader-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    background: var(--theme-color);
+    border-radius: 4px 0 0 4px;
+    width: calc(var(--fader-position, 50) * 1%);
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+.simple-fader-thumb {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    left: calc(var(--fader-position, 50) * 1%);
+    width: 14px;
+    height: 16px;
+    background: var(--bg-button);
+    border: 1px solid var(--theme-color);
+    border-radius: 3px;
+    pointer-events: none;
+}
+
+.simple-fader-value {
+    font-size: 9px;
+    color: var(--theme-color);
+    text-align: left;
+    min-width: 26px;
+}
+
+/* Fader hover state */
+.simple-fader-track:hover .simple-fader-thumb {
+    border-color: var(--theme-color-hover);
+}
+
+/* Fader active/dragging state */
+.simple-fader-container.dragging .simple-fader-thumb {
+    background: var(--theme-color);
+    border-color: var(--theme-color);
+}
+
+.simple-fader-container.dragging .simple-fader-fill {
+    opacity: 0.6;
+}
+
+/* ===== TIME STRIP CONTAINER (Fixed at bottom) ===== */
+
+.time-strip-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+
+/* ===== iPad Landscape Adjustments ===== */
+
+@media screen and (max-width: 1194px) and (orientation: landscape) {
+    .time-strip {
+        height: 36px;
+    }
+
+    .strip-label {
+        font-size: 10px;
+        min-width: 40px;
+    }
+
+    .simple-fader-track {
+        width: 75px;
+    }
+}
+
+
+/* ============================================
+   Gradient Mode Styling
+   Note: .gradient-mode is on html element (parent)
+   ============================================ */
+
+/* Time strip border with gradient */
+.gradient-mode .time-strip {
+    position: relative;
+    border-color: transparent;
+}
+
+.gradient-mode .time-strip::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: var(--theme-gradient-h);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+/* Labels with gradient text */
+.gradient-mode .strip-label {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Display boxes with gradient border and text */
+.gradient-mode .strip-display {
+    position: relative;
+    border-color: transparent;
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.gradient-mode .strip-display::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: var(--theme-gradient-h);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* Buttons with gradient border and text */
+.gradient-mode .strip-btn {
+    position: relative;
+    border-color: transparent;
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.gradient-mode .strip-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: var(--theme-gradient-h);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+/* Active buttons with gradient fill */
+.gradient-mode .strip-btn.active {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: padding-box;
+    -webkit-text-fill-color: var(--bg-module);
+    background-clip: padding-box;
+    color: var(--bg-module);
+}
+
+/* Settings button SVG fill */
+.gradient-mode .strip-settings-btn svg {
+    fill: url(#gradient-fill);
+}
+
+/* Fader labels with gradient text */
+.gradient-mode .simple-fader-label {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Fader fill with gradient */
+.gradient-mode .simple-fader-fill {
+    background: var(--theme-gradient-h);
+}
+
+/* Fader thumb with gradient border */
+.gradient-mode .simple-fader-thumb {
+    position: relative;
+    border-color: transparent;
+}
+
+.gradient-mode .simple-fader-thumb::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: var(--theme-gradient-h);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+/* Fader value with gradient text */
+.gradient-mode .simple-fader-value {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
