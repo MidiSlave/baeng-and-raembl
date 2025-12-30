@@ -3,7 +3,7 @@
 import { state, parameterDefinitions } from './state.js';
 import { config, colors } from './config.js';
 import { setThemeHue, loadThemeHue, saveThemeHue } from './utils/themeColor.js';
-import { setupFaders, setupSlidePots, setupResetButtons, setupPlayButton, setupSwitches, setupRandomButtons } from './ui.js';
+import { setupFaders, setupSlidePots, destroyAllSlidePots, setupResetButtons, setupPlayButton, setupSwitches, setupRandomButtons } from './ui.js';
 import { setupMiniFaders } from './ui/miniFaders.js';
 // import { initClock, togglePlay } from './modules/clock.js'; // OLD: Using original Ræmbl clock
 import { initClock, togglePlay } from '../shared/clock.js'; // NEW: Using shared clock
@@ -988,6 +988,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             fxModeCloudsBtn.classList.toggle('active', mode === 'clouds');
         }
 
+        // Clear SlidePot registry before DOM is destroyed
+        // (ensures setupSlidePots creates new instances for fresh DOM elements)
+        destroyAllSlidePots();
+
         // Re-render modules FIRST so canvas exists before audio init
         renderModules(true); // Pass true to clear existing modules
 
@@ -1009,9 +1013,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             initDelay();
         } else if (mode === 'clouds') {
             // Clouds worklet was initialized in switchFxMode()
-            // Now attach UI event handlers and start animation
-            attachCloudsEventHandlers();
-            startCloudsAnimation();
+            // Delay handler attachment to ensure DOM is fully ready after re-render
+            // Uses event delegation with deduplication to handle FX mode switches
+            setTimeout(() => {
+                console.log('[Main] Delayed attachment of Clouds event handlers');
+                attachCloudsEventHandlers();
+                startCloudsAnimation();
+            }, 100);
 
             // IMPORTANT: Re-initialize Clouds fader visuals after setupFaders() runs
             // (setupFaders sets them to 0 because they're not in the state system)

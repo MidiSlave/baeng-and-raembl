@@ -295,9 +295,7 @@ export function switchEngine(engineType) {
 
   // Quick release on subtractive if switching away
   if (previousEngine === 'subtractive' && engineType !== 'subtractive') {
-    if (config.workletBridge) {
-      config.workletBridge.switchEngine(engineType);
-    }
+    releaseAllVoices();
   }
 
   // Quick release on Plaits if switching away

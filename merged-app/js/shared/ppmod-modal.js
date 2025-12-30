@@ -83,6 +83,13 @@ export function initPPModModal() {
         }
     });
 
+    // Blur sliders on mouseup so keyboard triggers work while modal is open
+    modal.addEventListener('mouseup', () => {
+        if (document.activeElement && document.activeElement.tagName === 'INPUT') {
+            document.activeElement.blur();
+        }
+    });
+
     // Dragging handlers
     header.addEventListener('mousedown', startDrag);
     header.addEventListener('touchstart', startDrag, { passive: false });
@@ -251,6 +258,9 @@ export function closePPModModal() {
     if (modal) {
         modal.classList.add('hidden');
     }
+
+    // Restore keyboard focus to body so keyboard triggers work
+    document.body.focus();
 
     // Save position
     saveModalPosition();
@@ -1406,25 +1416,77 @@ function startVisualisation() {
             ctx.fillText('ATK', 4, 12);
             ctx.fillText('REL', width * attackRatio + 4, 12);
         } else if (currentMode === 'RND') {
-            // Draw sample-and-hold style random waveform
+            // Draw sample-and-hold style random waveform reflecting all RND parameters
             const modConfig = currentApp === 'raembl'
                 ? window.raemblState?.perParamModulations?.[currentParamId]
-                : null;
-            const sampleRateHz = modConfig?.rndSampleRate ?? 1000;
+                : window.baengState?.perParamModulations?.[currentParamId];
 
-            // Calculate number of samples to show (based on rate, showing ~0.5 seconds)
-            const displayDurationMs = 500;
-            const numSamples = Math.max(4, Math.min(64, Math.round(sampleRateHz * displayDurationMs / 1000)));
+            // Handle per-voice params for Bæng (config is in modConfig.voices[voiceIndex])
+            let sampleRateHz = 1000;
+            let bitLength = 16;
+            let probability = 100;
+            let depth = 50;
+            let offset = 0;
+
+            if (modConfig) {
+                if (currentIsVoiceParam && currentVoiceIndex !== null && modConfig.voices) {
+                    // Bæng per-voice param
+                    const voiceConfig = modConfig.voices[currentVoiceIndex];
+                    sampleRateHz = voiceConfig?.rndSampleRate ?? 1000;
+                    bitLength = voiceConfig?.rndBitLength ?? 16;
+                    probability = voiceConfig?.rndProbability ?? 100;
+                    depth = modConfig.depth ?? 50;
+                    offset = modConfig.offset ?? 0;
+                } else {
+                    // Global param (Ræmbl or Bæng effect)
+                    sampleRateHz = modConfig.rndSampleRate ?? 1000;
+                    bitLength = modConfig.rndBitLength ?? 16;
+                    probability = modConfig.rndProbability ?? 100;
+                    depth = modConfig.depth ?? 50;
+                    offset = modConfig.offset ?? 0;
+                }
+            }
+
+            // Calculate number of samples using logarithmic scaling for better visual range
+            // 100Hz → ~8 samples, 1000Hz → ~24 samples, 10000Hz → ~64 samples
+            const logMin = Math.log(100);
+            const logMax = Math.log(10000);
+            const logRate = Math.log(Math.max(100, Math.min(10000, sampleRateHz)));
+            const rateRatio = (logRate - logMin) / (logMax - logMin); // 0-1
+            const numSamples = Math.round(8 + rateRatio * 56); // 8 to 64 samples
             const stepWidth = width / numSamples;
-            const amp = height / 2 - 10;
 
-            // Use seeded random for consistent visualisation (changes each frame slightly)
+            // Amplitude scaled by depth (0-100%)
+            const maxAmp = height / 2 - 10;
+            const amp = maxAmp * (depth / 100);
+
+            // Offset shifts the centre line (-100 to +100 maps to full range)
+            const offsetY = (offset / 100) * maxAmp;
+
+            // Number of discrete levels based on bit length
+            const numLevels = Math.pow(2, Math.min(bitLength, 8));
+
+            // Use seeded random for consistent visualisation
             const seed = Math.floor(phase * 10);
+            let prevValue = 0.5;
 
             for (let i = 0; i < numSamples; i++) {
-                // Pseudo-random value based on seed and index
-                const randomValue = Math.sin((seed + i * 127.1) * 43758.5453) % 1;
-                const y = height / 2 - randomValue * amp;
+                let rawRandom = Math.abs(Math.sin((seed + i * 127.1) * 43758.5453) % 1);
+
+                // Apply probability
+                const probThreshold = probability / 100;
+                const shouldChange = Math.abs(Math.sin((seed + i * 317.3) * 12345.6789) % 1) < probThreshold;
+
+                let quantisedValue;
+                if (shouldChange || i === 0) {
+                    quantisedValue = Math.floor(rawRandom * numLevels) / numLevels;
+                    prevValue = quantisedValue;
+                } else {
+                    quantisedValue = prevValue;
+                }
+
+                // Apply depth (amplitude) and offset
+                const y = height / 2 - offsetY - (quantisedValue - 0.5) * 2 * amp;
                 const x1 = i * stepWidth;
                 const x2 = (i + 1) * stepWidth;
 
@@ -1437,7 +1499,36 @@ function startVisualisation() {
             }
             ctx.stroke();
 
-            // Draw sample markers (subtle)
+            // Draw offset indicator line (where centre is shifted to)
+            if (offset !== 0) {
+                ctx.strokeStyle = `${themeColor}40`;
+                ctx.lineWidth = 1;
+                ctx.setLineDash([4, 4]);
+                ctx.beginPath();
+                ctx.moveTo(0, height / 2 - offsetY);
+                ctx.lineTo(width, height / 2 - offsetY);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.strokeStyle = themeColor;
+                ctx.lineWidth = 2;
+            }
+
+            // Draw quantisation level lines for low bit depths
+            if (bitLength <= 4) {
+                ctx.strokeStyle = `${themeColor}15`;
+                ctx.lineWidth = 0.5;
+                for (let level = 0; level <= numLevels; level++) {
+                    const y = height / 2 - offsetY - ((level / numLevels) - 0.5) * 2 * amp;
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(width, y);
+                    ctx.stroke();
+                }
+                ctx.strokeStyle = themeColor;
+                ctx.lineWidth = 2;
+            }
+
+            // Draw sample markers
             ctx.fillStyle = `${themeColor}30`;
             for (let i = 1; i < numSamples; i++) {
                 const x = i * stepWidth;

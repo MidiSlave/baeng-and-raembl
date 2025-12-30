@@ -360,23 +360,34 @@ export function attachCloudsEventHandlers() {
         });
     }
 
-    // Clock sync toggle button (in header, matches freeze button pattern)
-    const clockSyncBtn = document.getElementById('clouds-clock-sync-button');
-    if (clockSyncBtn) {
-        clockSyncBtn.addEventListener('click', () => {
+    // Clock sync toggle button - use event delegation on module container
+    // This ensures clicks work even if button element is recreated after handler attachment
+    if (!module.dataset.clockSyncHandlerAttached) {
+        module.dataset.clockSyncHandlerAttached = 'true';
+        module.addEventListener('click', (e) => {
+            // Check if click target is the clock sync button or its children
+            const clockSyncBtn = e.target.closest('#clouds-clock-sync-button');
+            if (!clockSyncBtn) return;
+
+            console.log('[Clouds] Clock sync button clicked via delegation!');
             clockSyncEnabled = !clockSyncEnabled;
             clockSyncBtn.classList.toggle('active', clockSyncEnabled);
 
             // Subscribe or unsubscribe from clock
             if (clockSyncEnabled) {
                 clockUnsubscribe = subscribeToSharedClock(handleClockStep);
+                console.log('[Clouds] Clock sync enabled, subscribed to clock');
             } else {
                 if (clockUnsubscribe) {
                     clockUnsubscribe();
                     clockUnsubscribe = null;
                 }
+                console.log('[Clouds] Clock sync disabled');
             }
         });
+        console.log('[Clouds] Clock sync handler attached via delegation on module');
+    } else {
+        console.log('[Clouds] Clock sync handler already attached, skipping');
     }
 
     // Random button

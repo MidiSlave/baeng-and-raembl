@@ -9,7 +9,7 @@ import { drawDelay, startDelayAnimation } from './delay.js';
 import { drawReverb } from './reverb.js';
 import { mapRange } from '../utils.js';
 import { updateCloudsParameter } from './clouds.js';
-import { updatePlaitsParameter } from '../audio.js';
+import { updatePlaitsParameter, updateRingsParameter } from '../audio.js';
 import { updateModulationLED, slidePotRegistry } from '../ui/slidePots.js';
 import { SeqPattern, ADEnvelope, EnvelopeCurves, LFSR } from '../../shared/modulation-utils.js';
 import { getCurrentParamId } from '../../shared/ppmod-modal.js';
@@ -1257,6 +1257,15 @@ function applyModulatedValue(paramId, modulatedValue, baseValue) {
         case 'plaits.lpgColour':
             // Normalise 0-100 to 0-1 range for Plaits AudioParams
             updatePlaitsParameter(paramId, modulatedValue / 100);
+            break;
+
+        // Rings parameters (physical modelling resonator)
+        case 'rings.structure':
+        case 'rings.brightness':
+        case 'rings.damping':
+        case 'rings.position':
+            // Normalise 0-100 to 0-1 range for Rings AudioParams
+            updateRingsParameter(paramId, modulatedValue / 100);
             break;
 
         // Envelope, Mod LFO parameters don't need update calls
