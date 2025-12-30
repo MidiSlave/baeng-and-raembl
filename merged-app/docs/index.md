@@ -1,6 +1,6 @@
 # Bæng & Ræmbl Documentation
 
-Welcome to the documentation for **Bæng & Ræmbl**, a unified web-based synthesiser suite combining a 6-voice drum machine (Bæng) with a polyphonic synthesiser (Ræmbl). Both instruments share synchronised timing and transport controls whilst maintaining independent audio routing.
+Welcome to the documentation for **Bæng & Ræmbl** — a semi-modular browser groovebox featuring a 6-voice drum machine (Bæng) and an 8-voice polysynth (Ræmbl). Includes JavaScript ports of Mutable Instruments Plaits, Rings & Clouds, generative Euclidean sequencers, and a [squares-and-circles](https://github.com/eh2k/squares-and-circles)-inspired modulation system.
 
 This documentation is organised into sections for musicians and developers.
 

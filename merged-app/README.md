@@ -1,8 +1,8 @@
 # Bæng & Ræmbl
 
-**Unified Web Audio Synthesiser Suite**
+**A semi-modular groovebox... thing.**
 
-A powerful web-based synthesiser combining a 6-voice drum machine (Bæng) with a polyphonic synthesiser (Ræmbl), synchronised timing, and professional effects processing.
+Drum machine meets polysynth meets generative sequencer. Features (almost complete) JavaScript ports of Mutable Instruments Plaits, Rings & Clouds, a custom-built subtractive synth, and a modulation system heavily inspired by [eh2k's squares-and-circles](https://github.com/eh2k/squares-and-circles). Runs in your browser. No reason it should work, but it does.
 
 ---
 
