@@ -246,60 +246,73 @@ updateParameterById('filter-cutoff', newValue);
 ### Signal Flow
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    Shared AudioContext                       │
-└─────────────────────────────────────────────────────────────┘
-                           │
-        ┌──────────────────┴──────────────────┐
-        │                                     │
-   ┌────▼────┐                          ┌────▼────┐
-   │  Bæng   │                          │ Ræmbl   │
-   │ Master  │                          │ Master  │
-   │ (-3dB)  │                          │ (-3dB)  │
-   └────┬────┘                          └────┬────┘
-        │                                     │
-   ┌────▼─────────────┐                 ┌────▼─────────────┐
-   │ Drum Bus         │                 │ Engine Output    │
-   │ (Drive/Crunch/   │                 │ (Subtractive/    │
-   │  Transients/     │                 │  Plaits/Rings)   │
-   │  Boom/Comp)      │                 │                  │
-   └────┬─────────────┘                 └────┬─────────────┘
-        │                                     │
-   ┌────▼─────────────┐                 ┌────▼─────────────┐
-   │ Voice Mix        │                 │ Voice Pool       │
-   │ (6 voices)       │                 │ (8 voices)       │
-   └────┬─────────────┘                 └────┬─────────────┘
-        │                                     │
-   ┌────▼─────────────┐                 ┌────▼─────────────┐
-   │ Per-Voice FX     │                 │ Filter + Env     │
-   │ • Clouds Send    │                 │ • Cutoff         │
-   │ • Reverb Send    │                 │ • Resonance      │
-   │ • Delay Send     │                 │ • ADSR           │
-   └────┬─────────────┘                 └────┬─────────────┘
-        │                                     │
-   ┌────▼─────────────┐                 ┌────▼─────────────┐
-   │ Engines          │                 │ Clouds FX        │
-   │ • DX7 (6-op FM)  │                 │ (Serial Insert)  │
-   │ • Analog         │                 │                  │
-   │ • SLICE/SMPL     │                 │                  │
-   └──────────────────┘                 └────┬─────────────┘
-                                              │
-                                         ┌────▼─────────────┐
-                                         │ Reverb/Delay     │
-                                         │ (Legacy FX)      │
-                                         └──────────────────┘
-        │                                     │
-        └──────────────────┬──────────────────┘
-                           │
-                    ┌──────▼──────┐
-                    │ Final       │
-                    │ Limiter     │
-                    │ (-0.1dB)    │
-                    └──────┬──────┘
-                           │
-                    ┌──────▼──────┐
-                    │ Destination │
-                    └─────────────┘
+         BÆNG (6 voices)                      RÆMBL (8 voices)
+              │                                     │
+┌─────────────▼─────────────┐       ┌───────────────▼───────────────┐
+│ Engines                   │       │ Engines                       │
+│ • DX7 (6-op FM)           │       │ • Subtractive (PolyBLEP)      │
+│ • Analog (kick/snr/hat)   │       │ • Plaits (24 engines)         │
+│ • SMPL (sample playback)  │       │ • Rings (6 resonators)        │
+│ • SLICE (breakbeat slicer)│       │                               │
+└─────────────┬─────────────┘       └───────────────┬───────────────┘
+              │                                     │
+┌─────────────▼─────────────┐       ┌───────────────▼───────────────┐
+│ Per-Voice Processing      │       │ Voice Pool (AudioWorklet)     │
+│ • Level / Pan             │       │ • Filter (TPT LP/HP)          │
+│ • Bit Reduction / Drive   │       │ • Amp Envelope (ADSR)         │
+│ • Gate / Choke Groups     │       │ • Filter Envelope (ADSR)      │
+└─────────────┬─────────────┘       │ • LFO Modulation              │
+              │                     └───────────────┬───────────────┘
+              │                                     │
+     ┌────────┴────────┐                   ┌────────┴────────┐
+     │                 │                   │                 │
+     ▼                 ▼                   ▼                 ▼
+┌─────────┐     ┌───────────┐       ┌───────────┐     ┌─────────┐
+│ Direct  │     │ FX Sends  │       │ FX Sends  │     │ Direct  │
+│ Out     │     │ • Reverb  │       │ • Reverb  │     │ Out     │
+│         │     │ • Delay   │       │ • Delay   │     │         │
+│         │     │ • Clouds  │       │           │     │         │
+└────┬────┘     └─────┬─────┘       └─────┬─────┘     └────┬────┘
+     │                │                   │                │
+     │                ▼                   ▼                │
+     │         ┌───────────┐       ┌───────────┐          │
+     │         │ FX Return │       │ FX Return │          │
+     │         │ (shared)  │       │ (shared)  │          │
+     │         └─────┬─────┘       └─────┬─────┘          │
+     │               │                   │                │
+     │               │                   ▼                │
+     │               │           ┌───────────────┐        │
+     │               │           │ Clouds FX     │        │
+     │               │           │ (Serial Insert│        │
+     │               │           │  OR Classic)  │        │
+     │               │           └───────┬───────┘        │
+     │               │                   │                │
+     ▼               ▼                   ▼                ▼
+┌─────────────────────────┐       ┌─────────────────────────┐
+│ Drum Bus                │       │                         │
+│ • Trim → Drive → Crunch │       │                         │
+│ • Transients → Boom     │       │                         │
+│ • Compressor → Dampen   │       │                         │
+└───────────┬─────────────┘       └────────────┬────────────┘
+            │                                  │
+            ▼                                  ▼
+     ┌─────────────┐                    ┌─────────────┐
+     │ Bæng Master │                    │Ræmbl Master │
+     │   (-5dB)    │                    │  (-13dB)    │
+     └──────┬──────┘                    └──────┬──────┘
+            │                                  │
+            └────────────────┬─────────────────┘
+                             │
+                      ┌──────▼──────┐
+                      │   Final     │
+                      │   Limiter   │
+                      │  (-0.1dB)   │
+                      └──────┬──────┘
+                             │
+                      ┌──────▼──────┐
+                      │ AudioContext│
+                      │ .destination│
+                      └─────────────┘
 ```
 
 ### Shared AudioContext
