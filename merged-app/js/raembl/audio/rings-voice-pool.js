@@ -11,6 +11,7 @@
 import { state } from '../state.js';
 import { generateDriftOffset, noteNameToMidi, transpositionToSemitones } from './pitch-preprocessing.js';
 import { findScaleNote } from './voice.js';
+import { validateRingsParam } from '../modules/ringsValidation.js';
 
 /**
  * Resonator model definitions
@@ -441,9 +442,12 @@ export class RingsVoicePool {
     const now = this.audioContext.currentTime;
 
     for (const [paramName, value] of Object.entries(params)) {
+      // Apply validation with current model to prevent instability
+      const validatedValue = validateRingsParam(paramName, value, this.currentModel);
+
       const audioParam = this.node.parameters.get(paramName);
       if (audioParam) {
-        audioParam.setTargetAtTime(value, now, 0.015);
+        audioParam.setTargetAtTime(validatedValue, now, 0.015);
       }
     }
   }

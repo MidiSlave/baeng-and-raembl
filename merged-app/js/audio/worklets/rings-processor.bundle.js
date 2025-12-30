@@ -122,7 +122,8 @@
     setGR(g, r) {
       this.g = g;
       this.r = r;
-      this.h = 1 / (1 + this.r * this.g + this.g * this.g);
+      const denom = 1 + this.r * this.g + this.g * this.g;
+      this.h = denom > 1e-6 ? 1 / denom : 1;
     }
     /**
      * Set frequency from LUT, resonance in true units
@@ -130,7 +131,8 @@
     setGQ(g, resonance) {
       this.g = g;
       this.r = 1 / resonance;
-      this.h = 1 / (1 + this.r * this.g + this.g * this.g);
+      const denom = 1 + this.r * this.g + this.g * this.g;
+      this.h = denom > 1e-6 ? 1 / denom : 1;
     }
     /**
      * Set frequency and resonance from true units
@@ -138,7 +140,8 @@
     setFQ(f, resonance, approximation = FrequencyApproximation.DIRTY) {
       this.g = tanApprox(f, approximation);
       this.r = 1 / resonance;
-      this.h = 1 / (1 + this.r * this.g + this.g * this.g);
+      const denom = 1 + this.r * this.g + this.g * this.g;
+      this.h = denom > 1e-6 ? 1 / denom : 1;
     }
     /**
      * Process single sample
@@ -149,6 +152,11 @@
       this.state1 = this.g * hp + bp;
       const lp = this.g * bp + this.state2;
       this.state2 = this.g * bp + lp;
+      if (!Number.isFinite(this.state1) || !Number.isFinite(this.state2)) {
+        this.state1 = 0;
+        this.state2 = 0;
+        return 0;
+      }
       switch (mode) {
         case FilterMode.LOW_PASS:
           return lp;
@@ -1378,13 +1386,13 @@
       for (let i = 0; i < maxModes; i++) {
         let partialFrequency = harmonic * stretchFactor;
         if (partialFrequency >= 0.49) {
-          partialFrequency = 0.49;
-        } else {
-          numModes = i + 1;
+          break;
         }
+        numModes = i + 1;
+        const resonance = Math.min(1 + partialFrequency * q, 1e3);
         this.f[i].setFQ(
           partialFrequency,
-          1 + partialFrequency * q,
+          resonance,
           FrequencyApproximation.FAST
         );
         stretchFactor += stiffness;
@@ -1394,6 +1402,7 @@
           stiffness *= 0.98;
         }
         qLoss += qLossDampingRate * (1 - qLoss);
+        qLoss = Math.min(qLoss, 0.95);
         harmonic += this.frequency;
         q *= qLoss;
       }
