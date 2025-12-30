@@ -7,6 +7,7 @@ tests/
 # Claude/editor files
 .claude/
 *.claude
+CLAUDE.md
 .DS_Store
 
 # Python tools (development only)
