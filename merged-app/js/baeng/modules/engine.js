@@ -159,7 +159,8 @@ export function triggerVoice(
     fixedTimingOffset = 0, // Fixed timing offset in seconds (for flams)
     velocityMultiplier = 1.0, // Velocity multiplier (for flam grace notes)
     skipVoiceRelease = false, // Skip monophonic voice release (for flam layering)
-    scheduledTime = null // Optional: pre-scheduled time from audio-thread scheduler
+    scheduledTime = null, // Optional: pre-scheduled time from audio-thread scheduler
+    melodicMidiNote = null // Optional: MIDI note for melodic keyboard input (overrides macroPitch)
 ) {
     if (!config.audioContext || !config.initialized) {
         console.warn('[triggerVoice] Audio not initialized');
@@ -422,15 +423,20 @@ export function triggerVoice(
             if (shouldSlide) {
                 // TB-303 style slide: glide pitch, don't retrigger envelope
                 // Send pitchSlide message to existing voice
-                // Use SAMPLED pitch (S&H) - not voiceSettings.macroPitch which changes every frame
-                const pitchParam = sampledPitch;
                 const fineTune = voiceSettings.dx7FineTune !== undefined ? voiceSettings.dx7FineTune : 0;
 
                 let targetMidiNote;
-                if (state.scaleQuantizeEnabled) {
-                    targetMidiNote = quantizePitchToScale(pitchParam, state.globalScale, state.globalRoot);
+                if (melodicMidiNote !== null) {
+                    // Melodic keyboard input - use MIDI note directly
+                    targetMidiNote = melodicMidiNote;
                 } else {
-                    targetMidiNote = Math.floor(48 + ((pitchParam - 50) / 50) * 24);
+                    // Use SAMPLED pitch (S&H) - not voiceSettings.macroPitch which changes every frame
+                    const pitchParam = sampledPitch;
+                    if (state.scaleQuantizeEnabled) {
+                        targetMidiNote = quantizePitchToScale(pitchParam, state.globalScale, state.globalRoot);
+                    } else {
+                        targetMidiNote = Math.floor(48 + ((pitchParam - 50) / 50) * 24);
+                    }
                 }
                 targetMidiNote += (fineTune / 100);
 
@@ -459,22 +465,28 @@ export function triggerVoice(
 
                 // Use AudioWorklet if available, otherwise fallback to ScriptProcessorNode
                 // Pass sampledPitch for S&H behaviour (PPMod pitch doesn't change mid-step)
+                // Pass melodicMidiNote if provided (keyboard melodic input overrides pitch calculation)
                 if (workletModulesLoaded) {
-                    currentVoiceInstance = createDX7VoiceAudioWorklet(voiceIndex, triggerTime, accentLevel, effectiveVelocityMultiplier, sampledPitch);
+                    currentVoiceInstance = createDX7VoiceAudioWorklet(voiceIndex, triggerTime, accentLevel, effectiveVelocityMultiplier, sampledPitch, melodicMidiNote);
                 } else {
-                    currentVoiceInstance = createDX7Voice(voiceIndex, triggerTime, accentLevel, effectiveVelocityMultiplier, sampledPitch);
+                    currentVoiceInstance = createDX7Voice(voiceIndex, triggerTime, accentLevel, effectiveVelocityMultiplier, sampledPitch, melodicMidiNote);
                 }
 
                 // Set legato state for new voice (enables slide on next trigger)
                 if (currentVoiceInstance?.workletNode) {
-                    // Use SAMPLED pitch (S&H) - not voiceSettings.macroPitch which changes every frame
-                    const pitchParam = sampledPitch;
                     const fineTune = voiceSettings.dx7FineTune !== undefined ? voiceSettings.dx7FineTune : 0;
                     let initialNote;
-                    if (state.scaleQuantizeEnabled) {
-                        initialNote = quantizePitchToScale(pitchParam, state.globalScale, state.globalRoot);
+                    if (melodicMidiNote !== null) {
+                        // Melodic keyboard input - use MIDI note directly
+                        initialNote = melodicMidiNote;
                     } else {
-                        initialNote = Math.floor(48 + ((pitchParam - 50) / 50) * 24);
+                        // Use SAMPLED pitch (S&H) - not voiceSettings.macroPitch which changes every frame
+                        const pitchParam = sampledPitch;
+                        if (state.scaleQuantizeEnabled) {
+                            initialNote = quantizePitchToScale(pitchParam, state.globalScale, state.globalRoot);
+                        } else {
+                            initialNote = Math.floor(48 + ((pitchParam - 50) / 50) * 24);
+                        }
                     }
                     initialNote += (fineTune / 100);
 
@@ -664,7 +676,7 @@ function applyDX7MacroModifiers(patchData, voiceSettings) {
 }
 
 // Create a DX7 FM synthesis voice
-function createDX7Voice(voiceIndex, startTime, accentLevel, velocityMultiplier = 1.0, sampledPitchOverride = null) {
+function createDX7Voice(voiceIndex, startTime, accentLevel, velocityMultiplier = 1.0, sampledPitchOverride = null, melodicMidiNoteOverride = null) {
     const ctx = config.audioContext;
     if (!ctx) return;
 
@@ -755,22 +767,28 @@ function createDX7Voice(voiceIndex, startTime, accentLevel, velocityMultiplier =
 
     // Create DX7 voice instance
     // Calculate MIDI note from pitch macro (mapping 0-100 to MIDI note range)
-    // Use sampledPitchOverride if provided (S&H behavior for PPMod), otherwise read from state
-    const pitchParam = sampledPitchOverride !== null ? sampledPitchOverride : (voiceSettings.macroPitch ?? 50);
     const fineTune = voiceSettings.dx7FineTune !== undefined ? voiceSettings.dx7FineTune : 0;
 
     // Calculate base MIDI note
-    // NOTE: dx7Transpose is NOT used here because it's derived from macroPitch via the PITCH macro.
-    // Using both would double-count the pitch offset. The pitchParam (macroPitch) is the single
-    // source of truth for pitch, either quantised to scale or mapped linearly.
     let baseMidiNote;
-    if (state.scaleQuantizeEnabled) {
-        // Use scale quantization - pitchParam (0-100) maps to notes within the selected scale
-        // No transpose added here as that would push notes out of scale
-        baseMidiNote = quantizePitchToScale(pitchParam, state.globalScale, state.globalRoot);
+    if (melodicMidiNoteOverride !== null) {
+        // Melodic keyboard input - use MIDI note directly (no pitch calculation)
+        baseMidiNote = melodicMidiNoteOverride;
     } else {
-        // Linear pitch mapping: pitch 50 = C3 (MIDI 48), ±2 octaves range
-        baseMidiNote = Math.floor(48 + ((pitchParam - 50) / 50) * 24); // MIDI 24-72 (C1-C5)
+        // Use sampledPitchOverride if provided (S&H behavior for PPMod), otherwise read from state
+        const pitchParam = sampledPitchOverride !== null ? sampledPitchOverride : (voiceSettings.macroPitch ?? 50);
+
+        // NOTE: dx7Transpose is NOT used here because it's derived from macroPitch via the PITCH macro.
+        // Using both would double-count the pitch offset. The pitchParam (macroPitch) is the single
+        // source of truth for pitch, either quantised to scale or mapped linearly.
+        if (state.scaleQuantizeEnabled) {
+            // Use scale quantization - pitchParam (0-100) maps to notes within the selected scale
+            // No transpose added here as that would push notes out of scale
+            baseMidiNote = quantizePitchToScale(pitchParam, state.globalScale, state.globalRoot);
+        } else {
+            // Linear pitch mapping: pitch 50 = C3 (MIDI 48), ±2 octaves range
+            baseMidiNote = Math.floor(48 + ((pitchParam - 50) / 50) * 24); // MIDI 24-72 (C1-C5)
+        }
     }
 
     // Apply fine tune offset (cents to fractional semitones)
@@ -922,7 +940,7 @@ function createDX7Voice(voiceIndex, startTime, accentLevel, velocityMultiplier =
  * AudioWorklet version for DX7 FM Synthesis
  * Creates per-voice AudioWorkletNode with stereo output and full effects chain
  */
-function createDX7VoiceAudioWorklet(voiceIndex, startTime, accentLevel, velocityMultiplier = 1.0, sampledPitchOverride = null) {
+function createDX7VoiceAudioWorklet(voiceIndex, startTime, accentLevel, velocityMultiplier = 1.0, sampledPitchOverride = null, melodicMidiNoteOverride = null) {
     const ctx = config.audioContext;
     if (!ctx) return;
 
@@ -960,19 +978,26 @@ function createDX7VoiceAudioWorklet(voiceIndex, startTime, accentLevel, velocity
     const modifiedPatch = applyDX7MacroModifiers(patchData, voiceSettings);
 
     // Get DX7-specific parameters
-    // Use sampledPitchOverride if provided (S&H behavior for PPMod), otherwise read from state
-    const pitchParam = sampledPitchOverride !== null ? sampledPitchOverride : (voiceSettings.macroPitch ?? 50);
     const fineTune = voiceSettings.dx7FineTune !== undefined ? voiceSettings.dx7FineTune : 0;
 
-    // Calculate base MIDI note (same logic as ScriptProcessorNode version)
-    // NOTE: dx7Transpose is NOT used - it's derived from macroPitch and would double-count
+    // Calculate base MIDI note
     let baseMidiNote;
-    if (state.scaleQuantizeEnabled) {
-        // Scale quantization - notes stay within selected scale
-        baseMidiNote = quantizePitchToScale(pitchParam, state.globalScale, state.globalRoot);
+    if (melodicMidiNoteOverride !== null) {
+        // Melodic keyboard input - use MIDI note directly (no pitch calculation)
+        baseMidiNote = melodicMidiNoteOverride;
     } else {
-        // Linear pitch mapping: pitch 50 = C3 (MIDI 48), ±2 octaves range
-        baseMidiNote = Math.floor(48 + ((pitchParam - 50) / 50) * 24); // MIDI 24-72 (C1-C5)
+        // Use sampledPitchOverride if provided (S&H behavior for PPMod), otherwise read from state
+        const pitchParam = sampledPitchOverride !== null ? sampledPitchOverride : (voiceSettings.macroPitch ?? 50);
+
+        // Calculate base MIDI note (same logic as ScriptProcessorNode version)
+        // NOTE: dx7Transpose is NOT used - it's derived from macroPitch and would double-count
+        if (state.scaleQuantizeEnabled) {
+            // Scale quantization - notes stays within selected scale
+            baseMidiNote = quantizePitchToScale(pitchParam, state.globalScale, state.globalRoot);
+        } else {
+            // Linear pitch mapping: pitch 50 = C3 (MIDI 48), ±2 octaves range
+            baseMidiNote = Math.floor(48 + ((pitchParam - 50) / 50) * 24); // MIDI 24-72 (C1-C5)
+        }
     }
 
     // Apply fine tune offset (cents to fractional semitones)

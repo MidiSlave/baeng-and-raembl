@@ -452,6 +452,9 @@ function setupPPModEventHandlers() {
                 lfoRate: 1.0,
                 lfoSync: false,
                 resetMode: 'off',
+                // Trigger/Reset source defaults
+                triggerSource: 'self',
+                resetSource: 'none',
                 // v1.1.0 mode-specific defaults
                 seqLength: 4,
                 seqPattern: [0.5, 0.5, 0.5, 0.5],
@@ -1266,6 +1269,27 @@ function handleKeyDown(event) {
         const finalOctave = Math.max(0, Math.min(8, targetOctave));
         const note = `${baseNoteName}${finalOctave}`;
 
+        // Calculate MIDI note number for melodic routing
+        const noteIndex = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'].indexOf(baseNoteName);
+        const midiNote = (finalOctave + 1) * 12 + noteIndex; // MIDI note (C-1 = 0, C4 = 60)
+
+        // Check keyboard routing
+        if (state.keyboardRouting === 'baeng') {
+            // Route to Bæng - dispatch event with MIDI note for melodic playback
+            document.dispatchEvent(new CustomEvent('baengMelodicTrigger', {
+                detail: {
+                    voiceIndex: state.lastSelectedBaengVoice,
+                    midiNote: midiNote,
+                    velocity: event.shiftKey ? 1.0 : 0.7, // Accent with Shift
+                    key: key // For key-up tracking
+                }
+            }));
+            activeKeyVoices[key] = `baeng_${midiNote}`; // Track for key-up
+            event.preventDefault();
+            return;
+        }
+
+        // Normal Ræmbl note triggering
         const velocity = 1.0; // Standard velocity
         const isAccented = event.shiftKey; // Use Shift key for accent
         const shouldSlide = false; // Keyboard slide not implemented here, could be another key

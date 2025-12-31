@@ -317,3 +317,53 @@ canvas {
     flex-grow: 1;
     min-height: 100px;
 }
+
+/* Keyboard Routing Indicator */
+.routing-indicator {
+    position: fixed;
+    bottom: 60px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid var(--border-grey-2);
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: monospace;
+    opacity: 0.8;
+    z-index: 1000;
+    transition: all 0.15s ease;
+}
+
+.routing-indicator:hover {
+    opacity: 1;
+}
+
+.routing-indicator .routing-label {
+    color: var(--text-grey-2);
+}
+
+.routing-indicator .routing-target {
+    font-weight: bold;
+    padding: 1px 4px;
+    border-radius: 2px;
+}
+
+.routing-indicator .routing-hint {
+    color: var(--text-grey-3);
+    font-size: 9px;
+}
+
+/* Ræmbl routing mode */
+.routing-indicator.raembl .routing-target {
+    color: #4ecdc4;
+    background: rgba(78, 205, 196, 0.15);
+}
+
+/* Bæng routing mode */
+.routing-indicator.baeng .routing-target {
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.15);
+}

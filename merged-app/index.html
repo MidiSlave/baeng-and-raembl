@@ -1014,6 +1014,42 @@
                     </div>
                 </div>
 
+                <!-- Trigger/Reset Controls -->
+                <div class="ppmod-trigger-controls">
+                    <div class="ppmod-trigger-control">
+                        <label>TRIG</label>
+                        <select id="ppmod-trigger-source">
+                            <option value="none">OFF</option>
+                            <option value="self" selected>SELF</option>
+                            <option value="T1">T1</option>
+                            <option value="T2">T2</option>
+                            <option value="T3">T3</option>
+                            <option value="T4">T4</option>
+                            <option value="T5">T5</option>
+                            <option value="T6">T6</option>
+                            <option value="SUM">SUM</option>
+                            <option value="bar">BAR</option>
+                            <option value="noteOn">NOTE</option>
+                        </select>
+                    </div>
+                    <div class="ppmod-trigger-control">
+                        <label>RST</label>
+                        <select id="ppmod-reset-source">
+                            <option value="none" selected>OFF</option>
+                            <option value="self">SELF</option>
+                            <option value="T1">T1</option>
+                            <option value="T2">T2</option>
+                            <option value="T3">T3</option>
+                            <option value="T4">T4</option>
+                            <option value="T5">T5</option>
+                            <option value="T6">T6</option>
+                            <option value="SUM">SUM</option>
+                            <option value="bar">BAR</option>
+                            <option value="noteOn">NOTE</option>
+                        </select>
+                    </div>
+                </div>
+
                 <!-- LFO Mode Panel -->
                 <div id="ppmod-panel-lfo" class="ppmod-mode-panel">
                     <!-- LFO Waveform selector -->
@@ -1866,6 +1902,13 @@
 
     <!-- Shared Time Strip (Bottom) -->
     <div id="time-strip-container" class="time-strip-container"></div>
+
+    <!-- Keyboard Routing Indicator -->
+    <div id="keyboard-routing-indicator" class="routing-indicator raembl">
+        <span class="routing-label">Keys:</span>
+        <span class="routing-target">RÆMBL</span>
+        <span class="routing-hint">(Tab)</span>
+    </div>
 
     <!-- Info Modal (positioned absolutely) -->
     <div id="info-modal" class="info-modal hidden">

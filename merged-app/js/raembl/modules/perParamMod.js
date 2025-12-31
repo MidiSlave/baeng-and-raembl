@@ -57,7 +57,9 @@ const DEFAULT_MOD_CONFIG = {
     rate: 1.0,        // Hz (0.05-30)
     depth: 0,         // 0-100%
     offset: 0,        // -100 to +100%
-    resetMode: 'off', // 'off'|'step'|'accent'|'bar'
+    resetMode: 'off', // 'off'|'step'|'accent'|'bar' (legacy - use triggerSource/resetSource)
+    triggerSource: 'none', // 'none'|'T1'-'T6'|'SUM'|'bar'|'noteOn'
+    resetSource: 'none',   // 'none'|'T1'-'T6'|'SUM'|'bar'|'noteOn'
     baseValue: null,  // Stored base value (set when modulation enabled)
     muted: false      // Mute state for temporary disable
 };
@@ -1668,9 +1670,186 @@ export function initPerParamModulation() {
     document.addEventListener('raemblStepAdvanced', handleSeqClockStep);
     document.addEventListener('clockTick', handleSeqClockStep); // Also listen for shared clock
 
+    // Bar boundary trigger (check isBarStart in step events)
+    document.addEventListener('raemblStepAdvanced', handleBarTrigger);
+
+    // Cross-app triggers: Ræmbl can respond to Bæng voice triggers
+    document.addEventListener('trackTriggered', handleBaengTrigger);
+
     // Expose cleanup function globally (similar to modlfo.js pattern)
     window.cleanupVoicePerParamModState = cleanupVoiceModulationState;
 
+}
+
+// --- Bar Boundary Trigger Handler ---
+
+/**
+ * Handle bar boundary triggers
+ * Check if any modulations have triggerSource='bar' or resetSource='bar'
+ */
+function handleBarTrigger(event) {
+    const isBarStart = event.detail?.isBarStart;
+    if (!isBarStart) return;
+
+    for (const [paramId, modConfig] of Object.entries(state.perParamModulations)) {
+        if (!modConfig.enabled) continue;
+
+        // Handle trigger on bar
+        if (modConfig.triggerSource === 'bar') {
+            handleModTriggerAction(paramId, modConfig);
+        }
+
+        // Handle reset on bar
+        if (modConfig.resetSource === 'bar') {
+            handleModResetAction(paramId, modConfig);
+        }
+    }
+}
+
+// --- Cross-App Trigger Handler (Bæng → Ræmbl) ---
+
+/**
+ * Handle Bæng voice triggers (cross-app)
+ * Allows Ræmbl modulations to sync to Bæng drum triggers
+ */
+function handleBaengTrigger(event) {
+    const trackIndex = event.detail?.trackIndex;
+    const trackName = `T${(trackIndex ?? 0) + 1}`;
+
+    for (const [paramId, modConfig] of Object.entries(state.perParamModulations)) {
+        if (!modConfig.enabled) continue;
+
+        // Check if this param uses Bæng triggers
+        const triggerSource = modConfig.triggerSource || 'none';
+        const resetSource = modConfig.resetSource || 'none';
+
+        // Handle trigger
+        const shouldTrigger =
+            triggerSource === trackName ||
+            triggerSource === 'SUM' ||
+            (['T1', 'T2', 'T3', 'T4', 'T5', 'T6'].includes(triggerSource) && triggerSource === trackName);
+
+        if (shouldTrigger) {
+            handleModTriggerAction(paramId, modConfig);
+        }
+
+        // Handle reset
+        const shouldReset =
+            resetSource === trackName ||
+            resetSource === 'SUM' ||
+            (['T1', 'T2', 'T3', 'T4', 'T5', 'T6'].includes(resetSource) && resetSource === trackName);
+
+        if (shouldReset) {
+            handleModResetAction(paramId, modConfig);
+        }
+    }
+}
+
+// --- Modulation Trigger/Reset Action Handlers ---
+
+/**
+ * Handle modulation trigger action (advance pattern, re-trigger envelope, etc.)
+ */
+function handleModTriggerAction(paramId, modConfig) {
+    const mode = modConfig.mode || 'LFO';
+
+    switch (mode) {
+        case 'SEQ':
+            // Advance to next step
+            const seqPattern = seqPatterns.get(paramId);
+            if (seqPattern) {
+                seqPattern.currentStep = (seqPattern.currentStep + 1) % seqPattern.steps.length;
+            }
+            break;
+        case 'TM':
+            // Advance step with mutation
+            advanceTMStepWithMutation(paramId, modConfig);
+            break;
+        case 'ENV':
+            // Re-trigger envelope from attack
+            const envelope = envEnvelopes.get(paramId);
+            if (envelope) {
+                envelope.triggerTime = performance.now();
+                envelope.phase = 'attack';
+            }
+            break;
+        case 'RND':
+            // Sample new random value
+            sampleAndHoldValues.set(paramId, (Math.random() * 2) - 1);
+            break;
+        case 'LFO':
+            // Reset phase to 0
+            const phaseData = phaseAccumulators.get(paramId);
+            if (phaseData) phaseData.phase = 0;
+            break;
+    }
+}
+
+/**
+ * Handle modulation reset action (return to initial state)
+ */
+function handleModResetAction(paramId, modConfig) {
+    const mode = modConfig.mode || 'LFO';
+
+    switch (mode) {
+        case 'SEQ':
+            // Return to step 0
+            const seqPattern = seqPatterns.get(paramId);
+            if (seqPattern) seqPattern.currentStep = 0;
+            break;
+        case 'TM':
+            // Return to step 0, restore initial pattern
+            const tmState = tmCurrentSteps.get(paramId);
+            if (tmState) {
+                tmState.currentStep = 0;
+                if (tmState.initialPattern) {
+                    tmState.pattern = [...tmState.initialPattern];
+                }
+            }
+            break;
+        case 'ENV':
+            // Force envelope to zero
+            const envelope = envEnvelopes.get(paramId);
+            if (envelope) {
+                envelope.phase = 'idle';
+                envelope.currentValue = 0;
+            }
+            break;
+        case 'RND':
+            // Re-seed and zero
+            sampleAndHoldValues.set(paramId, 0);
+            break;
+        case 'LFO':
+            // Reset phase to 0
+            const phaseData = phaseAccumulators.get(paramId);
+            if (phaseData) phaseData.phase = 0;
+            break;
+        case 'EF':
+            // Zero smoothed output
+            efSmoothedValues.set(paramId, 0);
+            break;
+    }
+}
+
+/**
+ * Advance TM step with probabilistic mutation
+ */
+function advanceTMStepWithMutation(paramId, modConfig) {
+    let tmState = tmCurrentSteps.get(paramId);
+    if (!tmState) {
+        tmState = { currentStep: 0, pattern: [], initialPattern: [] };
+        tmCurrentSteps.set(paramId, tmState);
+    }
+
+    // Advance step
+    tmState.currentStep = (tmState.currentStep + 1) % Math.max(1, tmState.pattern.length);
+
+    // Probabilistic mutation
+    const mutationChance = (modConfig.tmMutationRate || 10) / 100;
+    if (Math.random() < mutationChance && tmState.pattern.length > 0) {
+        const stepToMutate = Math.floor(Math.random() * tmState.pattern.length);
+        tmState.pattern[stepToMutate] = Math.random();
+    }
 }
 
 // --- SEQ/TM Step Advancement Handler (POLY mode) ---

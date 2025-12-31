@@ -123,6 +123,18 @@ function setupKeyboardVoiceTriggers() {
             return;
         }
 
+        // Tab key: Toggle keyboard routing between Ræmbl and Bæng
+        if (event.key === 'Tab') {
+            event.preventDefault();
+            state.keyboardRouting = state.keyboardRouting === 'raembl' ? 'baeng' : 'raembl';
+
+            // Dispatch event for UI updates
+            document.dispatchEvent(new CustomEvent('keyboardRoutingChanged', {
+                detail: { target: state.keyboardRouting }
+            }));
+            return;
+        }
+
         if (event.key >= '1' && event.key <= '6') {
             // Prevent repeated triggers when holding the key
             if (event.repeat) return;
@@ -143,6 +155,9 @@ function setupKeyboardVoiceTriggers() {
                 // Slice editor will handle this with preventDefault
                 return;
             }
+
+            // Track last selected voice for keyboard routing
+            state.lastSelectedBaengVoice = voiceIndex;
 
             // Normal voice selection and triggering
             if (voiceIndex >= 0 && voiceIndex < config.MAX_VOICES) {
@@ -178,7 +193,7 @@ function setupKeyboardVoiceTriggers() {
             updateEditModeDisplay();
         }
     });
-    
+
     document.addEventListener('keyup', (event) => {
         // Reset temporary edit mode when key is released
         if ((event.key === 'r' || event.key === 'R') && state.tempEditMode === 'ratchet') {
@@ -192,6 +207,47 @@ function setupKeyboardVoiceTriggers() {
             updateEditModeDisplay();
         }
     });
+
+    // Listen for melodic keyboard triggers from Ræmbl (when keyboard routing is set to 'baeng')
+    document.addEventListener('baengMelodicTrigger', (event) => {
+        const { voiceIndex, midiNote, velocity } = event.detail;
+
+        // Dispatch track trigger event for per-parameter modulation (S&H sampling)
+        const trackTriggerEvent = new CustomEvent('trackTriggered', {
+            detail: {
+                trackIndex: voiceIndex,
+                accentLevel: velocity >= 1.0 ? 1 : 0,
+                isBarStart: false
+            }
+        });
+        document.dispatchEvent(trackTriggerEvent);
+
+        // Trigger the voice with melodic MIDI note
+        // Parameters: voiceIndex, accentLevel, ratchetCount, stepDuration, isDeviated, deviationMode,
+        //             fixedTimingOffset, velocityMultiplier, skipVoiceRelease, scheduledTime, melodicMidiNote
+        if (typeof triggerVoice === 'function') {
+            const accentLevel = velocity >= 1.0 ? 1 : 0;
+            triggerVoice(voiceIndex, accentLevel, 1, 0.25, false, 1, 0, velocity, false, null, midiNote);
+        }
+    });
+
+    // Listen for keyboard routing changes to update UI
+    document.addEventListener('keyboardRoutingChanged', (event) => {
+        updateKeyboardRoutingIndicator(event.detail.target);
+    });
+}
+
+// Update keyboard routing indicator UI
+function updateKeyboardRoutingIndicator(target) {
+    const indicator = document.getElementById('keyboard-routing-indicator');
+    if (indicator) {
+        const label = indicator.querySelector('.routing-target');
+        if (label) {
+            label.textContent = target === 'baeng' ? 'BÆNG' : 'RÆMBL';
+        }
+        indicator.classList.toggle('baeng', target === 'baeng');
+        indicator.classList.toggle('raembl', target === 'raembl');
+    }
 }
 
 // Update display to show current edit mode

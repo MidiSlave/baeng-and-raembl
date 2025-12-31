@@ -178,6 +178,22 @@ function setupCommonControls() {
         const val = Math.round(v);
         return val >= 0 ? `+${val}%` : `${val}%`;
     }, -100, 100);
+
+    // Trigger source select
+    const triggerSelect = document.getElementById('ppmod-trigger-source');
+    if (triggerSelect) {
+        triggerSelect.addEventListener('change', (e) => {
+            updateModulationParam('triggerSource', e.target.value);
+        });
+    }
+
+    // Reset source select
+    const resetSelect = document.getElementById('ppmod-reset-source');
+    if (resetSelect) {
+        resetSelect.addEventListener('change', (e) => {
+            updateModulationParam('resetSource', e.target.value);
+        });
+    }
 }
 
 function setupSlider(sliderId, paramName, formatFn, min = 0, max = 100) {
@@ -398,6 +414,9 @@ function populateControls(modConfig) {
         return val >= 0 ? `+${val}%` : `${val}%`;
     });
 
+    // Trigger/Reset controls
+    populateTriggerResetControls(modConfig);
+
     // Mode-specific controls - always set up handlers even with null modConfig
     // Pass modConfig (may be null/undefined, handlers will use defaults)
     populateLFOControls(modConfig);
@@ -406,6 +425,40 @@ function populateControls(modConfig) {
     populateEFControls(modConfig);
     populateTMControls(modConfig);
     populateSEQControls(modConfig);
+}
+
+/**
+ * Populate the trigger and reset source dropdowns
+ * Handles per-voice configs for Bæng
+ */
+function populateTriggerResetControls(modConfig) {
+    const triggerSelect = document.getElementById('ppmod-trigger-source');
+    const resetSelect = document.getElementById('ppmod-reset-source');
+
+    // Get trigger/reset values - handle per-voice configs for Bæng
+    let triggerSource = 'self';
+    let resetSource = 'none';
+
+    if (modConfig) {
+        if (currentIsVoiceParam && currentVoiceIndex !== null && modConfig.voices) {
+            // Bæng per-voice param - read from voice config
+            const voiceConfig = modConfig.voices[currentVoiceIndex];
+            triggerSource = voiceConfig?.triggerSource ?? 'self';
+            resetSource = voiceConfig?.resetSource ?? 'none';
+        } else {
+            // Global param (effect) or Ræmbl param
+            triggerSource = modConfig.triggerSource ?? 'self';
+            resetSource = modConfig.resetSource ?? 'none';
+        }
+    }
+
+    if (triggerSelect) {
+        triggerSelect.value = triggerSource;
+    }
+
+    if (resetSelect) {
+        resetSelect.value = resetSource;
+    }
 }
 
 function setSliderValue(sliderId, value, formatFn) {

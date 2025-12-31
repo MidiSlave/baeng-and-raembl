@@ -12,6 +12,8 @@ const SHARED_TIMING_PROPS = [
     'swing',
     'baengBarLength',
     'raemblBarLength',
+    'keyboardRouting',
+    'lastSelectedBaengVoice',
     'currentStepIndex',
     'displayBar',
     'displayBeat',
@@ -33,6 +35,10 @@ export const sharedState = {
     swing: 0,
     baengBarLength: 4,
     raemblBarLength: 4,
+    // Keyboard routing: 'raembl' (default) or 'baeng'
+    keyboardRouting: 'raembl',
+    // Last selected Bæng voice (0-5) for melodic keyboard routing
+    lastSelectedBaengVoice: 0,
     currentStepIndex: -1,
     displayBar: 1,
     displayBeat: 1,

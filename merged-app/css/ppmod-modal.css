@@ -201,6 +201,77 @@
 }
 
 /* ============================================================================
+   Trigger/Reset Controls
+   ============================================================================ */
+
+#ppmod-modal .ppmod-trigger-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-grey-2, #333);
+}
+
+#ppmod-modal .ppmod-trigger-control {
+    display: flex;
+    flex-direction: column;
+}
+
+#ppmod-modal .ppmod-trigger-control label {
+    font-size: 9px;
+    color: var(--theme-color);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+}
+
+#ppmod-modal .ppmod-trigger-control select {
+    width: 100%;
+    padding: 6px 8px;
+    font-size: 10px;
+    font-weight: bold;
+    color: var(--text-white);
+    background: var(--bg-darker);
+    border: 1px solid var(--border-grey-2, #333);
+    border-radius: 3px;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23888' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    padding-right: 24px;
+}
+
+#ppmod-modal .ppmod-trigger-control select:hover {
+    border-color: var(--theme-color);
+}
+
+#ppmod-modal .ppmod-trigger-control select:focus {
+    outline: none;
+    border-color: var(--theme-color);
+}
+
+#ppmod-modal .ppmod-trigger-control select option {
+    background: var(--bg-module);
+    color: var(--text-white);
+}
+
+/* Gradient mode support */
+.gradient-mode #ppmod-modal .ppmod-trigger-control label {
+    background: var(--theme-gradient-h);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.gradient-mode #ppmod-modal .ppmod-trigger-control select:hover,
+.gradient-mode #ppmod-modal .ppmod-trigger-control select:focus {
+    border-image: var(--theme-gradient-h) 1;
+}
+
+/* ============================================================================
    Mode Panels
    ============================================================================ */
 
