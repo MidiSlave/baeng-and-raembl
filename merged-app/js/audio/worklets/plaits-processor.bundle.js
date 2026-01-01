@@ -8661,6 +8661,7 @@
       this.k = new Float32Array(kLPCOrder);
       this.s = new Float32Array(kLPCOrder + 1);
       this.noiseState = 12345;
+      this.e = new Float32Array(11);
     }
     init() {
       this.phase = 0;
@@ -8674,11 +8675,14 @@
       this.noiseState = 12345;
     }
     playFrame(f1, f2, blend) {
+      if (!f1 || !f2 || typeof f1.period === "undefined" || typeof f2.period === "undefined") {
+        return;
+      }
       const frequency1 = f1.period === 0 ? this.frequency : 1 / f1.period;
       const frequency2 = f2.period === 0 ? this.frequency : 1 / f2.period;
       this.frequency = frequency1 + (frequency2 - frequency1) * blend;
-      const energy1 = f1.energy / 256;
-      const energy2 = f2.energy / 256;
+      const energy1 = (typeof f1.energy === "number" ? f1.energy : 0) / 256;
+      const energy2 = (typeof f2.energy === "number" ? f2.energy : 0) / 256;
       const noiseEnergy1 = f1.period === 0 ? energy1 : 0;
       const noiseEnergy2 = f2.period === 0 ? energy2 : 0;
       this.noiseEnergy = noiseEnergy1 + (noiseEnergy2 - noiseEnergy1) * blend;
@@ -8697,8 +8701,10 @@
       this.k[9] = this.blendCoefficient(f1.k9, f2.k9, blend, 128);
     }
     blendCoefficient(a, b, blend, scale) {
-      const a_f = a / scale;
-      const b_f = b / scale;
+      const a_val = typeof a === "number" ? a : 0;
+      const b_val = typeof b === "number" ? b : 0;
+      const a_f = a_val / scale;
+      const b_f = b_val / scale;
       return a_f + (b_f - a_f) * blend;
     }
     generateNoise() {
@@ -8731,7 +8737,7 @@
           nextSample += -discontinuity * NextBlepSample(resetTime);
           this.excitationPulseSampleIndex = resetSample;
         }
-        const e = new Float32Array(11);
+        const e = this.e;
         e[10] = this.generateNoise() > 0 ? this.noiseEnergy : -this.noiseEnergy;
         if (this.excitationPulseSampleIndex >= 0 && this.excitationPulseSampleIndex < LPC_EXCITATION_PULSE.length) {
           const s = LPC_EXCITATION_PULSE[this.excitationPulseSampleIndex];
@@ -8775,6 +8781,8 @@
       this.framePhase = 0;
       this.playing = false;
       this.currentBank = -1;
+      this.tempExc = new Float32Array(1);
+      this.tempOut = new Float32Array(1);
     }
     init() {
       this.lpcSynth.init();
@@ -8796,15 +8804,28 @@
       }
       if (this.currentBank >= 0 && this.playing) {
         const bank = LPC_WORD_BANKS[this.currentBank];
+        if (!bank || !bank.frames || bank.frames.length === 0) {
+          for (let i = 0; i < size; i++) {
+            aux[i] = 0;
+            out[i] = 0;
+          }
+          return;
+        }
         const framesPerSecond = 40;
         const frameIncrement = framesPerSecond / this.sampleRate;
         for (let i = 0; i < size; i++) {
-          const f1 = bank.frames[Math.floor(this.frameIndex)];
-          const f2 = bank.frames[Math.min(Math.floor(this.frameIndex) + 1, bank.frames.length - 1)];
+          const frameIdx = Math.floor(this.frameIndex);
+          const f1 = bank.frames[Math.min(frameIdx, bank.frames.length - 1)];
+          const f2 = bank.frames[Math.min(frameIdx + 1, bank.frames.length - 1)];
+          if (!f1 || !f2) {
+            aux[i] = 0;
+            out[i] = 0;
+            continue;
+          }
           const blend = this.frameIndex - Math.floor(this.frameIndex);
           this.lpcSynth.playFrame(f1, f2, blend);
-          const tempExc = new Float32Array(1);
-          const tempOut = new Float32Array(1);
+          const tempExc = this.tempExc;
+          const tempOut = this.tempOut;
           this.lpcSynth.render(prosodyAmount, f0 / (kLPCSpeechSynthDefaultF0 / this.sampleRate), tempExc, tempOut, 1);
           aux[i] = tempExc[0] * accent;
           out[i] = tempOut[0] * accent;
@@ -8824,11 +8845,26 @@
         }
       } else {
         const numPhonemes = LPC_PHONEMES.length;
-        const phonemeIndex = morph * (numPhonemes - 1.0001);
-        const phonemeInt = Math.floor(phonemeIndex);
-        const phonemeFrac = phonemeIndex - phonemeInt;
+        if (numPhonemes === 0) {
+          for (let i = 0; i < size; i++) {
+            aux[i] = 0;
+            out[i] = 0;
+          }
+          return;
+        }
+        const clampedMorph = Math.max(0, Math.min(1, morph));
+        const phonemeIndex = clampedMorph * (numPhonemes - 1.0001);
+        const phonemeInt = Math.max(0, Math.min(Math.floor(phonemeIndex), numPhonemes - 1));
+        const phonemeFrac = phonemeIndex - Math.floor(phonemeIndex);
         const f1 = LPC_PHONEMES[phonemeInt];
         const f2 = LPC_PHONEMES[Math.min(phonemeInt + 1, numPhonemes - 1)];
+        if (!f1 || !f2) {
+          for (let i = 0; i < size; i++) {
+            aux[i] = 0;
+            out[i] = 0;
+          }
+          return;
+        }
         this.lpcSynth.playFrame(f1, f2, phonemeFrac);
         const pitchShift = f0 / (kLPCSpeechSynthDefaultF0 / this.sampleRate);
         this.lpcSynth.render(prosodyAmount, pitchShift, aux, out, size);
@@ -8880,7 +8916,8 @@
       return Math.floor(this.wordBankQuantizerState);
     }
     render(params, outBuffer, auxBuffer, size) {
-      const { frequency, harmonics, timbre, morph, trigger, accent } = params;
+      const { frequency, harmonics, timbre, morph, trigger } = params;
+      const accent = params.accent ?? 0.8;
       const f0 = frequency / this.sampleRate;
       const group = harmonics * 6;
       const triggerRising = trigger && !this.lastTrigger;
