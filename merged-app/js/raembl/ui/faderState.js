@@ -118,6 +118,17 @@ export function updateFaderState(label, value, parent) {
             else if (parentId === 'mod') {
                 const stepVal = Math.round(value / 25);
                 state.modLfoWaveform = stepVal * 25;
+
+                // Update worklet LFO waveform (0=sine, 1=tri, 2=square)
+                // modLfoWaveform: 0=sin, 25=ramp, 50=square, 75=noise, 100=S&H
+                // Worklet only supports first 3, map ramp→tri for compatibility
+                if (config.useWorklet && config.workletBridge) {
+                    let workletWave = 0; // Default sine
+                    if (stepVal === 1) workletWave = 1; // Ramp → Triangle
+                    else if (stepVal === 2) workletWave = 2; // Square
+                    // Noise and S&H not supported in worklet, fall back to sine
+                    config.workletBridge.updateAllParameters({ lfoWave: workletWave });
+                }
             }
             break;
         case 'OFFSET': state.lfoOffset = value; break;
@@ -537,6 +548,12 @@ export function updateFaderState(label, value, parent) {
                 startDelayAnimation();
             } else if (parentId === 'mod' && label === 'RATE') { // Assuming RATE fader in MOD module
                  state.modLfoRate = value;
+
+                 // Update worklet LFO rate (0.1 to 20 Hz exponential)
+                 if (config.useWorklet && config.workletBridge) {
+                     const lfoFreqHz = 0.1 * Math.pow(20 / 0.1, value / 100); // 0.1 Hz to 20 Hz
+                     config.workletBridge.updateAllParameters({ lfoRate: lfoFreqHz });
+                 }
             }
             // Add other 'TIME' or 'RATE' faders here if they exist
             break;
@@ -569,6 +586,12 @@ export function updateFaderState(label, value, parent) {
         case 'RATE': // This is for the MOD LFO module
              if (parentId === 'mod') {
                 state.modLfoRate = value;
+
+                // Update worklet LFO rate (0.1 to 20 Hz exponential)
+                if (config.useWorklet && config.workletBridge) {
+                    const lfoFreqHz = 0.1 * Math.pow(20 / 0.1, value / 100); // 0.1 Hz to 20 Hz
+                    config.workletBridge.updateAllParameters({ lfoRate: lfoFreqHz });
+                }
              }
              break;
 
