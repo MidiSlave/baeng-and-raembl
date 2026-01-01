@@ -179,21 +179,69 @@ function setupCommonControls() {
         return val >= 0 ? `+${val}%` : `${val}%`;
     }, -100, 100);
 
-    // Trigger source select
-    const triggerSelect = document.getElementById('ppmod-trigger-source');
-    if (triggerSelect) {
-        triggerSelect.addEventListener('change', (e) => {
-            updateModulationParam('triggerSource', e.target.value);
-        });
-    }
+    // Custom dropdowns for trigger/reset
+    setupCustomDropdown('ppmod-trigger-dropdown', 'triggerSource');
+    setupCustomDropdown('ppmod-reset-dropdown', 'resetSource');
 
-    // Reset source select
-    const resetSelect = document.getElementById('ppmod-reset-source');
-    if (resetSelect) {
-        resetSelect.addEventListener('change', (e) => {
-            updateModulationParam('resetSource', e.target.value);
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.ppmod-dropdown')) {
+            closeAllDropdowns();
+        }
+    });
+}
+
+/**
+ * Setup a custom dropdown with toggle and selection behaviour
+ */
+function setupCustomDropdown(dropdownId, paramName) {
+    const dropdown = document.getElementById(dropdownId);
+    if (!dropdown) return;
+
+    const btn = dropdown.querySelector('.ppmod-dropdown-btn');
+    const menu = dropdown.querySelector('.ppmod-dropdown-menu');
+    const items = dropdown.querySelectorAll('.ppmod-dropdown-item');
+
+    // Toggle dropdown on button click
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = dropdown.classList.contains('open');
+        closeAllDropdowns();
+        if (!isOpen) {
+            dropdown.classList.add('open');
+        }
+    });
+
+    // Handle item selection
+    items.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const value = item.dataset.value;
+            const label = item.textContent;
+
+            // Update selected state
+            items.forEach(i => i.classList.remove('selected'));
+            item.classList.add('selected');
+
+            // Update button display
+            dropdown.querySelector('.ppmod-dropdown-value').textContent = label;
+
+            // Close dropdown
+            dropdown.classList.remove('open');
+
+            // Update modulation param
+            updateModulationParam(paramName, value);
         });
-    }
+    });
+}
+
+/**
+ * Close all open dropdowns
+ */
+function closeAllDropdowns() {
+    document.querySelectorAll('.ppmod-dropdown.open').forEach(d => {
+        d.classList.remove('open');
+    });
 }
 
 function setupSlider(sliderId, paramName, formatFn, min = 0, max = 100) {
@@ -274,6 +322,9 @@ export function closePPModModal() {
     if (modal) {
         modal.classList.add('hidden');
     }
+
+    // Close any open dropdowns
+    closeAllDropdowns();
 
     // Restore keyboard focus to body so keyboard triggers work
     document.body.focus();
@@ -432,9 +483,6 @@ function populateControls(modConfig) {
  * Handles per-voice configs for Bæng
  */
 function populateTriggerResetControls(modConfig) {
-    const triggerSelect = document.getElementById('ppmod-trigger-source');
-    const resetSelect = document.getElementById('ppmod-reset-source');
-
     // Get trigger/reset values - handle per-voice configs for Bæng
     let triggerSource = 'self';
     let resetSource = 'none';
@@ -452,13 +500,29 @@ function populateTriggerResetControls(modConfig) {
         }
     }
 
-    if (triggerSelect) {
-        triggerSelect.value = triggerSource;
-    }
+    // Update custom dropdowns
+    setCustomDropdownValue('ppmod-trigger-dropdown', triggerSource);
+    setCustomDropdownValue('ppmod-reset-dropdown', resetSource);
+}
 
-    if (resetSelect) {
-        resetSelect.value = resetSource;
-    }
+/**
+ * Set the value of a custom dropdown
+ */
+function setCustomDropdownValue(dropdownId, value) {
+    const dropdown = document.getElementById(dropdownId);
+    if (!dropdown) return;
+
+    const items = dropdown.querySelectorAll('.ppmod-dropdown-item');
+    const valueDisplay = dropdown.querySelector('.ppmod-dropdown-value');
+
+    // Find matching item and update selection
+    items.forEach(item => {
+        const isSelected = item.dataset.value === value;
+        item.classList.toggle('selected', isSelected);
+        if (isSelected && valueDisplay) {
+            valueDisplay.textContent = item.textContent;
+        }
+    });
 }
 
 function setSliderValue(sliderId, value, formatFn) {

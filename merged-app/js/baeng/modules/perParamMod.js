@@ -399,8 +399,9 @@ export function initPerParamModulation() {
     document.addEventListener('trackTriggered', handleTrackTrigger);
     document.addEventListener('sequencerStep', handleStepTrigger);
 
-    // Bar boundary trigger (shared clock broadcasts step events with isBarStart flag)
-    document.addEventListener('baengStepAdvanced', handleBarTrigger);
+    // Bar boundary triggers (separate for each app's bar length)
+    document.addEventListener('baengStepAdvanced', handleBaengBarTrigger);
+    document.addEventListener('raemblStepAdvanced', handleRaemblBarTrigger);
 
     // Cross-app triggers: Bæng can respond to Ræmbl note events
     document.addEventListener('raemblNoteOn', handleRaemblNoteTrigger);
@@ -411,23 +412,23 @@ export function initPerParamModulation() {
 }
 
 /**
- * Handle bar boundary triggers
- * Check if any modulations have triggerSource='bar' or resetSource='bar'
+ * Handle Bæng bar boundary triggers
+ * Check if any modulations have triggerSource='baengBar' or resetSource='baengBar'
  */
-function handleBarTrigger(event) {
+function handleBaengBarTrigger(event) {
     const isBarStart = event.detail?.isBarStart;
     if (!isBarStart) return;
 
     for (const [paramId, modConfig] of Object.entries(state.perParamModulations)) {
         if (!modConfig.enabled) continue;
 
-        // Handle trigger on bar
-        if (modConfig.triggerSource === 'bar') {
+        // Handle trigger on Bæng bar
+        if (modConfig.triggerSource === 'baengBar') {
             handleModTrigger(paramId, modConfig);
         }
 
-        // Handle reset on bar
-        if (modConfig.resetSource === 'bar') {
+        // Handle reset on Bæng bar
+        if (modConfig.resetSource === 'baengBar') {
             handleModReset(paramId, modConfig);
         }
 
@@ -437,10 +438,48 @@ function handleBarTrigger(event) {
                 const voiceConfig = modConfig.voices[voiceIndex];
                 if (!voiceConfig?.enabled) continue;
 
-                if (voiceConfig.triggerSource === 'bar') {
+                if (voiceConfig.triggerSource === 'baengBar') {
                     handleModTriggerForVoice(paramId, voiceConfig, voiceIndex);
                 }
-                if (voiceConfig.resetSource === 'bar') {
+                if (voiceConfig.resetSource === 'baengBar') {
+                    handleModResetForVoice(paramId, voiceConfig, voiceIndex);
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Handle Ræmbl bar boundary triggers
+ * Check if any modulations have triggerSource='raemblBar' or resetSource='raemblBar'
+ */
+function handleRaemblBarTrigger(event) {
+    const isBarStart = event.detail?.isBarStart;
+    if (!isBarStart) return;
+
+    for (const [paramId, modConfig] of Object.entries(state.perParamModulations)) {
+        if (!modConfig.enabled) continue;
+
+        // Handle trigger on Ræmbl bar
+        if (modConfig.triggerSource === 'raemblBar') {
+            handleModTrigger(paramId, modConfig);
+        }
+
+        // Handle reset on Ræmbl bar
+        if (modConfig.resetSource === 'raemblBar') {
+            handleModReset(paramId, modConfig);
+        }
+
+        // Per-voice params: check each voice's config
+        if (modConfig.isVoiceParam && modConfig.voices) {
+            for (let voiceIndex = 0; voiceIndex < modConfig.voices.length; voiceIndex++) {
+                const voiceConfig = modConfig.voices[voiceIndex];
+                if (!voiceConfig?.enabled) continue;
+
+                if (voiceConfig.triggerSource === 'raemblBar') {
+                    handleModTriggerForVoice(paramId, voiceConfig, voiceIndex);
+                }
+                if (voiceConfig.resetSource === 'raemblBar') {
                     handleModResetForVoice(paramId, voiceConfig, voiceIndex);
                 }
             }

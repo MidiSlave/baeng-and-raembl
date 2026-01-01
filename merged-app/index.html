@@ -1002,12 +1002,12 @@
 
                 <!-- Common Controls -->
                 <div class="ppmod-common-controls">
-                    <div class="ppmod-control">
+                    <div class="ppmod-control" data-info-id="ppmod-depth">
                         <label>DEPTH</label>
                         <input type="range" id="ppmod-depth" min="0" max="100" value="50">
                         <span class="ppmod-value" id="ppmod-depth-val">50%</span>
                     </div>
-                    <div class="ppmod-control">
+                    <div class="ppmod-control" data-info-id="ppmod-offset">
                         <label>OFFSET</label>
                         <input type="range" id="ppmod-offset" min="-100" max="100" value="0">
                         <span class="ppmod-value" id="ppmod-offset-val">+0%</span>
@@ -1016,44 +1016,58 @@
 
                 <!-- Trigger/Reset Controls -->
                 <div class="ppmod-trigger-controls">
-                    <div class="ppmod-trigger-control">
-                        <label>TRIG</label>
-                        <select id="ppmod-trigger-source">
-                            <option value="none">OFF</option>
-                            <option value="self" selected>SELF</option>
-                            <option value="T1">T1</option>
-                            <option value="T2">T2</option>
-                            <option value="T3">T3</option>
-                            <option value="T4">T4</option>
-                            <option value="T5">T5</option>
-                            <option value="T6">T6</option>
-                            <option value="SUM">SUM</option>
-                            <option value="bar">BAR</option>
-                            <option value="noteOn">NOTE</option>
-                        </select>
+                    <div class="ppmod-trigger-control" data-info-id="ppmod-trigger-dropdown">
+                        <label>ADV</label>
+                        <div class="ppmod-dropdown" id="ppmod-trigger-dropdown" data-param="triggerSource">
+                            <button class="ppmod-dropdown-btn" type="button">
+                                <span class="ppmod-dropdown-value">SELF</span>
+                                <span class="ppmod-dropdown-arrow">▾</span>
+                            </button>
+                            <div class="ppmod-dropdown-menu">
+                                <div class="ppmod-dropdown-item" data-value="none">OFF</div>
+                                <div class="ppmod-dropdown-item selected" data-value="self">SELF</div>
+                                <div class="ppmod-dropdown-item" data-value="T1">T1</div>
+                                <div class="ppmod-dropdown-item" data-value="T2">T2</div>
+                                <div class="ppmod-dropdown-item" data-value="T3">T3</div>
+                                <div class="ppmod-dropdown-item" data-value="T4">T4</div>
+                                <div class="ppmod-dropdown-item" data-value="T5">T5</div>
+                                <div class="ppmod-dropdown-item" data-value="T6">T6</div>
+                                <div class="ppmod-dropdown-item" data-value="SUM">ANY</div>
+                                <div class="ppmod-dropdown-item" data-value="baengBar">B.LEN</div>
+                                <div class="ppmod-dropdown-item" data-value="raemblBar">R.LEN</div>
+                                <div class="ppmod-dropdown-item" data-value="noteOn">R.NOTE</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="ppmod-trigger-control">
-                        <label>RST</label>
-                        <select id="ppmod-reset-source">
-                            <option value="none" selected>OFF</option>
-                            <option value="self">SELF</option>
-                            <option value="T1">T1</option>
-                            <option value="T2">T2</option>
-                            <option value="T3">T3</option>
-                            <option value="T4">T4</option>
-                            <option value="T5">T5</option>
-                            <option value="T6">T6</option>
-                            <option value="SUM">SUM</option>
-                            <option value="bar">BAR</option>
-                            <option value="noteOn">NOTE</option>
-                        </select>
+                    <div class="ppmod-trigger-control" data-info-id="ppmod-reset-dropdown">
+                        <label>SYNC</label>
+                        <div class="ppmod-dropdown" id="ppmod-reset-dropdown" data-param="resetSource">
+                            <button class="ppmod-dropdown-btn" type="button">
+                                <span class="ppmod-dropdown-value">OFF</span>
+                                <span class="ppmod-dropdown-arrow">▾</span>
+                            </button>
+                            <div class="ppmod-dropdown-menu">
+                                <div class="ppmod-dropdown-item selected" data-value="none">OFF</div>
+                                <div class="ppmod-dropdown-item" data-value="self">SELF</div>
+                                <div class="ppmod-dropdown-item" data-value="T1">T1</div>
+                                <div class="ppmod-dropdown-item" data-value="T2">T2</div>
+                                <div class="ppmod-dropdown-item" data-value="T3">T3</div>
+                                <div class="ppmod-dropdown-item" data-value="T4">T4</div>
+                                <div class="ppmod-dropdown-item" data-value="T5">T5</div>
+                                <div class="ppmod-dropdown-item" data-value="T6">T6</div>
+                                <div class="ppmod-dropdown-item" data-value="SUM">ANY</div>
+                                <div class="ppmod-dropdown-item" data-value="baengBar">B.LEN</div>
+                                <div class="ppmod-dropdown-item" data-value="raemblBar">R.LEN</div>
+                                <div class="ppmod-dropdown-item" data-value="noteOn">R.NOTE</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- LFO Mode Panel -->
-                <div id="ppmod-panel-lfo" class="ppmod-mode-panel">
+                <div id="ppmod-panel-lfo" class="ppmod-mode-panel" data-info-id="ppmod-panel-lfo">
                     <!-- LFO Waveform selector -->
-                    <div class="ppmod-selector ppmod-lfo-wave-row">
+                    <div class="ppmod-selector ppmod-lfo-wave-row" data-info-id="ppmod-lfo-wave-btns">
                         <span class="ppmod-selector-label">WAVE</span>
                         <div class="ppmod-selector-buttons" id="ppmod-lfo-wave-btns">
                             <button class="ppmod-selector-btn active" data-value="0">SIN</button>
@@ -1066,7 +1080,7 @@
                     </div>
                     <!-- LFO Rate control -->
                     <div class="ppmod-mode-controls">
-                        <div class="ppmod-control">
+                        <div class="ppmod-control" data-info-id="ppmod-lfo-rate">
                             <label>RATE</label>
                             <input type="range" id="ppmod-lfo-rate" min="0.05" max="30" step="0.05" value="1">
                             <span class="ppmod-value" id="ppmod-lfo-rate-val">1.00Hz</span>
@@ -1075,9 +1089,9 @@
                 </div>
 
                 <!-- RND Mode Panel -->
-                <div id="ppmod-panel-rnd" class="ppmod-mode-panel hidden">
+                <div id="ppmod-panel-rnd" class="ppmod-mode-panel hidden" data-info-id="ppmod-panel-rnd">
                     <!-- Bit length selector -->
-                    <div class="ppmod-selector ppmod-rnd-bits-row">
+                    <div class="ppmod-selector ppmod-rnd-bits-row" data-info-id="ppmod-rnd-bits-btns">
                         <span class="ppmod-selector-label">BIT LENGTH</span>
                         <div class="ppmod-selector-buttons" id="ppmod-rnd-bits-btns">
                             <button class="ppmod-selector-btn" data-value="4">4</button>
@@ -1088,12 +1102,12 @@
                     </div>
                     <!-- Probability and Rate controls -->
                     <div class="ppmod-mode-controls">
-                        <div class="ppmod-control">
+                        <div class="ppmod-control" data-info-id="ppmod-rnd-prob">
                             <label>PROB</label>
                             <input type="range" id="ppmod-rnd-prob" min="0" max="100" value="100">
                             <span class="ppmod-value" id="ppmod-rnd-prob-val">100%</span>
                         </div>
-                        <div class="ppmod-control">
+                        <div class="ppmod-control" data-info-id="ppmod-rnd-rate">
                             <label>RATE</label>
                             <input type="range" id="ppmod-rnd-rate" min="0" max="100" step="any" value="50">
                             <span class="ppmod-value" id="ppmod-rnd-rate-val">1.0kHz</span>
@@ -1102,9 +1116,9 @@
                 </div>
 
                 <!-- ENV Mode Panel -->
-                <div id="ppmod-panel-env" class="ppmod-mode-panel hidden">
+                <div id="ppmod-panel-env" class="ppmod-mode-panel hidden" data-info-id="ppmod-panel-env">
                     <!-- Source selector row -->
-                    <div class="ppmod-selector ppmod-env-source-row">
+                    <div class="ppmod-selector ppmod-env-source-row" data-info-id="ppmod-env-source-btns">
                         <span class="ppmod-selector-label">SOURCE</span>
                         <div class="ppmod-selector-buttons" id="ppmod-env-source-btns">
                             <button class="ppmod-selector-btn active" data-value="note-on">NOTE</button>
@@ -1114,17 +1128,17 @@
                     </div>
                     <!-- Attack/Release/Curve row -->
                     <div class="ppmod-mode-controls three-col">
-                        <div class="ppmod-control">
+                        <div class="ppmod-control" data-info-id="ppmod-env-attack">
                             <label>ATK</label>
                             <input type="range" id="ppmod-env-attack" min="0" max="100" step="any" value="25">
                             <span class="ppmod-value" id="ppmod-env-attack-val">10ms</span>
                         </div>
-                        <div class="ppmod-control">
+                        <div class="ppmod-control" data-info-id="ppmod-env-release">
                             <label>REL</label>
                             <input type="range" id="ppmod-env-release" min="0" max="100" step="any" value="50">
                             <span class="ppmod-value" id="ppmod-env-release-val">200ms</span>
                         </div>
-                        <div class="ppmod-selector ppmod-env-curve-selector">
+                        <div class="ppmod-selector ppmod-env-curve-selector" data-info-id="ppmod-env-curve-btns">
                             <span class="ppmod-selector-label">CURVE</span>
                             <div class="ppmod-selector-buttons" id="ppmod-env-curve-btns">
                                 <button class="ppmod-selector-btn" data-value="linear">LIN</button>
@@ -1137,9 +1151,9 @@
                 </div>
 
                 <!-- EF Mode Panel -->
-                <div id="ppmod-panel-ef" class="ppmod-mode-panel hidden">
+                <div id="ppmod-panel-ef" class="ppmod-mode-panel hidden" data-info-id="ppmod-panel-ef">
                     <!-- Source selector -->
-                    <div class="ppmod-selector ppmod-ef-source-row">
+                    <div class="ppmod-selector ppmod-ef-source-row" data-info-id="ppmod-ef-source-btns">
                         <span class="ppmod-selector-label">SOURCE</span>
                         <div class="ppmod-selector-buttons" id="ppmod-ef-source-btns">
                             <button class="ppmod-selector-btn active" data-value="raembl">RÆMBL</button>
@@ -1149,17 +1163,17 @@
                     </div>
                     <!-- Attack/Release/Sensitivity controls -->
                     <div class="ppmod-mode-controls three-col">
-                        <div class="ppmod-control">
+                        <div class="ppmod-control" data-info-id="ppmod-ef-attack">
                             <label>ATK</label>
                             <input type="range" id="ppmod-ef-attack" min="0" max="100" step="any" value="25">
                             <span class="ppmod-value" id="ppmod-ef-attack-val">10ms</span>
                         </div>
-                        <div class="ppmod-control">
+                        <div class="ppmod-control" data-info-id="ppmod-ef-release">
                             <label>REL</label>
                             <input type="range" id="ppmod-ef-release" min="0" max="100" step="any" value="50">
                             <span class="ppmod-value" id="ppmod-ef-release-val">100ms</span>
                         </div>
-                        <div class="ppmod-control">
+                        <div class="ppmod-control" data-info-id="ppmod-ef-sensitivity">
                             <label>SENS</label>
                             <input type="range" id="ppmod-ef-sensitivity" min="0" max="200" value="100">
                             <span class="ppmod-value" id="ppmod-ef-sensitivity-val">100%</span>
@@ -1175,14 +1189,14 @@
                 </div>
 
                 <!-- TM Mode Panel -->
-                <div id="ppmod-panel-tm" class="ppmod-mode-panel hidden">
+                <div id="ppmod-panel-tm" class="ppmod-mode-panel hidden" data-info-id="ppmod-panel-tm">
                     <div class="ppmod-mode-controls">
-                        <div class="ppmod-control">
+                        <div class="ppmod-control" data-info-id="ppmod-tm-length">
                             <label>LENGTH</label>
                             <input type="range" id="ppmod-tm-length" min="1" max="16" step="1" value="8">
                             <span class="ppmod-value" id="ppmod-tm-length-val">8 steps</span>
                         </div>
-                        <div class="ppmod-control">
+                        <div class="ppmod-control" data-info-id="ppmod-tm-prob">
                             <label>PROB</label>
                             <input type="range" id="ppmod-tm-prob" min="0" max="100" value="50">
                             <span class="ppmod-value" id="ppmod-tm-prob-val">50%</span>
@@ -1191,22 +1205,22 @@
                     <!-- TM Pattern Display (read-only visualisation) -->
                     <div class="ppmod-tm-pattern" id="ppmod-tm-pattern"></div>
                     <!-- Randomise button -->
-                    <div class="ppmod-tm-actions">
+                    <div class="ppmod-tm-actions" data-info-id="ppmod-tm-randomise">
                         <button class="ppmod-tm-randomise-btn" id="ppmod-tm-randomise">RANDOMISE</button>
                     </div>
                 </div>
 
                 <!-- SEQ Mode Panel -->
-                <div id="ppmod-panel-seq" class="ppmod-mode-panel hidden">
+                <div id="ppmod-panel-seq" class="ppmod-mode-panel hidden" data-info-id="ppmod-panel-seq">
                     <div class="ppmod-mode-controls">
-                        <div class="ppmod-control">
+                        <div class="ppmod-control" data-info-id="ppmod-seq-length">
                             <label>LENGTH</label>
                             <input type="range" id="ppmod-seq-length" min="1" max="16" step="1" value="4">
                             <span class="ppmod-value" id="ppmod-seq-length-val">4 steps</span>
                         </div>
                     </div>
                     <!-- Step editor will be populated by JS in Phase 2 -->
-                    <div class="ppmod-seq-editor" id="ppmod-seq-editor">
+                    <div class="ppmod-seq-editor" id="ppmod-seq-editor" data-info-id="ppmod-seq-editor">
                         <!-- Steps added dynamically -->
                     </div>
                     <div class="ppmod-hint">Drag steps up/down to set values</div>

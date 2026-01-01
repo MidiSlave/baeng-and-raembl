@@ -1106,6 +1106,130 @@ const MODULE_INFO = {
     'raembl-module-clock': {
         name: 'TIME Module',
         desc: 'Shared timing controls for both apps. BPM, swing, and bar length settings. The visualisation shows the current beat position.'
+    },
+
+    // ===== PPMOD Modal =====
+    'ppmod-modal': {
+        name: 'Per-Parameter Modulation',
+        desc: 'Adds modulation to any parameter. Choose from 6 modes: LFO (oscillator), RND (random), ENV (envelope), EF (envelope follower), TM (Turing machine), SEQ (step sequencer). K-rate updates at 30fps.'
+    },
+    'ppmod-depth': {
+        name: 'Modulation Depth',
+        desc: 'How much the modulation affects the parameter (0-100%). Higher values = stronger effect. 0% disables modulation entirely.'
+    },
+    'ppmod-offset': {
+        name: 'Modulation Offset',
+        desc: 'Bipolar DC offset added to the modulation (-100 to +100%). Shifts the modulation range up or down from the base value. Useful for one-sided effects.'
+    },
+    'ppmod-trigger-dropdown': {
+        name: 'Advance Source (ADV)',
+        desc: 'What advances the modulation. OFF=free-running, SELF=this voice, T1-T6=Bæng voices, ANY=any Bæng hit, B.LEN=Bæng bar start, R.LEN=Ræmbl bar start, R.NOTE=Ræmbl noteOn. Advances SEQ/TM steps, re-triggers ENV.'
+    },
+    'ppmod-reset-dropdown': {
+        name: 'Sync/Reset Source (SYNC)',
+        desc: 'What resets/syncs the modulation to its initial state. Same options as ADV. Resets LFO phase, SEQ/TM step position, ENV to attack phase. Use for synced modulation that loops with bar length.'
+    },
+    // LFO Mode
+    'ppmod-panel-lfo': {
+        name: 'LFO Mode',
+        desc: 'Low Frequency Oscillator. Continuous cyclic modulation using sine, triangle, square, saw, ramp, or sample & hold waveforms. Classic synth modulation for vibrato, tremolo, filter sweeps.'
+    },
+    'ppmod-lfo-rate': {
+        name: 'LFO Rate',
+        desc: 'Speed of the LFO oscillation (0.05-30Hz). Lower rates = slow sweeps, higher rates = vibrato/tremolo. The visualisation shows the current waveform shape.'
+    },
+    'ppmod-lfo-wave-btns': {
+        name: 'LFO Waveform',
+        desc: 'Shape of the LFO wave. SIN=smooth/organic, TRI=linear ramps, SQR=abrupt on/off, SAW=falling ramp, RAMP=rising ramp, S&H=random steps (sample & hold).'
+    },
+    // RND Mode
+    'ppmod-panel-rnd': {
+        name: 'RND Mode',
+        desc: 'Random modulation using a Linear Feedback Shift Register (LFSR). Creates sample & hold style random values with controllable bit depth, probability, and update rate.'
+    },
+    'ppmod-rnd-bits-btns': {
+        name: 'Bit Length',
+        desc: 'LFSR register size (4/8/16/32 bits). Lower values = fewer discrete levels = more "stepped" random. Higher values = smoother random distribution.'
+    },
+    'ppmod-rnd-prob': {
+        name: 'Probability',
+        desc: 'Chance that the random value changes on each update (0-100%). 100%=always changes, lower values=holds values longer. Creates sparse random patterns.'
+    },
+    'ppmod-rnd-rate': {
+        name: 'Update Rate',
+        desc: 'How often the random value updates (100Hz-10kHz). Lower rates = slower random changes, higher rates = faster/noisier modulation.'
+    },
+    // ENV Mode
+    'ppmod-panel-env': {
+        name: 'ENV Mode',
+        desc: 'Attack-Decay envelope triggered by note events. Creates one-shot modulation bursts on each trigger. Classic for pitch/filter transients.'
+    },
+    'ppmod-env-source-btns': {
+        name: 'Envelope Source',
+        desc: 'What triggers the envelope. NOTE=note-on events, AMP=follows amplitude envelope, FILT=follows filter envelope. Use TRIG/RST for external triggers.'
+    },
+    'ppmod-env-attack': {
+        name: 'Attack Time',
+        desc: 'Time to rise from 0 to peak (0.2ms-8s). Short attacks = snappy transients, long attacks = slow swells. Logarithmic scaling for fine control.'
+    },
+    'ppmod-env-release': {
+        name: 'Release/Decay Time',
+        desc: 'Time to fall from peak back to 0 (0.2ms-8s). Short decays = plucky, long decays = sustained. Logarithmic scaling for fine control.'
+    },
+    'ppmod-env-curve-btns': {
+        name: 'Curve Shape',
+        desc: 'Envelope curve type. LIN=linear/straight, EXP=exponential/punchy (fast start), LOG=logarithmic/soft (slow start), S=S-curve/smooth.'
+    },
+    // EF Mode
+    'ppmod-panel-ef': {
+        name: 'EF Mode',
+        desc: 'Envelope Follower. Tracks the amplitude of an audio source to generate modulation. Classic for auto-wah, ducking, and dynamics-based effects.'
+    },
+    'ppmod-ef-source-btns': {
+        name: 'Audio Source',
+        desc: 'Which audio signal to follow. RÆMBL=synth output, BÆNG=drum output, MASTER=combined mix. Use for sidechain-style ducking or auto-wah.'
+    },
+    'ppmod-ef-attack': {
+        name: 'Attack Time',
+        desc: 'How fast the follower responds to rising levels (1-1000ms). Short = responsive, long = smoothed. Affects how quickly transients register.'
+    },
+    'ppmod-ef-release': {
+        name: 'Release Time',
+        desc: 'How fast the follower responds to falling levels (1-1000ms). Short = tight tracking, long = sustained/smoothed response.'
+    },
+    'ppmod-ef-sensitivity': {
+        name: 'Sensitivity',
+        desc: 'Input gain/sensitivity (0-200%). Higher values = stronger response to quieter signals. Adjust to match input dynamics.'
+    },
+    // TM Mode
+    'ppmod-panel-tm': {
+        name: 'TM Mode',
+        desc: 'Turing Machine - probabilistic step sequencer inspired by Music Thing Modular. Each step has a random value that may mutate on each pass. Creates evolving, semi-random patterns.'
+    },
+    'ppmod-tm-length': {
+        name: 'Pattern Length',
+        desc: 'Number of steps in the Turing Machine pattern (1-16). Shorter = faster cycling, longer = more variation before repeat.'
+    },
+    'ppmod-tm-prob': {
+        name: 'Mutation Probability',
+        desc: 'Chance that each step value mutates on playback (0-100%). 0%=locked pattern, 100%=fully random, 50%=evolving/drifting. The sweet spot for organic variation.'
+    },
+    'ppmod-tm-randomise': {
+        name: 'Randomise Pattern',
+        desc: 'Generates a completely new random pattern. Use when you want a fresh starting point for the Turing Machine.'
+    },
+    // SEQ Mode
+    'ppmod-panel-seq': {
+        name: 'SEQ Mode',
+        desc: 'Step Sequencer. Manually draw a pattern of values that cycles through in sync with triggers. Classic for arpeggios, rhythmic filter patterns, and CV-style modulation.'
+    },
+    'ppmod-seq-length': {
+        name: 'Sequence Length',
+        desc: 'Number of steps in the sequence (1-16). Drag the step bars to set values. The sequence advances on each trigger event.'
+    },
+    'ppmod-seq-editor': {
+        name: 'Step Editor',
+        desc: 'Drag step bars up/down to set values (0-100%). The current playback step is highlighted. Each step outputs its value until the next trigger advances the sequence.'
     }
 };
 

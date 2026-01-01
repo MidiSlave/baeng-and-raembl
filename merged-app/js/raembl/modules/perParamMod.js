@@ -1670,8 +1670,9 @@ export function initPerParamModulation() {
     document.addEventListener('raemblStepAdvanced', handleSeqClockStep);
     document.addEventListener('clockTick', handleSeqClockStep); // Also listen for shared clock
 
-    // Bar boundary trigger (check isBarStart in step events)
-    document.addEventListener('raemblStepAdvanced', handleBarTrigger);
+    // Bar boundary triggers (separate for each app's bar length)
+    document.addEventListener('raemblStepAdvanced', handleRaemblBarTrigger);
+    document.addEventListener('baengStepAdvanced', handleBaengBarTrigger);
 
     // Cross-app triggers: Ræmbl can respond to Bæng voice triggers
     document.addEventListener('trackTriggered', handleBaengTrigger);
@@ -1681,26 +1682,49 @@ export function initPerParamModulation() {
 
 }
 
-// --- Bar Boundary Trigger Handler ---
+// --- Bar Boundary Trigger Handlers ---
 
 /**
- * Handle bar boundary triggers
- * Check if any modulations have triggerSource='bar' or resetSource='bar'
+ * Handle Ræmbl bar boundary triggers
+ * Check if any modulations have triggerSource='raemblBar' or resetSource='raemblBar'
  */
-function handleBarTrigger(event) {
+function handleRaemblBarTrigger(event) {
     const isBarStart = event.detail?.isBarStart;
     if (!isBarStart) return;
 
     for (const [paramId, modConfig] of Object.entries(state.perParamModulations)) {
         if (!modConfig.enabled) continue;
 
-        // Handle trigger on bar
-        if (modConfig.triggerSource === 'bar') {
+        // Handle trigger on Ræmbl bar
+        if (modConfig.triggerSource === 'raemblBar') {
             handleModTriggerAction(paramId, modConfig);
         }
 
-        // Handle reset on bar
-        if (modConfig.resetSource === 'bar') {
+        // Handle reset on Ræmbl bar
+        if (modConfig.resetSource === 'raemblBar') {
+            handleModResetAction(paramId, modConfig);
+        }
+    }
+}
+
+/**
+ * Handle Bæng bar boundary triggers
+ * Check if any modulations have triggerSource='baengBar' or resetSource='baengBar'
+ */
+function handleBaengBarTrigger(event) {
+    const isBarStart = event.detail?.isBarStart;
+    if (!isBarStart) return;
+
+    for (const [paramId, modConfig] of Object.entries(state.perParamModulations)) {
+        if (!modConfig.enabled) continue;
+
+        // Handle trigger on Bæng bar
+        if (modConfig.triggerSource === 'baengBar') {
+            handleModTriggerAction(paramId, modConfig);
+        }
+
+        // Handle reset on Bæng bar
+        if (modConfig.resetSource === 'baengBar') {
             handleModResetAction(paramId, modConfig);
         }
     }
