@@ -4520,7 +4520,9 @@ function initEffects() {
     // Clouds processor will be created when worklet is loaded (async)
     // For now, connect input analyser directly to output analyser as passthrough
     config.cloudsInputAnalyser.connect(config.cloudsOutputAnalyser);
-    config.cloudsOutputAnalyser.connect(config.masterGain);
+    // Insert ducking gain between Clouds output and master (like reverb/delay)
+    config.cloudsOutputAnalyser.connect(config.duckingGains.baengClouds);
+    config.duckingGains.baengClouds.connect(config.masterGain);
 
     // Flag to track if Clouds processor is ready
     config.cloudsReady = false;
@@ -5092,18 +5094,26 @@ export function startBusVisualization() {
     function draw() {
         busAnimationId = requestAnimationFrame(draw);
 
-        // Update theme colours every 60 frames (~1 second)
-        frameCount++;
-        if (frameCount % 60 === 0) {
-            const styles = getComputedStyle(document.documentElement);
-            themeColor = styles.getPropertyValue('--theme-color').trim() || '#FFDC32';
-            bgModule = styles.getPropertyValue('--bg-module').trim() || '#111111';
+        // Safety check - stop animation if canvas/analyser become invalid
+        if (!canvas.isConnected || !config.busOutputAnalyser) {
+            console.warn('[Bæng] BUS visualisation stopped - canvas or analyser unavailable');
+            stopBusVisualization();
+            return;
         }
 
-        // Get time-domain data for waveform
-        config.busOutputAnalyser.getByteTimeDomainData(waveformData);
-        // Get frequency data for boom meter (sub-bass region)
-        config.busOutputAnalyser.getByteFrequencyData(freqData);
+        try {
+            // Update theme colours every 60 frames (~1 second)
+            frameCount++;
+            if (frameCount % 60 === 0) {
+                const styles = getComputedStyle(document.documentElement);
+                themeColor = styles.getPropertyValue('--theme-color').trim() || '#FFDC32';
+                bgModule = styles.getPropertyValue('--bg-module').trim() || '#111111';
+            }
+
+            // Get time-domain data for waveform
+            config.busOutputAnalyser.getByteTimeDomainData(waveformData);
+            // Get frequency data for boom meter (sub-bass region)
+            config.busOutputAnalyser.getByteFrequencyData(freqData);
 
         // Clear canvas (theme-aware background, matches other Bæng visualisations)
         ctx.fillStyle = bgModule;
@@ -5151,6 +5161,10 @@ export function startBusVisualization() {
         if (boomContribution > 0) {
             ctx.fillStyle = createThemeGradient(ctx, 0, 0, width, 0);
             ctx.fillRect(0, height - boomMeterHeight, width * Math.min(1, boomContribution * 2), boomMeterHeight);
+        }
+        } catch (err) {
+            console.error('[Bæng] BUS visualisation error:', err);
+            stopBusVisualization();
         }
     }
 

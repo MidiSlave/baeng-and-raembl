@@ -41,8 +41,12 @@ export function initSidechainModal() {
         return;
     }
 
-    // Close button
+    // Close button (with touch support for mobile/iPad)
     closeBtn.addEventListener('click', closeDuckModal);
+    closeBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        closeDuckModal();
+    }, { passive: false });
 
     // Close on Escape key
     document.addEventListener('keydown', (e) => {

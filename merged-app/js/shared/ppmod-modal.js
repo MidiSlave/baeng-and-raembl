@@ -56,6 +56,24 @@ const ENV_CURVE_NAMES = ['LIN', 'EXP', 'LOG', 'S'];
 let animFrameId = null;
 
 // ============================================================================
+// Touch Support Helper
+// ============================================================================
+
+/**
+ * Add both click and touchend handlers for reliable touch device support
+ * @param {HTMLElement} element - Element to attach handlers to
+ * @param {Function} handler - Handler function to call
+ */
+function addTouchClick(element, handler) {
+    if (!element) return;
+    element.addEventListener('click', handler);
+    element.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        handler(e);
+    }, { passive: false });
+}
+
+// ============================================================================
 // Initialisation
 // ============================================================================
 
@@ -73,8 +91,8 @@ export function initPPModModal() {
         return;
     }
 
-    // Close button
-    closeBtn.addEventListener('click', closePPModModal);
+    // Close button (with touch support for mobile/iPad)
+    addTouchClick(closeBtn, closePPModModal);
 
     // Close on Escape key
     document.addEventListener('keydown', (e) => {
@@ -100,26 +118,30 @@ export function initPPModModal() {
     document.addEventListener('mouseup', stopDrag);
     document.addEventListener('touchend', stopDrag);
 
-    // Mode tab clicks
+    // Mode tab clicks (with touch support for mobile/iPad)
     modal.querySelectorAll('.ppmod-tab').forEach(tab => {
-        tab.addEventListener('click', (e) => {
+        const handler = (e) => {
             const mode = e.target.dataset.mode;
             if (mode) {
                 selectMode(mode);
             }
-        });
+        };
+        addTouchClick(tab, handler);
     });
 
-    // Voice selector button clicks (for Bæng per-voice params)
+    // Voice selector button clicks (for Bæng per-voice params, with touch support)
     const voiceSelector = document.getElementById('ppmod-voice-selector');
     if (voiceSelector) {
         voiceSelector.querySelectorAll('.ppmod-voice-btn').forEach((btn, i) => {
-            btn.addEventListener('click', () => handleVoiceSelect(i));
+            addTouchClick(btn, () => handleVoiceSelect(i));
         });
     }
 
-    // Reset button
-    document.getElementById('ppmod-reset-btn')?.addEventListener('click', handleReset);
+    // Reset button (with touch support for mobile/iPad)
+    const resetBtn = document.getElementById('ppmod-reset-btn');
+    if (resetBtn) {
+        addTouchClick(resetBtn, handleReset);
+    }
 
     // Common controls
     setupCommonControls();
@@ -183,12 +205,14 @@ function setupCommonControls() {
     setupCustomDropdown('ppmod-trigger-dropdown', 'triggerSource');
     setupCustomDropdown('ppmod-reset-dropdown', 'resetSource');
 
-    // Close dropdowns when clicking outside
-    document.addEventListener('click', (e) => {
+    // Close dropdowns when clicking/tapping outside (with touch support)
+    const closeDropdownsHandler = (e) => {
         if (!e.target.closest('.ppmod-dropdown')) {
             closeAllDropdowns();
         }
-    });
+    };
+    document.addEventListener('click', closeDropdownsHandler);
+    document.addEventListener('touchend', closeDropdownsHandler);
 }
 
 /**
@@ -202,19 +226,24 @@ function setupCustomDropdown(dropdownId, paramName) {
     const menu = dropdown.querySelector('.ppmod-dropdown-menu');
     const items = dropdown.querySelectorAll('.ppmod-dropdown-item');
 
-    // Toggle dropdown on button click
-    btn.addEventListener('click', (e) => {
+    // Toggle dropdown on button click/tap (with touch support)
+    const toggleHandler = (e) => {
         e.stopPropagation();
         const isOpen = dropdown.classList.contains('open');
         closeAllDropdowns();
         if (!isOpen) {
             dropdown.classList.add('open');
         }
-    });
+    };
+    btn.addEventListener('click', toggleHandler);
+    btn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        toggleHandler(e);
+    }, { passive: false });
 
-    // Handle item selection
+    // Handle item selection (with touch support)
     items.forEach(item => {
-        item.addEventListener('click', (e) => {
+        const selectHandler = (e) => {
             e.stopPropagation();
             const value = item.dataset.value;
             const label = item.textContent;
@@ -231,7 +260,12 @@ function setupCustomDropdown(dropdownId, paramName) {
 
             // Update modulation param
             updateModulationParam(paramName, value);
-        });
+        };
+        item.addEventListener('click', selectHandler);
+        item.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            selectHandler(e);
+        }, { passive: false });
     });
 }
 

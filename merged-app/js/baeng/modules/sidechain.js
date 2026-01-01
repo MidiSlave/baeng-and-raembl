@@ -49,6 +49,7 @@ export function initSidechainBus(ctx) {
     config.duckingGains = {
         baengReverb: ctx.createGain(),
         baengDelay: ctx.createGain(),
+        baengClouds: ctx.createGain(),
         raemblReverb: ctx.createGain(),
         raemblDelay: ctx.createGain(),
         raemblClouds: ctx.createGain()
@@ -58,6 +59,7 @@ export function initSidechainBus(ctx) {
     config.duckingAnalysers = {
         baengReverb: ctx.createAnalyser(),
         baengDelay: ctx.createAnalyser(),
+        baengClouds: ctx.createAnalyser(),
         raemblReverb: ctx.createAnalyser(),
         raemblDelay: ctx.createAnalyser(),
         raemblClouds: ctx.createAnalyser()
