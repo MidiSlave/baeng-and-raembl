@@ -167,3 +167,22 @@ export function ensureLfoAnimationRunning() {
     }
     return false;
 }
+
+// --- PPMod Update Functions ---
+// These are called by perParamMod.js when modulating LFO parameters
+
+export function updateLfoRate(rate) {
+    state.lfoFreq = Math.max(0, Math.min(100, rate));
+}
+
+export function updateLfoDepth(depth) {
+    state.lfoAmp = Math.max(0, Math.min(100, depth));
+}
+
+export function updateLfoWaveform(waveform) {
+    state.lfoWaveform = Math.max(0, Math.min(100, waveform));
+}
+
+export function updateLfoOffset(offset) {
+    state.lfoOffset = Math.max(-100, Math.min(100, offset));
+}

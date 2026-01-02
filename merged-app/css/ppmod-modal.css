@@ -1023,3 +1023,28 @@
     background: var(--theme-gradient-h);
     border-color: transparent;
 }
+
+/* ============================================================================
+   PPMod Warning LED States
+   ============================================================================ */
+/* Applied to fader LEDs when modulating parameters that could cause issues */
+
+.fader-led.ppmod-warn {
+    background: linear-gradient(to top, #ff6600 0%, #ff9933 100%);
+    box-shadow: 0 0 8px rgba(255, 102, 0, 0.8);
+}
+
+.fader-led.ppmod-danger {
+    background: linear-gradient(to top, #cc0000 0%, #ff3333 100%);
+    box-shadow: 0 0 10px rgba(204, 0, 0, 0.9);
+    animation: ppmod-danger-pulse 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes ppmod-danger-pulse {
+    from {
+        box-shadow: 0 0 10px rgba(204, 0, 0, 0.9);
+    }
+    to {
+        box-shadow: 0 0 15px rgba(255, 51, 51, 1);
+    }
+}

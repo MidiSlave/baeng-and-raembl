@@ -543,3 +543,40 @@ export function initFactors() {
 
     updateAnimationState();
 }
+
+// --- PPMod Update Functions ---
+// These are called by perParamMod.js when modulating FACTORS parameters
+
+export function updateFactorsSteps(steps) {
+    state.steps = Math.max(1, Math.round(steps));
+    updateFactorsPattern();
+}
+
+export function updateFactorsFills(fills) {
+    state.fills = Math.max(1, Math.round(fills));
+    updateFactorsPattern();
+}
+
+export function updateFactorsRotation(rotation) {
+    state.rotation = Math.round(rotation);
+    updateFactorsPattern();
+}
+
+export function updateFactorsAccentAmt(accentAmt) {
+    state.accentAmt = Math.max(0, Math.round(accentAmt));
+    updateFactorsPattern();
+}
+
+export function updateFactorsSlideAmt(slideAmt) {
+    state.slideAmt = Math.max(0, Math.round(slideAmt));
+    updateFactorsPattern();
+}
+
+export function updateFactorsTrillAmt(trillAmt) {
+    state.trillAmt = Math.max(0, Math.round(trillAmt));
+    updateFactorsPattern();
+}
+
+export function updateFactorsGateLength(gateLength) {
+    state.gateLength = Math.max(5, Math.min(100, gateLength));
+}

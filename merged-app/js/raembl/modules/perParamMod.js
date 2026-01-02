@@ -7,6 +7,9 @@ import { updateFilter, updateReverb, updateReverbSendLevel, updateDelay } from '
 import { updatePulseWidth, updateOscillatorTransposition, updateMixerLevels, calculateKeyTrackedBaseCutoff as calculateKeyTrackedBaseCutoffFromVoice } from '../audio/voice.js';
 import { drawDelay, startDelayAnimation } from './delay.js';
 import { drawReverb } from './reverb.js';
+import { updateFactorsPattern } from './factors.js';
+import { drawLfo } from './lfo.js';
+import { drawPath } from './path.js';
 import { mapRange } from '../utils.js';
 import { updateCloudsParameter } from './clouds.js';
 import { updatePlaitsParameter, updateRingsParameter } from '../audio.js';
@@ -62,6 +65,27 @@ const DEFAULT_MOD_CONFIG = {
     resetSource: 'none',   // 'none'|'T1'-'T6'|'SUM'|'bar'|'noteOn'
     baseValue: null,  // Stored base value (set when modulation enabled)
     muted: false      // Mute state for temporary disable
+};
+
+// --- Dangerous Parameter Registry ---
+// Parameters that can cause audio issues or silence when modulated to extreme values
+const PPMOD_DANGEROUS_PARAMS = {
+    'factors.steps': {
+        severity: 'WARN',
+        minSafe: 1,
+        reason: 'Modulating to 0 silences pattern'
+    },
+    'factors.fills': {
+        severity: 'WARN',
+        minSafe: 1,
+        reason: '0 fills prevents all triggers'
+    },
+    'factors.gateLength': {
+        severity: 'DANGER',
+        minSafe: 5,
+        maxSafe: 95,
+        reason: '<5% risks trigger loss, >95% stuck gates'
+    }
 };
 
 // Audio-rate parameter IDs (use per-voice oscillators)
@@ -1157,8 +1181,25 @@ function applyModulatedValue(paramId, modulatedValue, baseValue) {
     const paramDef = parameterDefinitions[paramId];
     if (!paramDef) return;
 
-    // Round octave transposition params to integers (they use lookup tables)
-    if (paramId === 'osc.oct' || paramId === 'osc.subOct') {
+    // --- Dangerous Parameter Bounds Enforcement ---
+    const dangerousConfig = PPMOD_DANGEROUS_PARAMS[paramId];
+    if (dangerousConfig) {
+        if (dangerousConfig.minSafe !== undefined && modulatedValue < dangerousConfig.minSafe) {
+            console.warn(`[PPMod] ${paramId} clamped to ${dangerousConfig.minSafe}: ${dangerousConfig.reason}`);
+            modulatedValue = dangerousConfig.minSafe;
+        }
+        if (dangerousConfig.maxSafe !== undefined && modulatedValue > dangerousConfig.maxSafe) {
+            console.warn(`[PPMod] ${paramId} clamped to ${dangerousConfig.maxSafe}: ${dangerousConfig.reason}`);
+            modulatedValue = dangerousConfig.maxSafe;
+        }
+    }
+
+    // Round integer params to prevent decimal display values
+    if (paramId === 'osc.oct' || paramId === 'osc.subOct' ||
+        paramId === 'factors.steps' || paramId === 'factors.fills' ||
+        paramId === 'factors.shift' || paramId === 'factors.accentAmt' ||
+        paramId === 'factors.slideAmt' || paramId === 'factors.trillAmt' ||
+        paramId === 'path.scale' || paramId === 'path.root') {
         modulatedValue = Math.round(modulatedValue);
     }
 
@@ -1268,6 +1309,43 @@ function applyModulatedValue(paramId, modulatedValue, baseValue) {
         case 'rings.position':
             // Normalise 0-100 to 0-1 range for Rings AudioParams
             updateRingsParameter(paramId, modulatedValue / 100);
+            break;
+
+        // FACTORS parameters (Euclidean pattern generator)
+        case 'factors.steps':
+        case 'factors.fills':
+        case 'factors.shift':
+        case 'factors.accentAmt':
+        case 'factors.slideAmt':
+        case 'factors.trillAmt':
+            // State already rounded and updated above - regenerate pattern
+            updateFactorsPattern();
+            break;
+
+        case 'factors.gateLength':
+            // Gate length doesn't regenerate pattern, just affects note duration
+            // State already updated above
+            break;
+
+        // LFO parameters (main LFO that drives PATH sampling)
+        case 'lfo.amp':
+        case 'lfo.freq':
+        case 'lfo.waveform':
+        case 'lfo.offset':
+            // LFO values are read directly from state in updateLfoValue()
+            // Animation loop redraws continuously
+            break;
+
+        // PATH parameters (scale quantisation and triggering)
+        case 'path.scale':
+        case 'path.root':
+            // State already rounded and updated above
+            // Redraw path visualisation
+            drawPath();
+            break;
+
+        case 'path.probability':
+            // Probability is read directly from state in handleSampleTrigger()
             break;
 
         // Envelope, Mod LFO parameters don't need update calls
@@ -2306,9 +2384,32 @@ export function updateModulationVisualFeedback() {
         const opacity = 0.3 + (waveValue + 1) * 0.35;
 
         if (isSlidePotOnly) {
-            // SlidePot-only: just update LED brightness
+            // SlidePot-only: update LED brightness and value display text
             elements.slidePot.setModulating(true);
             elements.slidePot.setLedBrightness(opacity);
+
+            // Calculate modulated value for display
+            const baseValue = modConfig.baseValue !== null ? modConfig.baseValue : state[paramDef.statePath];
+            const modAmount = (waveValue * modConfig.depth * 0.5) + modConfig.offset;
+            const range = paramDef.max - paramDef.min;
+            let modulatedValue = baseValue + (modAmount / 100) * range;
+            modulatedValue = Math.max(paramDef.min, Math.min(paramDef.max, modulatedValue));
+
+            // Round integer params
+            if (paramDef.step === 1 || paramId.startsWith('factors.') ||
+                paramId === 'path.scale' || paramId === 'path.root') {
+                modulatedValue = Math.round(modulatedValue);
+            }
+
+            // Update ONLY the value text display (not knob position)
+            const valueEl = elements.slidePot.container?.querySelector('.slide-pot-value');
+            if (valueEl) {
+                // Use SlidePot's formatter if available
+                const formatted = elements.slidePot.options?.formatValue
+                    ? elements.slidePot.options.formatValue(modulatedValue)
+                    : modulatedValue;
+                valueEl.textContent = formatted;
+            }
         } else {
             // Legacy fader: full visual feedback
 
@@ -2331,6 +2432,16 @@ export function updateModulationVisualFeedback() {
             // Update fader fill to show modulated value in real-time
             elements.fill.style.height = `${Math.min(100, Math.max(0, modulatedPercent))}%`;
             elements.fill.classList.add('modulation-active');
+
+            // Update value display text if available
+            if (elements.valueDisplay) {
+                // Round integer params for display
+                const displayValue = (paramDef.step === 1 || paramId.startsWith('factors.') ||
+                    paramId === 'path.scale' || paramId === 'path.root')
+                    ? Math.round(modulatedValue)
+                    : modulatedValue.toFixed(0);
+                elements.valueDisplay.textContent = displayValue;
+            }
 
             // Show reference line at base value
             elements.baseLine.classList.add('active');

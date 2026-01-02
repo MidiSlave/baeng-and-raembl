@@ -514,3 +514,22 @@ export function initPath() {
 
     updateAnimationState();
 }
+
+// --- PPMod Update Functions ---
+// These are called by perParamMod.js when modulating PATH parameters
+
+export function updatePathScale(scale) {
+    state.scale = Math.max(0, Math.min(31, Math.round(scale)));
+}
+
+export function updatePathRoot(root) {
+    state.root = Math.max(0, Math.min(11, Math.round(root)));
+}
+
+export function updatePathProbability(probability) {
+    state.probability = Math.max(0, Math.min(100, probability));
+}
+
+export function updatePathGateLength(gateLength) {
+    state.gateLength = Math.max(5, Math.min(100, gateLength));
+}
